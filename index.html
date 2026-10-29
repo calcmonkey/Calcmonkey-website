@@ -713,7 +713,7 @@ var store={
 get:function(k,d){try{var v=localStorage.getItem('cm_'+k);return v===null?d:JSON.parse(v);}catch(e){return d;}},
 set:function(k,v){try{localStorage.setItem('cm_'+k,JSON.stringify(v));}catch(e){}}
 };
-var S={grade:store.get('grade',2),bananas:store.get('bananas',0),xp:store.get('xp',0),look:store.get('look',{head:'cap',eyes:'',neck:'',top:'tee',bottom:'jeans',feet:'sneakers',hand:'banana'}),scene:store.get('scene','jungle'),mname:store.get('mname','Milo'),newsc:store.get('newsc',''),sound:store.get('sound',true),best:store.get('best',{})};
+var S={grade:store.get('grade',2),bananas:store.get('bananas',0),xp:store.get('xp',0),look:store.get('look',{head:'cap',eyes:'',neck:'',top:'tee',bottom:'jeans',feet:'sneakers',hand:'banana'}),scene:store.get('scene','jungle'),mname:(function(n){return !n||n==='Milo'?'Mochi':n;})(store.get('mname','Mochi')),newsc:store.get('newsc',''),sound:store.get('sound',true),best:store.get('best',{})};
 function setBest(k,v,lowerIsBetter){var b=S.best[k];if(b==null||(lowerIsBetter?v<b:v>b)){S.best[k]=v;store.set('best',S.best);return true;}return false;}
 
 /* ================= helpers ================= */
@@ -1708,7 +1708,7 @@ return [{t:'When a problem has lots of operations, everyone agrees on the same o
 };
 
 /* ---------- Jungle Word Trek: multi-step word problems (grades 2–6) ---------- */
-var KNAMES=['Milo','Coco','Kiki','Bongo','Lulu','Zuri','Pip','Mango'];
+var KNAMES=['Mochi','Coco','Kiki','Bongo','Lulu','Zuri','Pip','Mango'];
 function money(n){return '$'+(Math.round(n*100)/100).toFixed(2);}
 var WORD={
 2:[function(N){var a=rnd(15,45),b=rnd(12,40),c=rnd(10,a+b-5);return {story:N+' picked '+a+' bananas in the morning and '+b+' bananas in the afternoon. Then '+N+' gave '+c+' bananas to friends. How many bananas does '+N+' have now?',plan:['How many bananas '+N+' picked in all','How many friends '+N+' has','How many bananas the friends ate'],steps:[{q:'How many bananas did '+N+' pick in all?',a:a+b,hint:'Add the morning and afternoon bananas: '+a+' + '+b+'.'},{q:'How many are left after giving away '+c+'?',a:a+b-c,hint:'Subtract: '+(a+b)+' − '+c+'.'}],ans:a+b-c,unit:'bananas'};},
@@ -2596,7 +2596,7 @@ q(view,'items').onclick=function(e){var b=e.target.closest('.cm-item');if(!b)ret
 q(view,'preset').onclick=function(){var L=sceneById(S.scene).look,n={};SLOTS.forEach(function(s){n[s[0]]=L[s[0]]||'';});S.look=n;save();sfxWin();paintScene();paintItems();};
 q(view,'rand').onclick=function(){SLOTS.forEach(function(s){var ids=Object.keys(ITEMS).filter(function(id){return ITEMS[id].slot===s[0]&&itemOpen(id);});if(s[0]!=='top'&&s[0]!=='bottom')ids.push('','');S.look[s[0]]=ids.length?pick(ids):'';});save();sfxGood();paintScene();paintItems();};
 q(view,'none').onclick=function(){SLOTS.forEach(function(s){S.look[s[0]]='';});save();paintScene();paintItems();};
-q(view,'nm').addEventListener('input',function(){var v=this.value.trim()||'Milo';S.mname=v;store.set('mname',v);root.querySelectorAll('.cm-h3').forEach(function(h){if(/Closet/.test(h.textContent))h.textContent='👕 '+v+'’s Closet';});});
+q(view,'nm').addEventListener('input',function(){var v=this.value.trim()||'Mochi';S.mname=v;store.set('mname',v);root.querySelectorAll('.cm-h3').forEach(function(h){if(/Closet/.test(h.textContent))h.textContent='👕 '+v+'’s Closet';});});
 paintScene();paintAdv();paintTabs();paintItems();
 }
 var labF='all',labQ='';
