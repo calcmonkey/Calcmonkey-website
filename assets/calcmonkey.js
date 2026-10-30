@@ -2091,7 +2091,14 @@ var ok=cone.length===order.s.length&&cone.every(function(v,i){return v===order.s
 if(ok){busy=true;cu.classList.remove('want');mkA.classList.add('give');c.T.after(function(){mkA.classList.remove('give');cone=[];cherry=false;paint();},800);var tip=1+(Date.now()-t0<9000?1:0);tips+=tip;n++;sfxGood();bub.innerHTML='<b class="cm-iyum">Yum! ❤️</b><small>+'+tip+' 🪙 tip'+(tip>1?'s':'')+'</small>';cu.classList.add('happy');
 c.say(80,30,'+'+tip+' 🪙');info();c.T.after(function(){cu.className='cm-icust out';},900);
 c.T.after(function(){if(n>=N)c.end('Mochi’s ice cream stand was a hit!','You served <b>'+N+'</b> happy customers and earned <b>'+tips+'</b> tips 🪙');else next();},1500);}
-else{sfxBad();bub.innerHTML='<small>Hmm… that’s not what I ordered!</small>';cu.classList.remove('nope');void cu.offsetWidth;cu.classList.add('nope');c.T.after(function(){if(order)showOrder();},1300);}
+else{sfxBad();bub.innerHTML='<small>Hmm… that’s not what I ordered!</small>';cu.classList.remove('nope');void cu.offsetWidth;cu.classList.add('nope');
+busy=true;var keep=0;while(keep<cone.length&&keep<order.s.length&&cone[keep]===order.s[keep])keep++;
+var drop=cone.slice(keep),dropCh=cherry&&(keep<cone.length||!order.ch);
+c.T.after(function(){
+var mk=mkA.querySelector('.cm-icone');if(mk){var sc=mk.querySelectorAll('i');for(var q=0;q<drop.length;q++){var el=sc[q];if(el)el.classList.add('cm-idrop');}if(dropCh){var ch=mk.querySelector('em');if(ch)ch.classList.add('cm-idrop');}}
+if(drop.length||dropCh){tone(300,.12,'sine');tone(220,.15,'sine',.1);}
+c.T.after(function(){cone=cone.slice(0,keep);if(dropCh)cherry=false;paint();busy=false;if(order)showOrder();},550);
+},600);}
 }
 next();
 },

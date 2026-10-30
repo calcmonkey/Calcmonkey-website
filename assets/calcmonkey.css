@@ -1055,3 +1055,5 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-toast b{color:#c2410c}
 @media(prefers-reduced-motion:reduce){.cm-rays,.cm-sparks i,.cm-unbanner b{animation:none}}
 .cm-unbanner{margin-bottom:14px}@media(max-width:560px){.cm-unbanner{margin-bottom:16px}.cm-ticket{padding:4px 12px}}
+.cm-icone .cm-idrop{animation:cm-idrop .55s ease-in forwards}
+@keyframes cm-idrop{to{transform:translate(40px,160px) rotate(80deg);opacity:0}}
