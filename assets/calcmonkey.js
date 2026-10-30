@@ -2476,7 +2476,7 @@ window.addEventListener('hashchange',function(){if((location.hash||'').indexOf('
 
 /* ================= parent sign-in: save progress to the cloud (Firebase) ================= */
 /* Paste the Firebase web config here. null = sign-in is hidden. */
-var FB_CONFIG=null;
+var FB_CONFIG={apiKey:"AIzaSyB5Ear37v7jUHgJkm7dhyn1kprrnLLWLn8",authDomain:"calc-monkey.firebaseapp.com",projectId:"calc-monkey",storageBucket:"calc-monkey.firebasestorage.app",messagingSenderId:"845993172331",appId:"1:845993172331:web:e9ce3efe63bc292957002e"};
 var FB_VER='10.12.2',SYNC_KEYS=['grade','bananas','xp','look','scene','mname','best','labprog'];
 var cloud={user:null,ready:false,loading:null,saving:false,timer:null,applying:false,db:null};
 function acctBtn(){return root.querySelector('#cm-acct');}
