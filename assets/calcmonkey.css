@@ -1057,3 +1057,18 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-unbanner{margin-bottom:14px}@media(max-width:560px){.cm-unbanner{margin-bottom:16px}.cm-ticket{padding:4px 12px}}
 .cm-icone .cm-idrop{animation:cm-idrop .55s ease-in forwards}
 @keyframes cm-idrop{to{transform:translate(40px,160px) rotate(80deg);opacity:0}}
+/* math game win screens: make finishing feel like a party */
+.cm-overlay.cm-ovwin{overflow:hidden;background:radial-gradient(circle at 50% 45%,rgba(124,58,237,.55),rgba(43,35,80,.7))}
+.cm-overlay.cm-ovwin::before{content:"";position:absolute;left:50%;top:50%;width:240%;aspect-ratio:1;margin:-120% 0 0 -120%;background:repeating-conic-gradient(rgba(253,224,71,.3) 0 8deg,transparent 8deg 20deg);animation:cm-spin 16s linear infinite;pointer-events:none}
+.cm-overlay.cm-ovfix.cm-ovwin::before{width:240vmax;margin:-120vmax 0 0 -120vmax}
+.cm-ovwin .cm-ovbox{position:relative;z-index:1;border-color:#b45309;box-shadow:0 0 0 5px #fde047,0 8px 0 5px #b45309,0 0 40px 10px rgba(253,224,71,.5);animation:cm-unpop .6s cubic-bezier(.2,1.6,.5,1)}
+.cm-cheer{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(26px,5.5vw,40px);line-height:1;color:#ff7a1a;text-shadow:0 3px 0 #b45309,0 0 14px #fde047;text-align:center;margin-bottom:4px;animation:cm-cheerin .6s .1s cubic-bezier(.2,1.8,.5,1) both,cm-nextp 1s .8s ease-in-out infinite}
+@keyframes cm-cheerin{from{transform:scale(.3) rotate(-12deg);opacity:0}}
+.cm-wbar{margin:4px 0 12px;text-align:left}
+.cm-wbarl{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800;font-size:14px;flex-wrap:wrap}
+.cm-wearn{font-family:'Baloo 2',sans-serif;font-size:22px;color:#15803d;background:#dcfce7;border:2px solid #15803d;border-radius:999px;padding:0 10px}
+.cm-wbar .cm-kmeter{height:14px;margin-top:4px}
+.cm-wbar .cm-kmeter i{transition:width 1.1s cubic-bezier(.3,.9,.4,1)}
+.cm-ovshort .cm-cheer{font-size:22px;text-align:left}
+.cm-ovshort .cm-wbar{margin:2px 0 6px;clear:both}.cm-ovshort .cm-wearn{font-size:16px}.cm-ovshort .cm-wbarl{font-size:12px}
+@media(prefers-reduced-motion:reduce){.cm-overlay.cm-ovwin::before,.cm-cheer{animation:none}}

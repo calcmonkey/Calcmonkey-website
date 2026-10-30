@@ -274,10 +274,27 @@ var CONF=['#ff5fa2','#ffd23f','#22c55e','#38bdf8','#8b5cf6','#ff8c42'];
 function confetti(box){for(var i=0;i<26;i++){var c=document.createElement('i');c.className='cm-conf';c.style.left=rnd(2,96)+'%';c.style.background=pick(CONF);c.style.animationDelay=(Math.random()*.35)+'s';box.appendChild(c);(function(el){setTimeout(function(){el.remove();},1900);})(c);}}
 function floatText(box,x,y,txt){var s=document.createElement('span');s.className='cm-float';s.style.left=x+'px';s.style.top=y+'px';s.textContent=txt;box.appendChild(s);setTimeout(function(){s.remove();},950);}
 function showOv(ov,html,btn,cb){showOv2(ov,html,[[btn,cb]]);}
+var CHEERS=['Banana-tastic!','Math superstar!','You did it!','Super-duper!','Brain power!','Awesome math!','Way to go!','Math champ!','Fantastic!','You rock!','Hooray!','Number ninja!'];
+function winFx(ov){
+var box=ov.querySelector('.cm-ovbox');if(!box)return;ov.classList.add('cm-ovwin');
+box.insertAdjacentHTML('afterbegin','<div class="cm-cheer">'+pick(CHEERS)+'</div>');
+var earned=Math.max(0,S.bananas-GAME_BAN0),btns=box.querySelector('.cm-ovbtns');
+if(earned>0&&btns){
+var nx=nextScene(),prev=SCENES.filter(function(x){return x.need<=GAME_BAN0;}).pop()||SCENES[0],nx0=SCENES.filter(function(x){return x.need>GAME_BAN0;})[0];
+var from=nx0?Math.round((GAME_BAN0-prev.need)/(nx0.need-prev.need)*100):100,to=nx?Math.round((S.bananas-(SCENES.filter(function(x){return x.need<=S.bananas;}).pop().need))/(nx.need-SCENES.filter(function(x){return x.need<=S.bananas;}).pop().need)*100):100;
+if(nx0&&nx!==nx0)to=100;
+btns.insertAdjacentHTML('beforebegin','<div class="cm-wbar"><div class="cm-wbarl"><span class="cm-wearn">+<b>0</b> 🍌</span><span>'+(nx?(nx.need-S.bananas)+' more to '+nx.icon+' '+nx.name:'🏆 Every trip unlocked!')+'</span></div><div class="cm-kmeter"><i style="width:'+from+'%"></i></div></div>');
+var b=box.querySelector('.cm-wearn b'),bar=box.querySelector('.cm-wbar i'),k=0,steps=Math.min(earned,20),tick=setInterval(function(){k++;if(!b.isConnected){clearInterval(tick);return;}b.textContent=Math.round(earned*k/steps);tone(700+k*25,.04,'triangle');if(k>=steps)clearInterval(tick);},Math.max(45,900/steps));
+setTimeout(function(){if(bar.isConnected)bar.style.width=to+'%';},150);
+}
+[0,450,950].forEach(function(t){setTimeout(function(){if(ov.isConnected&&!ov.classList.contains('hide'))confetti(ov);},t);});
+[[523,.1,0],[659,.1,.1],[784,.1,.2],[1047,.25,.3],[784,.1,.55],[1047,.35,.65]].forEach(function(n){tone(n[0],n[1],'triangle',n[2]+.05);});
+}
 function showOv2(ov,html,btns){
 ov.classList.remove('cm-ovcoach');
 ov.innerHTML='<div class="cm-ovbox">'+html+'<div class="cm-ovbtns">'+btns.map(function(b,i){return '<button class="cm-bigbtn'+(b[2]?' '+b[2]:'')+'" data-i="'+i+'">'+b[0]+'</button>';}).join('')+'</div></div>';
-ov.classList.remove('hide','cm-ovfix');ov.classList.toggle('cm-ovshort',ov.clientHeight>0&&ov.clientHeight<340);
+ov.classList.remove('hide','cm-ovfix','cm-ovwin');ov.classList.toggle('cm-ovshort',ov.clientHeight>0&&ov.clientHeight<340);
+if(/cm-yay/.test(html))winFx(ov);
 var obx=ov.querySelector('.cm-ovbox');function fitOv(){if(!obx.isConnected||ov.classList.contains('hide')||ov.classList.contains('cm-ovfix'))return;if(ov.clientHeight>0&&(obx.scrollHeight>obx.clientHeight+2||obx.scrollHeight>ov.clientHeight-6)){ov.classList.remove('cm-ovshort');ov.classList.add('cm-ovfix');}}if(obx){fitOv();requestAnimationFrame(fitOv);setTimeout(fitOv,350);setTimeout(fitOv,1200);setTimeout(function(){if(!obx.isConnected||ov.classList.contains('hide')||ov.classList.contains('cm-ovfix'))return;var bb=obx.getBoundingClientRect();if(bb.bottom>window.innerHeight-8||bb.top<0)obx.scrollIntoView({block:'center',behavior:'smooth'});},800);}
 ov.querySelectorAll('.cm-ovbtns button').forEach(function(el){el.onclick=function(){ov.classList.add('hide');btns[+el.getAttribute('data-i')][1]();};});
 }
@@ -2274,7 +2291,7 @@ function start(){c.stop();c.T=timers();c.lay.innerHTML='';c.panelEl.innerHTML=''
 c.setProb(F.icon+' '+F.name);box.querySelector('[data-r="stats"]').innerHTML=chip('🎉 Just for fun');
 showOv(c.ov,'<div class="cm-ovemoji">'+F.icon+'</div><h3>'+F.name+'</h3><p>'+F.intro+'</p>','Let’s go! ▶',start);
 }
-function vFun(id){
+function vFun(id){GAME_BAN0=S.bananas;
 var sc=SCENES.filter(function(s){return s.id===id;})[0];if(!sc||!FUN[id])return go('kids/monkey');
 var back='<a href="#cm/kids/monkey" data-go="kids/monkey">← Back to '+esc(S.mname)+'’s Adventures</a>';
 if(!sceneOpen(sc)){view.innerHTML='<div class="cm-crumbs">'+back+'</div><div class="cm-game" style="text-align:center"><div class="cm-ovemoji">🔒</div><h2 class="cm-gtitle">'+FUN[id].name+'</h2><p style="font-weight:700">This game comes with the <b>'+sc.icon+' '+sc.name+'</b> trip. Earn <b>'+(sc.need-S.bananas)+'</b> more bananas to unlock it!</p><p><a class="cm-bigbtn" href="#cm/kids" data-go="kids">Go play ▶</a></p></div>';return;}
@@ -2321,17 +2338,17 @@ view.innerHTML=miniBanner()+
 '<h2 class="cm-h2">🎉 Adventure Fun <small>Just-for-fun games — every trip '+esc(S.mname)+' unlocks comes with one!</small></h2><div class="cm-kgrid">'+SCENES.map(function(sc){var F=FUN[sc.id],o=sceneOpen(sc);return o?'<a href="#cm/kids/fun-'+sc.id+'" data-go="kids/fun-'+sc.id+'" class="cm-kcard adv" style="--c:#c4f0ff"><div class="cm-kicon">'+F.icon+'</div><h3>'+F.name+'</h3><p>'+F.d+'</p><span class="cm-play">'+sc.icon+' '+sc.name+' ▶</span></a>':'<div class="cm-kcard adv locked" style="--c:#e5e7eb"><div class="cm-kicon">🔒</div><h3>'+F.name+'</h3><p>'+F.d+'</p><span class="cm-play">Unlocks with '+sc.icon+' '+sc.name+' at '+sc.need+' 🍌</span></div>';}).join('')+'</div>';
 view.querySelectorAll('[data-grade]').forEach(function(b){b.onclick=function(){S.grade=+b.getAttribute('data-grade');store.set('grade',S.grade);tone(600,.08,'triangle');vKids();};});
 }
-var CUR_GAME='';
+var CUR_GAME='',GAME_BAN0=0;
 function gameOrder(){return KGAMES.map(function(k){return k.id;}).concat(THINK_BY_GRADE[S.grade]||[],MATHX.map(function(m){return m.id;}));}
 function gameInfo(id){var k=KGAMES.filter(function(x){return x.id===id;})[0];if(k)return k;var m=mxById(id);if(m)return {icon:ADV[m.th].icon,name:ADV[m.th].game};return THINK[id]||KGAMES[0];}
-function nextBtn(){if(PENDING_ADV)setTimeout(announceAdv,800);var o=gameOrder(),n=o[(o.indexOf(CUR_GAME)+1)%o.length],g=gameInfo(n);return ['Next: '+g.icon+' '+g.name+' ▶',function(){go('kids/'+n);},'next'];}
+function nextBtn(){if(PENDING_ADV)setTimeout(announceAdv,2200);var o=gameOrder(),n=o[(o.indexOf(CUR_GAME)+1)%o.length],g=gameInfo(n);return ['Next: '+g.icon+' '+g.name+' ▶',function(){go('kids/'+n);},'next'];}
 function kCards(g,mini){return KGAMES.map(function(k){return '<a href="#cm/kids/'+k.id+'" data-go="kids/'+k.id+'" class="cm-kcard'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d+'</p>')+'<span class="cm-play">Play ▶</span></a>';}).join('')+
 THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d[g]+'</p>')+'<span class="cm-play">Start ▶</span></a>';}).join('')+mxCards(mini);}
 function vKidGame(id){
 if(id==='monkey')return vMonkey();
 if(id.indexOf('fun-')===0)return vFun(id.slice(4));
 if(id.indexOf('adv-')===0)return go('kids/fun-'+id.slice(4));
-CUR_GAME=id;
+CUR_GAME=id;GAME_BAN0=S.bananas;
 var think=THINK[id],mx=mxById(id);if(!KG_FN[id]&&!think&&!mx)return go('kids');
 var grades=think?think.grades:[1,2,3,4,5,6],cur=grades.indexOf(+S.grade)>-1?+S.grade:grades[0];
 view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Back to the Kids Jungle</a><label style="font-weight:800">Grade <select class="cm-gsel">'+grades.map(function(n){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label></div><div class="cm-game" id="cm-g"></div>';
