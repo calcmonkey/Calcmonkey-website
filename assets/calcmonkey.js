@@ -1994,7 +1994,7 @@ gAdv(view.querySelector('#cm-g'),id);
 
 /* ================= ADVENTURE REWARD GAMES (just for fun, no math) ================= */
 var FUN={
-jungle:{name:'Treetop Leap',icon:'🐒',d:'Swing from vine to vine and leap all the way to the treehouse!',intro:'Mochi is swinging through the jungle! Tap when Mochi swings <b>forward</b> to let go and leap to the next vine. Grab the jungle snacks on the way!',tip:'Tap anywhere (or press the space bar) to let go of the vine.'},
+jungle:{name:'Treetop Leap',icon:'🐒',d:'Swing from vine to vine and leap all the way to the treehouse!',intro:'Mochi is swinging through the jungle! 🍌🍓🥭 <b>Your goal: grab ALL the fruit</b> on the way to the treehouse! Tap when Mochi swings <b>forward</b> to leap to the next vine — let go <b>later</b> to jump higher, <b>sooner</b> to stay lower.',tip:'Goal: grab all the fruit! Tap anywhere (or press the space bar) to let go of the vine.'},
 beach:{name:'Ice Cream Stand',icon:'🍦',d:'Run Mochi’s beach ice cream stand and make every customer’s cone.',intro:'Mochi is running the ice cream stand at the beach! Look at each customer’s order, build the same cone — then tap the <b>customer</b> to give it to them!',tip:'Tap flavors to stack scoops (bottom first), add a cherry if they want one, then tap the customer to hand it over!'},
 party:{name:'Party Time!',icon:'🎁',d:'Open Mochi’s birthday presents and blow out the candles.',intro:'It’s Mochi’s birthday party! Tap each present to shake it, pull off the ribbon and open it. Then blow out the candles!',tip:'Tap a present three times to open it.'},
 snow:{name:'Ski Run',icon:'⛷️',d:'Ski down the mountain, jump the rocks and catch snowflakes.',intro:'Mochi is skiing down the mountain! Tap to <b>jump</b> over rocks and snowmen, and catch the snowflakes in the air.',tip:'Tap anywhere (or press the space bar or ↑) to jump.'},
@@ -2016,13 +2016,13 @@ c.lay.innerHTML=h;var w=q(c.lay,'w'),mk=q(c.lay,'mk'),vEls=w.querySelectorAll('.
 mk.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(yay);
 function vx(i){return 60+GAP*i;}
 function end(i,th){return [vx(i)+L*Math.sin(th),L*Math.cos(th)];}
-fEls.forEach(function(e,i){vpos(e,vx(i)+GAP/2,66);});vpos(tree,vx(N)+58,24);
-function info(){c.setProb('🌿 Vine '+cur+' / '+N+'   '+(got?'· '+got+' snacks':''));}
+var fy=[];fEls.forEach(function(e,i){fy[i]=i===0?52:rnd(16,64);vpos(e,vx(i)+GAP/2,fy[i]);});vpos(tree,vx(N)+58,24);
+function info(){c.setProb('🍓 Fruit: '+got+' / '+N+'   ·   🌿 Vine '+cur+' / '+N);}
 info();
 function placeMk(x,y,rot){var s=c.W()/300;mk.style.left=((x-cam)*s)+'px';mk.style.top=(y*s)+'px';mk.style.transform='translate(-50%,-18.4%) rotate('+(rot||0)+'rad)';}
 function tap(){
 if(mode!=='swing')return;var th=A*Math.sin(phi),fwd=Math.cos(phi)>0;
-if(fwd&&th>-0.25){mode='fly';var p0=end(cur,th),p1=end(cur+1,-0.42);fl={u:0,p0:p0,p1:p1,c0:cam,c1:vx(cur+1)-60};tone(520,.08,'triangle');tone(780,.12,'triangle',.06);}
+if(fwd&&th>-0.25){mode='fly';var p0=end(cur,th),p1=end(cur+1,-0.42);fl={u:0,p0:p0,p1:p1,c0:cam,c1:vx(cur+1)-60,hh:28+76*Math.max(0,Math.min(1,(th+0.25)/(A+0.25)))};tone(520,.08,'triangle');tone(780,.12,'triangle',.06);}
 else{mode='fall';var p=end(cur,th);fall={x:p[0],y:p[1],vx:fwd?40:-30,vy:-60,t:0};tone(220,.25,'sine');}
 }
 c.tap=tap;
@@ -2032,9 +2032,9 @@ c.loop(function(dt){
 t+=dt;var s=c.W()/300;w.style.transform='translateX('+(-cam*s)+'px)';
 vEls.forEach(function(v,i){var th=i===cur&&mode==='swing'?A*Math.sin(phi):(i===cur+1&&mode==='fly'?-0.42*Math.min(1,fl.u*1.3):0.06*Math.sin(t*1.3+i));v.style.left=(vx(i)*s)+'px';v.style.height=(L*s)+'px';v.style.transform='rotate('+(-th)+'rad)';});
 if(mode==='swing'){phi+=OM*dt;var th=A*Math.sin(phi),p=end(cur,th);placeMk(p[0],p[1],-th);}
-else if(mode==='fly'){fl.u=Math.min(1,fl.u+dt/0.72);var u=fl.u,x=fl.p0[0]+(fl.p1[0]-fl.p0[0])*u,y=fl.p0[1]+(fl.p1[1]-fl.p0[1])*u-60*Math.sin(Math.PI*u);cam=fl.c0+(fl.c1-fl.c0)*u;placeMk(x,y,0.5*Math.sin(Math.PI*2*u));
-var fe=fEls[cur];if(fe&&!fe.classList.contains('got')&&Math.abs(x-(vx(cur)+GAP/2))<26&&Math.abs(y-66)<30){fe.classList.add('got');got++;tone(988,.08,'triangle');info();}
-if(u>=1){cur++;phi=Math.asin(-0.42/A);mode='swing';info();if(cur>=N){mode='done';c.T.after(function(){w.querySelector('.cm-jtree').classList.add('yay');},200);c.T.after(function(){c.end('You made it to the treehouse!','Mochi leaped across all '+N+' vines and grabbed <b>'+got+'</b> jungle snack'+(got===1?'':'s')+'! 🍌');},1300);}}}
+else if(mode==='fly'){fl.u=Math.min(1,fl.u+dt/0.72);var u=fl.u,x=fl.p0[0]+(fl.p1[0]-fl.p0[0])*u,y=fl.p0[1]+(fl.p1[1]-fl.p0[1])*u-fl.hh*Math.sin(Math.PI*u);cam=fl.c0+(fl.c1-fl.c0)*u;placeMk(x,y,0.5*Math.sin(Math.PI*2*u));
+var fe=fEls[cur];if(fe&&!fe.classList.contains('got')&&Math.abs(x-(vx(cur)+GAP/2))<24&&Math.abs(y-fy[cur])<22){fe.classList.add('got');got++;tone(988,.08,'triangle');info();}
+if(u>=1){cur++;phi=Math.asin(-0.42/A);mode='swing';info();if(cur>=N){mode='done';c.T.after(function(){w.querySelector('.cm-jtree').classList.add('yay');},200);c.T.after(function(){c.end(got>=N?'You grabbed ALL the fruit!':'You made it to the treehouse!',got>=N?'Mochi leaped across all '+N+' vines and grabbed every piece of fruit! 🍌🍓🥭 Amazing!':'Mochi grabbed <b>'+got+'</b> of '+N+' fruit. Can you grab them all next time? 🍓');},1300);}}}
 else if(mode==='fall'){fall.t+=dt;if(fall.y<168){fall.vy+=520*dt;fall.x+=fall.vx*dt;fall.y=Math.min(168,fall.y+fall.vy*dt);}placeMk(fall.x,fall.y,Math.sin(fall.t*12)*0.2);
 if(fall.t>1.3){mode='swing';phi=0;}}
 });
