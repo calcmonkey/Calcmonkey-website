@@ -939,3 +939,14 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-scrap{position:absolute;left:30%;top:40%;width:40%;height:30%;background:var(--pat),var(--pc);border-radius:4px 10px 3px 12px;z-index:4;animation:cm-scrap .9s ease-out forwards}
 .cm-gift.pat0 .cm-scrap,.cm-gift.pat1 .cm-scrap,.cm-gift.pat2 .cm-scrap,.cm-gift.pat3 .cm-scrap,.cm-gift.pat4 .cm-scrap{background:var(--pat),var(--pc)}
 @keyframes cm-scrap{to{transform:translate(var(--rx),var(--ry)) rotate(var(--rr)) scale(.5);opacity:0}}
+.cm-bigbtn.next{background:linear-gradient(90deg,#22c55e,#16a34a)!important;animation:cm-nextp 1.3s ease-in-out infinite;box-shadow:0 5px 0 var(--ink),0 0 0 4px #fde047!important}
+@keyframes cm-nextp{50%{transform:scale(1.06)}}
+.cm-ovbtns .cm-bigbtn.alt{font-size:18px!important;padding:6px 18px!important}
+.cm-ovbtns .cm-bigbtn.next{white-space:nowrap;font-size:22px!important}
+.cm-ovshort .cm-ovbox{max-width:100%;padding:10px 14px}
+.cm-ovshort .cm-ovbox h3{font-size:20px;line-height:1.1}
+.cm-ovshort .cm-ovbox p{font-size:13px;margin:2px 0 8px!important;line-height:1.3}
+.cm-ovshort .cm-yay svg{width:52px}
+.cm-ovshort .cm-ovbtns{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:4px}
+.cm-ovshort .cm-ovbtns .cm-bigbtn{font-size:15px!important;padding:4px 12px!important}
+.cm-ovshort .cm-ovbtns .cm-bigbtn.next{font-size:16px!important}
