@@ -88,22 +88,33 @@ SCENES.forEach(function(sc){if(sc.need>before&&sc.need<=S.bananas){S.newsc=sc.id
 function addXP(n){S.xp+=n;store.set('xp',S.xp);updStats('xp');}
 
 /* ================= the monkey (original art) ================= */
-var INK='#2b2350',O=' stroke="#2b2350" stroke-width="3" stroke-linejoin="round"',O2=' stroke="#2b2350" stroke-width="2" stroke-linejoin="round"';
+var INK='#2b2350',O=' stroke="#5a3a28" stroke-width="2.5" stroke-linejoin="round"',O2=' stroke="#5a3a28" stroke-width="1.8" stroke-linejoin="round"';
 var HEAD_ACC={
 party:'<polygon points="60,0 43,30 77,30" fill="#ff5fa2"'+O+'/><path d="M50 20 L70 20 M47 26 L73 26" stroke="#ffd23f" stroke-width="3"/><circle cx="60" cy="2" r="6" fill="#ffd23f" stroke="#2b2350" stroke-width="2.5"/>',
 shades:'<rect x="34" y="45" width="24" height="15" rx="6" fill="#1b1838"/><rect x="62" y="45" width="24" height="15" rx="6" fill="#1b1838"/><path d="M57 50 h6" stroke="#1b1838" stroke-width="3"/><path d="M38 49 h8 M66 49 h8" stroke="#fff" stroke-width="2" opacity=".55"/>',
 crown:'<polygon points="36,30 40,8 50,20 60,1 70,20 80,8 84,30" fill="#ffd23f"'+O+'/><circle cx="60" cy="22" r="3.5" fill="#ff5fa2"/><circle cx="46" cy="25" r="2.5" fill="#38bdf8"/><circle cx="74" cy="25" r="2.5" fill="#22c55e"/>',
 wizard:'<polygon points="66,-7 38,28 84,28" fill="#6c4bd8"'+O+'/><ellipse cx="60" cy="28" rx="33" ry="6" fill="#6c4bd8"'+O+'/><text x="58" y="21" font-size="12" text-anchor="middle" fill="#ffd23f">★</text><text x="68" y="8" font-size="8" text-anchor="middle" fill="#ffd23f">π</text>'
 };
-function headInner(){
-return '<circle cx="22" cy="60" r="15" fill="#9a6233"'+O+'/><circle cx="22" cy="60" r="8" fill="#f6c995"/>'+
-'<circle cx="98" cy="60" r="15" fill="#9a6233"'+O+'/><circle cx="98" cy="60" r="8" fill="#f6c995"/>'+
-'<circle cx="60" cy="60" r="38" fill="#9a6233"'+O+'/>'+
-'<ellipse cx="60" cy="72" rx="27" ry="21" fill="#f6c995"/><ellipse cx="47" cy="54" rx="13" ry="14" fill="#f6c995"/><ellipse cx="73" cy="54" rx="13" ry="14" fill="#f6c995"/>'+
-'<circle cx="48" cy="54" r="5.5" fill="#2b1a0e"/><circle cx="72" cy="54" r="5.5" fill="#2b1a0e"/><circle cx="50" cy="52" r="1.8" fill="#fff"/><circle cx="74" cy="52" r="1.8" fill="#fff"/>'+
-'<ellipse cx="56" cy="67" rx="2.2" ry="1.6" fill="#5a3418"/><ellipse cx="64" cy="67" rx="2.2" ry="1.6" fill="#5a3418"/>'+
-'<path d="M47 76 Q60 91 73 76" stroke="#5a3418" stroke-width="3.5" fill="#ff8fa3" stroke-linecap="round"/>'+
-'<circle cx="38" cy="70" r="5" fill="#ff8fa3" opacity=".55"/><circle cx="82" cy="70" r="5" fill="#ff8fa3" opacity=".55"/>';
+var MID=0,FUR='#a0632f',FUR_D='#7c4a20',FUR_L='#c98a50',CRM='#f8d5a8';
+function mDefs(id){return '<defs><radialGradient id="'+id+'f" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="'+FUR_L+'"/><stop offset=".6" stop-color="'+FUR+'"/><stop offset="1" stop-color="'+FUR_D+'"/></radialGradient><radialGradient id="'+id+'s" cx=".4" cy=".3" r=".9"><stop offset="0" stop-color="#fff1dc"/><stop offset="1" stop-color="#efc391"/></radialGradient></defs>';}
+/* Plush Mochi head, centred at (60,60). mood 'yay' = excited face */
+function headInner(id,mood){
+var own=!id;if(own)id='cmm'+(++MID);var F='url(#'+id+'f)',C='url(#'+id+'s)';
+return (own?mDefs(id):'')+
+'<circle cx="21" cy="61" r="16" fill="'+F+'"/><circle cx="22" cy="61.5" r="8.5" fill="#f4a6a0"/><circle cx="99" cy="61" r="16" fill="'+F+'"/><circle cx="98" cy="61.5" r="8.5" fill="#f4a6a0"/>'+
+'<circle cx="60" cy="60" r="40" fill="'+F+'"/>'+
+'<path d="M51.6 20.4 Q54 10.8 61.2 15.6 Q64.8 7.2 70.8 16.8" stroke="'+FUR+'" stroke-width="5.5" fill="none" stroke-linecap="round"/>'+
+'<path d="M60.0 46.8 C54.0 34.8 31.2 36.0 31.2 56.4 C31.2 64.8 34.8 69.6 37.2 73.2 C32.4 80.4 36.0 98.4 60.0 98.4 C84.0 98.4 87.6 80.4 82.8 73.2 C85.2 69.6 88.8 64.8 88.8 56.4 C88.8 36.0 66.0 34.8 60.0 46.8 Z" fill="'+C+'"/>'+
+(mood==='yay'?
+'<path d="M41 56 Q48 47 55 56 M65 56 Q72 47 79 56" stroke="#2a1a10" stroke-width="3.6" fill="none" stroke-linecap="round"/>'+
+'<ellipse cx="37" cy="70" rx="7" ry="4.5" fill="#ff8fa3" opacity=".65"/><ellipse cx="83" cy="70" rx="7" ry="4.5" fill="#ff8fa3" opacity=".65"/>'+
+'<path d="M57 64.5 Q60 62.5 63 64.5 Q60 68.5 57 64.5 Z" fill="#6b3a1e"/>'+
+'<path d="M50 71 Q60 89 70 71 Z" fill="#7a2e2e" stroke="#6b3a1e" stroke-width="2" stroke-linejoin="round"/><path d="M54.5 78.5 Q60 84.5 65.5 78.5 Q60 81 54.5 78.5 Z" fill="#ff8fa3"/>'
+:
+[48,72].map(function(x){return '<ellipse cx="'+x+'" cy="55" rx="6.2" ry="7.6" fill="#2a1a10"/><circle cx="'+(x+2)+'" cy="52.4" r="2.6" fill="#fff"/><circle cx="'+(x-1.8)+'" cy="58.4" r="1.2" fill="#fff"/>';}).join('')+
+'<ellipse cx="38" cy="70" rx="6.6" ry="4.2" fill="#ff8fa3" opacity=".6"/><ellipse cx="82" cy="70" rx="6.6" ry="4.2" fill="#ff8fa3" opacity=".6"/>'+
+'<path d="M56.6 65 Q60 62.6 63.4 65 Q60 69.8 56.6 65 Z" fill="#6b3a1e"/>'+
+'<path d="M54 73.5 Q60 80 66 73.5" stroke="#6b3a1e" stroke-width="2.4" fill="none" stroke-linecap="round"/>');
 }
 /* head-only monkey: used for the little logo */
 function monkeySVG(acc,cls){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -8 120 128" class="'+(cls||'')+'" aria-hidden="true">'+headInner()+(HEAD_ACC[acc]||'')+'</svg>';}
@@ -124,11 +135,11 @@ var ITEMS={
 tee:{slot:'top',name:'Banana Tee',scene:'jungle',svg:'<path d="'+TEE+'" fill="#ffd23f"'+O+'/><path d="M90 160 Q100 174 114 158" stroke="#f59e0b" stroke-width="6" fill="none" stroke-linecap="round"/>'},
 hawaii:{slot:'top',name:'Hawaiian Shirt',scene:'beach',svg:'<path d="'+TEE+'" fill="#14b8a6"'+O+'/><path d="M86 123 L100 142 L114 123" fill="#fff"'+O2+'/>'+[[82,150],[114,148],[96,172],[122,180],[78,184],[106,192],[60,146],[140,146]].map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5" fill="#fb7185"/><circle cx="'+p[0]+'" cy="'+p[1]+'" r="2" fill="#fde047"/>';}).join('')},
 striped:{slot:'top',name:'Party Shirt',scene:'party',svg:'<path d="'+TEE+'" fill="#f472b6"'+O+'/><path d="M70 142 H130 M69 158 H131 M69 174 H131 M70 189 H130" stroke="#fff" stroke-width="5"/><path d="'+TEE+'" fill="none"'+O+'/>'},
-puffer:{slot:'top',name:'Puffy Coat',scene:'snow',svg:sleeves('#ef4444')+'<path d="'+TEE+'" fill="#ef4444"'+O+'/><path d="M70 148 Q100 156 130 148 M69 170 Q100 178 131 170 M60 152 Q66 156 70 152 M130 152 Q134 156 140 152" stroke="#b91c1c" stroke-width="3" fill="none"/><path d="M100 128 L100 203" stroke="#fde047" stroke-width="3"/><path d="M80 120 Q100 134 120 120 L122 128 Q100 142 78 128 Z" fill="#fca5a5"'+O2+'/>'},
+puffer:{slot:'top',name:'Puffy Coat',scene:'snow',sl:'#ef4444',svg:'<path d="'+TEE+'" fill="#ef4444"'+O+'/><path d="M70 148 Q100 156 130 148 M69 170 Q100 178 131 170 M60 152 Q66 156 70 152 M130 152 Q134 156 140 152" stroke="#b91c1c" stroke-width="3" fill="none"/><path d="M100 128 L100 203" stroke="#fde047" stroke-width="3"/><path d="M80 120 Q100 134 120 120 L122 128 Q100 142 78 128 Z" fill="#fca5a5"'+O2+'/>'},
 jersey:{slot:'top',name:'Team Jersey',scene:'soccer',svg:'<path d="'+TEE+'" fill="#2563eb"'+O+'/><path d="M88 123 L100 136 L112 123" fill="#fff"'+O2+'/><path d="M57 142 L64 156 M143 142 L136 156" stroke="#fff" stroke-width="4"/><text x="100" y="182" font-size="30" font-weight="900" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif">10</text>'},
-tux:{slot:'top',name:'Tuxedo Jacket',scene:'opera',svg:sleeves('#1f2937')+'<path d="'+TEE+'" fill="#1f2937"'+O+'/><path d="M85 121 L100 168 L115 121 Q100 131 85 121 Z" fill="#fff"/><path d="M85 121 L95 160 M115 121 L105 160" stroke="#6b7280" stroke-width="3"/><circle cx="100" cy="178" r="2.5" fill="#e5e7eb"/><circle cx="100" cy="190" r="2.5" fill="#e5e7eb"/><path d="M116 146 L126 146 L121 140 Z" fill="#ef4444"/>'},
+tux:{slot:'top',name:'Tuxedo Jacket',scene:'opera',sl:'#1f2937',svg:'<path d="'+TEE+'" fill="#1f2937"'+O+'/><path d="M85 121 L100 168 L115 121 Q100 131 85 121 Z" fill="#fff"/><path d="M85 121 L95 160 M115 121 L105 160" stroke="#6b7280" stroke-width="3"/><circle cx="100" cy="178" r="2.5" fill="#e5e7eb"/><circle cx="100" cy="190" r="2.5" fill="#e5e7eb"/><path d="M116 146 L126 146 L121 140 Z" fill="#ef4444"/>'},
 gown:{slot:'top',name:'Sparkly Gown',scene:'opera',svg:'<path d="M68 176 Q100 186 132 176 L154 246 Q100 262 46 246 Z" fill="#9333ea"'+O+'/><path d="M76 120 Q100 130 124 120 L131 180 Q100 190 69 180 Z" fill="#a855f7"'+O+'/><path d="M70 178 Q100 188 130 178" stroke="#fbbf24" stroke-width="4" fill="none"/>'+[[80,214],[118,224],[98,236],[66,236],[134,236],[104,204]].map(function(p){return '<text x="'+p[0]+'" y="'+p[1]+'" font-size="10" fill="#fde68a" text-anchor="middle">✦</text>';}).join('')},
-spacesuit:{slot:'top',name:'Space Suit',scene:'space',svg:sleeves('#e2e8f0')+'<path d="'+TEE+'" fill="#f8fafc"'+O+'/><path d="M58 166 L66 166 M134 166 L142 166" stroke="#f97316" stroke-width="5"/><rect x="85" y="146" width="30" height="22" rx="4" fill="#cbd5e1"'+O2+'/><circle cx="93" cy="157" r="3.5" fill="#ef4444"/><circle cx="103" cy="157" r="3.5" fill="#22c55e"/><circle cx="111" cy="152" r="2.5" fill="#3b82f6"/>'},
+spacesuit:{slot:'top',name:'Space Suit',scene:'space',sl:'#e2e8f0',svg:'<path d="'+TEE+'" fill="#f8fafc"'+O+'/><path d="M58 166 L66 166 M134 166 L142 166" stroke="#f97316" stroke-width="5"/><rect x="85" y="146" width="30" height="22" rx="4" fill="#cbd5e1"'+O2+'/><circle cx="93" cy="157" r="3.5" fill="#ef4444"/><circle cx="103" cy="157" r="3.5" fill="#22c55e"/><circle cx="111" cy="152" r="2.5" fill="#3b82f6"/>'},
 robe:{slot:'top',name:'Royal Robe',scene:'palace',back:'<path d="M70 116 Q100 108 130 116 L164 270 Q100 286 36 270 Z" fill="#b91c1c"'+O+'/>',svg:'<path d="'+TEE+'" fill="#7c3aed"'+O+'/><rect x="68" y="180" width="64" height="9" fill="#fbbf24"'+O2+'/><path d="M64 116 Q100 150 136 116 L132 130 Q100 156 68 130 Z" fill="#fff"'+O2+'/><circle cx="80" cy="130" r="2" fill="#111"/><circle cx="100" cy="141" r="2" fill="#111"/><circle cx="120" cy="130" r="2" fill="#111"/>'},
 /* bottoms */
 jeans:{slot:'bottom',name:'Blue Jeans',scene:'jungle',svg:'<path d="'+PANTS+'" fill="#3b82f6"'+O+'/><path d="M80 200 L80 243 M120 200 L120 243" stroke="#1d4ed8" stroke-width="2"/><path d="M74 194 Q80 200 88 196 M112 196 Q120 200 126 194" stroke="#1d4ed8" stroke-width="2" fill="none"/>'},
@@ -181,24 +192,28 @@ scepter:{slot:'hand',name:'Scepter',scene:'palace',svg:'<path d="M144 206 L152 1
 };
 var SLOTS=[['head','🎩','Hats'],['eyes','🕶️','Glasses'],['neck','🎀','Neck'],['top','👕','Tops'],['bottom','👖','Bottoms'],['feet','👟','Shoes'],['hand','🍌','Hold']];
 var DEFAULT_LOOK={head:'cap',eyes:'',neck:'',top:'tee',bottom:'jeans',feet:'sneakers',hand:'banana'};
-function monkeyBody(L){
-L=L||{};function it(s){var i=ITEMS[L[s]];return i||null;}
-var back='';SLOTS.forEach(function(s){var i=it(s[0]);if(i&&i.back)back+=i.back;});
-function part(s){var i=it(s);return i?i.svg:'';}
-return back+
-'<path d="M118 204 C150 224 184 228 186 204 C187 188 168 186 167 199" stroke="#2b2350" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M118 204 C150 224 184 228 186 204 C187 188 168 186 167 199" stroke="#9a6233" stroke-width="8" fill="none" stroke-linecap="round"/>'+
-'<path d="M86 192 L82 248 M114 192 L118 248" stroke="#2b2350" stroke-width="20" stroke-linecap="round"/><path d="M86 192 L82 248 M114 192 L118 248" stroke="#9a6233" stroke-width="14" stroke-linecap="round"/>'+
-'<ellipse cx="78" cy="254" rx="15" ry="8" fill="#f6c995"'+O+'/><ellipse cx="122" cy="254" rx="15" ry="8" fill="#f6c995"'+O+'/>'+
-'<ellipse cx="100" cy="158" rx="34" ry="48" fill="#9a6233"'+O+'/><ellipse cx="100" cy="166" rx="22" ry="30" fill="#f6c995"/>'+
+function monkeyBody(L,mood){
+L=L||{};var yay=mood==='yay',id='cmm'+(++MID),F='url(#'+id+'f)',C='url(#'+id+'s)';function it(s){var i=ITEMS[L[s]];return i||null;}
+var back='';SLOTS.forEach(function(s){if(yay&&s[0]==='hand')return;var i=it(s[0]);if(i&&i.back)back+=i.back;});
+function part(s){if(yay&&s==='hand')return '';var i=it(s);return i?i.svg:'';}
+var top=it('top'),sl=top&&top.sl,ac=sl||FUR,ae=sl?'#5a3a28':FUR_D;
+var ARMS=yay?'M74 134 Q38 106 42 40 M126 134 Q162 106 158 40':'M72 132 Q54 158 56 186 M128 132 Q146 158 144 186';
+var arms='<path d="'+ARMS+'" stroke="'+ae+'" stroke-width="'+(sl?19:18)+'" fill="none" stroke-linecap="round"/><path d="'+ARMS+'" stroke="'+ac+'" stroke-width="'+(sl?14.5:14)+'" fill="none" stroke-linecap="round"/>';
+var hands=yay?'<circle cx="42" cy="32" r="10.5" fill="'+C+'"/><circle cx="158" cy="32" r="10.5" fill="'+C+'"/>':'<circle cx="56" cy="192" r="9.5" fill="'+C+'"/><circle cx="144" cy="192" r="9.5" fill="'+C+'"/>';
+return mDefs(id)+back+
+'<path d="M120 206 C150 226 186 228 187 204 C188 188 168 186 167 199" stroke="'+FUR_D+'" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M120 206 C150 226 186 228 187 204 C188 188 168 186 167 199" stroke="'+FUR+'" stroke-width="8" fill="none" stroke-linecap="round"/>'+
+'<path d="M86 192 L82 246 M114 192 L118 246" stroke="'+FUR_D+'" stroke-width="22" stroke-linecap="round"/><path d="M86 192 L82 246 M114 192 L118 246" stroke="'+FUR+'" stroke-width="18" stroke-linecap="round"/>'+
+'<ellipse cx="78" cy="254" rx="16" ry="9" fill="'+C+'" stroke="#d9a066" stroke-width="1.5"/><ellipse cx="122" cy="254" rx="16" ry="9" fill="'+C+'" stroke="#d9a066" stroke-width="1.5"/>'+
+'<ellipse cx="100" cy="160" rx="36" ry="48" fill="'+F+'"/><ellipse cx="100" cy="168" rx="24" ry="31" fill="'+C+'"/>'+
 part('feet')+part('bottom')+
-'<path d="M72 132 Q54 158 56 186 M128 132 Q146 158 144 186" stroke="#2b2350" stroke-width="18" fill="none" stroke-linecap="round"/><path d="M72 132 Q54 158 56 186 M128 132 Q146 158 144 186" stroke="#9a6233" stroke-width="12" fill="none" stroke-linecap="round"/>'+
-part('top')+
-'<circle cx="56" cy="192" r="9" fill="#f6c995"'+O+'/><circle cx="144" cy="192" r="9" fill="#f6c995"'+O+'/>'+
+(yay?arms+hands+part('top'):part('top')+arms+hands)+
 part('hand')+
-'<g transform="translate(40,12)">'+headInner()+'</g>'+
-part('neck')+part('eyes')+part('head');
+part('neck')+
+'<g transform="translate(100 72) scale(1.18) translate(-100 -72)"><g transform="translate(40,12)">'+headInner(id,mood)+'</g>'+part('eyes')+part('head')+'</g>';
 }
-function monkeyFull(L,cls){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -24 212 304" class="'+(cls||'')+'" aria-hidden="true">'+monkeyBody(L)+'</svg>';}
+function monkeyFull(L,cls,mood){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -24 212 304" class="'+(cls||'')+'" aria-hidden="true">'+monkeyBody(L,mood)+'</svg>';}
+function yayMochi(){var sp=function(x,y,c,k){return '<path d="M'+x+' '+(y-10*k)+' L'+(x+3*k)+' '+(y-3*k)+' L'+(x+10*k)+' '+y+' L'+(x+3*k)+' '+(y+3*k)+' L'+x+' '+(y+10*k)+' L'+(x-3*k)+' '+(y+3*k)+' L'+(x-10*k)+' '+y+' L'+(x-3*k)+' '+(y-3*k)+' Z" fill="'+c+'"/>';};
+return '<a class="cm-yay" href="#cm/kids/monkey" data-go="kids/monkey" title="Dress up '+esc(S.mname)+'"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -30 212 310" aria-hidden="true"><g class="cm-twinkle">'+sp(10,20,'#ffd23f',1.2)+sp(194,100,'#38bdf8',1)+sp(186,6,'#ff5fa2',.9)+sp(6,150,'#22c55e',.8)+'</g><g class="cm-yhop">'+monkeyBody(S.look,'yay')+'</g></svg><small>Tap '+esc(S.mname)+' to dress up!</small></a>';}
 function monkeyURI(L){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(monkeyFull(L||S.look));}
 
 /* ---------- adventures (scenes) ---------- */
@@ -245,7 +260,7 @@ function showOv(ov,html,btn,cb){showOv2(ov,html,[[btn,cb]]);}
 function showOv2(ov,html,btns){
 ov.classList.remove('cm-ovcoach');
 ov.innerHTML='<div class="cm-ovbox">'+html+'<div class="cm-ovbtns">'+btns.map(function(b,i){return '<button class="cm-bigbtn'+(b[2]?' '+b[2]:'')+'" data-i="'+i+'">'+b[0]+'</button>';}).join('')+'</div></div>';
-ov.classList.remove('hide');
+ov.classList.remove('hide');ov.classList.toggle('cm-ovshort',ov.clientHeight>0&&ov.clientHeight<340);
 ov.querySelectorAll('.cm-ovbtns button').forEach(function(el){el.onclick=function(){ov.classList.add('hide');btns[+el.getAttribute('data-i')][1]();};});
 }
 function kNum(s){return numIn(String(s==null?'':s).replace(/[\s,$¢]/g,''));}
@@ -406,7 +421,7 @@ rafLoop(function(dt){if(st.run)update(dt);draw(dt);});
 function start(){st={run:true,hearts:3,score:0,wrong:0,mx:C.w/2,tx:C.w/2,items:[],q:[],sp:0,parts:[],shake:0};newProb();}
 function end(){
 st.run=false;st.items=[];st.q=[];var nb=setBest('banana'+S.grade,st.score),hard=st.wrong>=2&&st.score<=st.wrong;
-var html='<div class="cm-ovemoji">'+(hard?'🤔':'🐒')+'</div><h3>'+(hard?'Those were tricky!':'Great job!')+'</h3><p>You grabbed <b>'+st.score+'</b> banana'+(st.score===1?'':'s')+'.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want Coach Monkey to show you a trick for <b>'+st.miss.q+'</b>?':'')+'</p>';
+var html=(hard?'<div class="cm-ovemoji">🤔</div>':yayMochi())+'<h3>'+(hard?'Those were tricky!':'Great job!')+'</h3><p>You grabbed <b>'+st.score+'</b> banana'+(st.score===1?'':'s')+'.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want Coach Monkey to show you a trick for <b>'+st.miss.q+'</b>?':'')+'</p>';
 showOv2(ov,html,hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt']]:[['Play again',start]]);
 }
 function mv(e){var r=cv.getBoundingClientRect();st.tx=clamp(e.clientX-r.left,40,C.w-40);}
@@ -446,7 +461,7 @@ function resume(){sky.classList.remove('cm-paused');st.streak=0;st.run=true;time
 function offer(){pause();showOv2(ov,'<div class="cm-ovemoji">🤔</div><h3>Tricky ones?</h3><p>Coach Monkey can show you a trick for problems like <b>'+st.miss.q+'</b>. The clock is paused!</p>',[['🐒 Show me how!',function(){factCoach(ov,st.miss,resume);}],['Keep playing',resume,'alt']]);}
 function start(){sky.classList.remove('cm-paused');st={run:true,time:60,score:0,wrong:0,streak:0};hud();newProb();spawn();timersOn();}
 function end(){st.run=false;T.clear();clearB();probEl.textContent='Time!';var nb=setBest('balloon'+S.grade,st.score),hard=struggled(st);if(st.score>0){confetti(sky);sfxWin();}
-showOv2(ov,'<div class="cm-ovemoji">'+(hard?'🤔':'🎉')+'</div><h3>Time’s up!</h3><p>You popped <b>'+st.score+'</b> balloon'+(st.score===1?'':'s')+'.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt']]:[['Play again',start]]);}
+showOv2(ov,(hard?'<div class="cm-ovemoji">🤔</div>':yayMochi())+'<h3>Time’s up!</h3><p>You popped <b>'+st.score+'</b> balloon'+(st.score===1?'':'s')+'.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt']]:[['Play again',start]]);}
 hud();
 showOv(ov,'<div class="cm-ovemoji">🎈</div><h3>Balloon Pop</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>You have 60 seconds. Pop as many right-answer balloons as you can!</p>','Start! ▶',start);
 }
@@ -470,7 +485,7 @@ function pause(){st.run=false;T.clear();}
 function resume(){st.streak=0;st.run=true;T.every(tick,100);}
 function offer(){pause();showOv2(ov,'<div class="cm-ovemoji">🤔</div><h3>Need a hand?</h3><p>The parrot is waiting. Want Coach Monkey to show you how to do <b>'+st.miss.q+'</b>?</p>',[['🐒 Show me how!',function(){factCoach(ov,st.miss,function(){ask();resume();});}],['Keep racing',resume,'alt']]);}
 function start(){st={run:true,me:0,bot:0,right:0,wrong:0,streak:0};place();hud();ask();T.every(tick,100);}
-function win(){st.run=false;T.clear();addBananas(5);sfxWin();confetti(track);showOv(ov,'<div class="cm-ovemoji">🏆</div><h3>You won!</h3><p>You beat the parrot! <b>+5 bananas</b> 🍌</p>','Race again',start);}
+function win(){st.run=false;T.clear();addBananas(5);sfxWin();confetti(track);showOv(ov,yayMochi()+'<h3>You won!</h3><p>You beat the parrot! <b>+5 bananas</b> 🍌</p>','Race again',start);}
 function lose(){st.run=false;T.clear();addBananas(1);var hard=st.wrong>=3;showOv2(ov,'<div class="cm-ovemoji">🦜</div><h3>So close!</h3><p>The parrot won this time. You got <b>'+st.right+'</b> right. Here’s <b>+1 banana</b> for trying!'+(hard&&st.miss?'<br>Want a quick lesson first?':'')+'</p>',hard&&st.miss?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Race again ▶');}],['Race again',start,'alt']]:[['Race again',start]]);}
 place();hud();ans.innerHTML='';
 showOv(ov,'<div class="cm-ovemoji">🏁</div><h3>Jungle Race</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>Answer '+need+' facts before the parrot reaches the finish line!</p>','Ready, set, GO!',start);
@@ -527,7 +542,7 @@ function offer(){pause();showOv2(ov,'<div class="cm-ovemoji">🤔</div><h3>Trick
 function start(){T.clear();st={run:true,fed:0,t:0,wrong:0,streak:0,score:0,slots:[],extra:[]};sel=null;busy=false;st.last=Date.now();for(var i=0;i<3;i++)newMonkey(i);decoy();paint();hud();T.every(tick,1000);}
 function win(){
 st.run=false;T.clear();addBananas(3);sfxWin();confetti(area);var nb=setBest('feed'+S.grade,st.t,true),hard=struggled(st);
-showOv2(ov,'<div class="cm-ovemoji">🐵</div><h3>Everyone’s full!</h3><p>You fed '+GOAL+' monkeys in <b>'+st.t+' seconds</b>. <b>+3 bonus bananas</b> 🍌'+(nb?'<br>🏆 Fastest time for grade '+S.grade+'!':'<br>Best: '+S.best['feed'+S.grade]+'s')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt']]:[['Play again',start]]);
+showOv2(ov,yayMochi()+'<h3>Everyone’s full!</h3><p>You fed '+GOAL+' monkeys in <b>'+st.t+' seconds</b>. <b>+3 bonus bananas</b> 🍌'+(nb?'<br>🏆 Fastest time for grade '+S.grade+'!':'<br>Best: '+S.best['feed'+S.grade]+'s')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt']]:[['Play again',start]]);
 }
 hud();
 showOv(ov,'<div class="cm-ovemoji">🐵</div><h3>Feed the Monkeys</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>Each hungry monkey is holding a problem. Give it the banana with the right answer! Feed '+GOAL+' monkeys as fast as you can.</p>','Start! ▶',start);
@@ -1099,7 +1114,7 @@ if(mist>=3)setTimeout(function(){showOv2(ov,'<div class="cm-ovemoji">🤔</div><
 };
 function load(){mist=0;p=G.gen(g);q(box,'next').classList.add('hide');api.say('');q(box,'area').innerHTML='';hud();trail();G.mount(q(box,'area'),p,api,g);}
 function coach(){runCoach(ov,'How to: '+G.name,G.learn(p,g),{done:'Got it! ✓'});}
-function finish(){confetti(box);showOv2(ov,'<div class="cm-ovemoji">🏁</div><h3>Expedition complete!</h3><p>You solved '+R+' problems and earned <b>'+earned+' bananas</b>! 🍌</p>',[['Play again',function(){round=0;earned=0;load();}],['Back to the jungle',function(){go('kids');},'alt']]);}
+function finish(){confetti(box);showOv2(ov,yayMochi()+'<h3>Expedition complete!</h3><p>You solved '+R+' problems and earned <b>'+earned+' bananas</b>! 🍌</p>',[['Play again',function(){round=0;earned=0;load();}],['Back to the jungle',function(){go('kids');},'alt']]);}
 q(box,'coach').onclick=coach;
 q(box,'next').onclick=function(){if(round>=R)finish();else load();};
 load();
@@ -1838,7 +1853,7 @@ area:function(b){chShell(b,'area','∫ Area Hunter',AR_CH,mountArea);}
 /* ================= VIEWS ================= */
 function vHome(){
 var topics=COURSES.reduce(function(s,c){return s+c.topics.length;},0),nThink=Object.keys(THINK).length;
-view.innerHTML='<section class="cm-hero"><div><h1>Math is way more fun with a <span>monkey</span>.</h1><p>Free games and step-by-step help for every kid and every student — from 1st grade counting all the way to college calculus.</p></div><div class="cm-hero-m">'+monkeyFull(S.look,'cm-bounce')+'</div></section>'+
+view.innerHTML='<section class="cm-hero"><div><h1>Math is way more fun with a <span>monkey</span>.</h1><p>Free games and step-by-step help for every kid and every student — from 1st grade counting all the way to college calculus.</p></div><a class="cm-hero-m" href="#cm/kids/monkey" data-go="kids/monkey" title="Dress up '+esc(S.mname)+'">'+monkeyFull(S.look,'cm-bounce')+'<span class="cm-tapme">👕 Tap '+esc(S.mname)+' to dress up!</span></a></section>'+
 '<div class="cm-doors"><a class="cm-door kids" href="#cm/kids" data-go="kids"><span class="cm-dtag">Grades 1 – 6</span><h2>Kids Jungle</h2><p>Fast-fact games, step-by-step puzzles for every grade, and a monkey to dress up and send on adventures!</p><span class="cm-dgo">Let’s play! →</span><span class="cm-dart">🍌</span></a>'+
 '<a class="cm-door lab" href="#cm/lab" data-go="lab"><span class="cm-dtag">Grades 7 – College</span><h2>Big Brain Lab</h2><p>Step-by-step lessons by grade and topic, instant solvers, and brain games for big kids who like to have fun too.</p><span class="cm-dgo">Enter the lab →</span><span class="cm-dart">🧠</span></a></div>'+
 '<div class="cm-feats"><div class="cm-feat"><b>'+(KGAMES.length+nThink)+'</b>jungle games</div><div class="cm-feat"><b>'+SCENES.length+'</b>monkey adventures</div><div class="cm-feat"><b>'+COURSES.length+'</b>courses, '+topics+' topics</div><div class="cm-feat"><b>'+TOOLS.length+'</b>step-by-step solvers</div></div>';

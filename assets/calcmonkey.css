@@ -52,7 +52,7 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-hero h1{font-family:'Baloo 2',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:800;line-height:1.02}
 .cm-hero h1 span{color:var(--pink)}
 .cm-hero p{font-size:19px;font-weight:700;margin-top:12px;max-width:520px}
-.cm-hero-m{display:flex;justify-content:center}
+.cm-hero-m{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer}.cm-hero-m:hover svg{transform:scale(1.04)}.cm-hero-m svg{transition:transform .2s}.cm-tapme{margin-top:6px;font-weight:800;font-size:15px;color:#7c3aed;background:#fff;border:2px solid #e9d5ff;border-radius:999px;padding:4px 12px}
 .cm-hero-m svg{width:min(280px,70vw);height:auto;filter:drop-shadow(0 10px 0 rgba(43,35,80,.15))}
 .cm-bounce{animation:cm-bounce 2.4s ease-in-out infinite}
 @keyframes cm-bounce{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(2deg)}}
@@ -116,7 +116,7 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-cwrap{position:relative;border:3px solid var(--ink);border-radius:20px;overflow:hidden;background:#bfefff}
 .cm-cwrap canvas{display:block;touch-action:none;cursor:pointer}
 .cm-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(43,35,80,.45);z-index:6;padding:16px;backdrop-filter:blur(2px)}
-.cm-ovbox{background:#fff;border:3px solid var(--ink);border-radius:24px;padding:20px 26px;text-align:center;max-width:380px;box-shadow:0 7px 0 var(--ink);animation:cm-pop-in .3s}
+.cm-ovbox{background:#fff;border:3px solid var(--ink);border-radius:24px;padding:20px 26px;text-align:center;max-width:380px;max-height:100%;overflow-y:auto;box-shadow:0 7px 0 var(--ink);animation:cm-pop-in .3s}
 .cm-ovbox h3{font-family:'Baloo 2',sans-serif;font-size:32px;font-weight:800}
 .cm-ovbox p{font-weight:700;margin:6px 0 14px!important}
 .cm-ovemoji{font-size:58px;line-height:1.1}
@@ -644,3 +644,6 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-ops button{width:46px}
 .cm-rank{padding:14px}
 }
+
+.cm-yay{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer;margin:-6px auto 4px}.cm-yay svg{width:96px;height:auto;overflow:visible}.cm-yay small{font-weight:800;font-size:13px;color:#7c3aed}.cm-yhop{animation:cm-yhop .55s ease-in-out infinite alternate;transform-origin:100px 260px}@keyframes cm-yhop{from{transform:translateY(4px) scale(1.02,.97)}to{transform:translateY(-14px) scale(.98,1.03)}}.cm-yay:hover svg{transform:scale(1.05)}
+.cm-ovshort .cm-yay{float:left;margin:0 10px 0 -8px}.cm-ovshort .cm-yay svg{width:70px}.cm-ovshort .cm-yay small{display:none}.cm-ovshort .cm-ovbox{text-align:left;padding:14px 18px}.cm-ovshort .cm-ovbox h3{font-size:26px}.cm-ovshort .cm-ovbtns{clear:both}
