@@ -2443,8 +2443,9 @@ LG_FN[id](view.querySelector('#cm-g'));
 
 /* ================= ROUTER ================= */
 var firstRender=true;
-function route(){var h=location.hash||'';if(h.indexOf('#cm/')===0)return decodeURIComponent(h.slice(4));return root.getAttribute('data-start')||'home';}
-function go(r){if(route()===r){render();return;}try{history.pushState(null,'','#cm/'+r);}catch(e){location.hash='cm/'+r;return;}render();}
+var memRoute=null;
+function route(){var h='';try{h=location.hash||'';}catch(e){}if(h.indexOf('#cm/')===0&&!memRoute)return decodeURIComponent(h.slice(4));if(memRoute)return memRoute;return root.getAttribute('data-start')||'home';}
+function go(r){if(route()===r){render();return;}var ok=false;if(!memRoute){try{history.pushState(null,'','#cm/'+r);ok=(location.hash==='#cm/'+r||decodeURIComponent(location.hash)==='#cm/'+r);}catch(e){}if(!ok){try{location.hash='cm/'+r;if(decodeURIComponent(location.hash)==='#cm/'+r)return;}catch(e){}}}if(!ok)memRoute=r;render();}
 function render(){
 runCleanups();
 var p=route().split('/'),sec=p[0];
