@@ -245,7 +245,7 @@ function sceneSVG(id,L,cls){return '<svg xmlns="http://www.w3.org/2000/svg" view
 function unlockToast(sc){
 var old=root.querySelector('.cm-toast');if(old)old.remove();
 var t=document.createElement('div');t.className='cm-toast';
-t.innerHTML='<div class="cm-toast-ic">'+sc.icon+'</div><div><b>New adventure unlocked!</b><span>'+S.mname+' can go to '+sc.name+' — with new clothes and a new game: '+ADV[sc.id].icon+' '+ADV[sc.id].game+'!</span></div><button>See it ▶</button><button class="x" aria-label="Close">✕</button>';
+t.innerHTML='<div class="cm-toast-ic">'+sc.icon+'</div><div><b>New adventure unlocked!</b><span>'+S.mname+' can go to '+sc.name+' — with new clothes and a new fun game: '+FUN[sc.id].icon+' '+FUN[sc.id].name+'!</span></div><button>See it ▶</button><button class="x" aria-label="Close">✕</button>';
 root.appendChild(t);sfxWin();
 t.querySelector('button').onclick=function(){S.scene=sc.id;store.set('scene',sc.id);t.remove();go('kids/monkey');};
 t.querySelector('.x').onclick=function(){t.remove();};
@@ -1978,7 +1978,7 @@ function win(){
 st.run=false;T.clear();addBananas(3);st.ban+=3;hud();if(TH.win)TH.win(c);else sfxWin();confetti(f);ch.innerHTML='';
 var hard=struggled(st);
 showOv2(ov,yayMochi()+'<h3>'+A.winT+'</h3><p>'+A.winP+' You earned <b>'+st.ban+' bananas</b> 🍌'+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',
-(hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}]]:[]).concat([['Play again',start,hard?'alt':''],['🗺️ More adventures',function(){go('kids/monkey');},'alt']]));
+(hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}]]:[]).concat([['Play again',start,hard?'alt':''],nextBtn()]));
 }
 hud();
 showOv(ov,'<div class="cm-ovemoji">'+A.icon+'</div><h3>'+A.game+'</h3><p>'+A.intro+'<br>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.</p>','Start! ▶',start);
@@ -1992,6 +1992,255 @@ view.querySelector('.cm-gsel').onchange=function(){S.grade=+this.value;store.set
 gAdv(view.querySelector('#cm-g'),id);
 }
 
+/* ================= ADVENTURE REWARD GAMES (just for fun, no math) ================= */
+var FUN={
+jungle:{name:'Treetop Leap',icon:'🐒',d:'Swing from vine to vine and leap all the way to the treehouse!',intro:'Mochi is swinging through the jungle! Tap when Mochi swings <b>forward</b> to let go and leap to the next vine. Grab the jungle snacks on the way!',tip:'Tap anywhere (or press the space bar) to let go of the vine.'},
+beach:{name:'Ice Cream Stand',icon:'🍦',d:'Run Mochi’s beach ice cream stand and make every customer’s cone.',intro:'Mochi is running the ice cream stand at the beach! Look at each customer’s order and build the same cone — then tap <b>Serve</b>.',tip:'Tap flavors to stack scoops (bottom first), add a cherry if they want one, then tap Serve.'},
+party:{name:'Party Time!',icon:'🎁',d:'Open Mochi’s birthday presents and blow out the candles.',intro:'It’s Mochi’s birthday party! Tap each present to shake it, pull off the ribbon and open it. Then blow out the candles!',tip:'Tap a present three times to open it.'},
+snow:{name:'Ski Run',icon:'⛷️',d:'Ski down the mountain, jump the rocks and catch snowflakes.',intro:'Mochi is skiing down the mountain! Tap to <b>jump</b> over rocks and snowmen, and catch the snowflakes in the air.',tip:'Tap anywhere (or press the space bar or ↑) to jump.'},
+soccer:{name:'Stadium Shootout',icon:'⚽',d:'Take 8 shots at the big stadium and beat the goalie.',intro:'The crowd is cheering for Mochi! Tap anywhere inside the goal to shoot. The goalie is quick — aim away from them and try the corners!',tip:'Tap inside the goal to shoot.'},
+opera:{name:'Opera Star',icon:'🎭',d:'Mochi stars at the opera — sing the song and earn roses.',intro:'Mochi is the star of the opera tonight! Tap when each golden note reaches the circle and Mochi will sing it.',tip:'Tap anywhere (or press the space bar) when a note reaches the circle.'},
+space:{name:'Star Flight',icon:'🚀',d:'Fly through space collecting stars and land on a new planet.',intro:'Mochi is flying through space! Steer the rocket to collect stars and fly around the space rocks. Land on a brand-new planet at the end!',tip:'Drag up and down, tap above or below the rocket, or use the ↑ ↓ keys.'},
+palace:{name:'Royal Fireworks',icon:'🎆',d:'Light up the sky over the palace with fireworks.',intro:'Long live Mochi! Tap the night sky to launch fireworks for the royal celebration. Tap fast for big combos!',tip:'Tap the sky to launch fireworks.'}
+};
+function vpos(el,x,y){el.style.left=(x/3)+'%';el.style.top=(y/2)+'%';}
+var FUN_G={
+/* ---------- Jungle: Treetop Leap ---------- */
+jungle:function(c){
+var N=10,GAP=92,L=108,A=.8,OM=3.2,cur=0,phi=0,mode='swing',cam=0,fl=null,got=0,t=0,fall=null,yay=monkeyFull(S.look,'','yay');
+var snacks=['🍌','🥭','🍓','🍍','🍑','🍉','🍇'];
+var h='<div class="cm-jworld" data-r="w">';for(var i=0;i<=N;i++)h+='<div class="cm-jv"><i></i></div>';
+for(i=0;i<N;i++)h+='<span class="cm-jfruit">'+pick(snacks)+'</span>';
+h+='<span class="cm-jtree">🛖</span></div><div class="cm-jleaves"></div><img class="cm-jmk" data-r="mk" alt="">';
+c.lay.innerHTML=h;var w=q(c.lay,'w'),mk=q(c.lay,'mk'),vEls=w.querySelectorAll('.cm-jv'),fEls=w.querySelectorAll('.cm-jfruit'),tree=w.querySelector('.cm-jtree');
+mk.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(yay);
+function vx(i){return 60+GAP*i;}
+function end(i,th){return [vx(i)+L*Math.sin(th),L*Math.cos(th)];}
+fEls.forEach(function(e,i){vpos(e,vx(i)+GAP/2,66);});vpos(tree,vx(N)+58,24);
+function info(){c.setProb('🌿 Vine '+cur+' / '+N+'   '+(got?'· '+got+' snacks':''));}
+info();
+function placeMk(x,y,rot){var s=c.W()/300;mk.style.left=((x-cam)*s)+'px';mk.style.top=(y*s)+'px';mk.style.transform='translate(-50%,-18.4%) rotate('+(rot||0)+'rad)';}
+function tap(){
+if(mode!=='swing')return;var th=A*Math.sin(phi),fwd=Math.cos(phi)>0;
+if(fwd&&th>-0.25){mode='fly';var p0=end(cur,th),p1=end(cur+1,-0.42);fl={u:0,p0:p0,p1:p1,c0:cam,c1:vx(cur+1)-60};tone(520,.08,'triangle');tone(780,.12,'triangle',.06);}
+else{mode='fall';var p=end(cur,th);fall={x:p[0],y:p[1],vx:fwd?40:-30,vy:-60,t:0};tone(220,.25,'sine');}
+}
+c.tap=tap;
+c.on(c.f,'pointerdown',function(e){if(e.target.closest('.cm-overlay'))return;tap();});
+c.on(document,'keydown',function(e){if(e.code==='Space'){e.preventDefault();tap();}});
+c.loop(function(dt){
+t+=dt;var s=c.W()/300;w.style.transform='translateX('+(-cam*s)+'px)';
+vEls.forEach(function(v,i){var th=i===cur&&mode==='swing'?A*Math.sin(phi):(i===cur+1&&mode==='fly'?-0.42*Math.min(1,fl.u*1.3):0.06*Math.sin(t*1.3+i));v.style.left=(vx(i)*s)+'px';v.style.height=(L*s)+'px';v.style.transform='rotate('+(-th)+'rad)';});
+if(mode==='swing'){phi+=OM*dt;var th=A*Math.sin(phi),p=end(cur,th);placeMk(p[0],p[1],-th);}
+else if(mode==='fly'){fl.u=Math.min(1,fl.u+dt/0.72);var u=fl.u,x=fl.p0[0]+(fl.p1[0]-fl.p0[0])*u,y=fl.p0[1]+(fl.p1[1]-fl.p0[1])*u-60*Math.sin(Math.PI*u);cam=fl.c0+(fl.c1-fl.c0)*u;placeMk(x,y,0.5*Math.sin(Math.PI*2*u));
+var fe=fEls[cur];if(fe&&!fe.classList.contains('got')&&Math.abs(x-(vx(cur)+GAP/2))<26&&Math.abs(y-66)<30){fe.classList.add('got');got++;tone(988,.08,'triangle');info();}
+if(u>=1){cur++;phi=Math.asin(-0.42/A);mode='swing';info();if(cur>=N){mode='done';c.T.after(function(){w.querySelector('.cm-jtree').classList.add('yay');},200);c.T.after(function(){c.end('You made it to the treehouse!','Mochi leaped across all '+N+' vines and grabbed <b>'+got+'</b> jungle snack'+(got===1?'':'s')+'! 🍌');},1300);}}}
+else if(mode==='fall'){fall.t+=dt;if(fall.y<168){fall.vy+=520*dt;fall.x+=fall.vx*dt;fall.y=Math.min(168,fall.y+fall.vy*dt);}placeMk(fall.x,fall.y,Math.sin(fall.t*12)*0.2);
+if(fall.t>1.3){mode='swing';phi=0;}}
+});
+},
+/* ---------- Beach: Ice Cream Stand ---------- */
+beach:function(c){
+var FL=[['Strawberry','#f9a8d4'],['Mint','#a7f3d0'],['Chocolate','#b7793f'],['Vanilla','#fff7d6'],['Blueberry','#93c5fd'],['Mango','#fdba74']],
+CUST=shuffle(['🐶','🐱','🐰','🐸','🐼','🦊','🐨','🐯','🐷','🐧','🦁','🐻']),N=8,n=0,tips=0,order=null,cone=[],cherry=false,busy=false,t0=0;
+function coneHTML(a,ch){return '<div class="cm-icone">'+(ch?'<em>🍒</em>':'')+a.slice().reverse().map(function(i){return '<i style="--pc:'+FL[i][1]+'"></i>';}).join('')+'<b></b></div>';}
+c.lay.innerHTML='<div class="cm-iawn"></div><img class="cm-imk" src="'+monkeyURI(S.look)+'" alt=""><div class="cm-icounter"></div><div class="cm-imake" data-r="mk"></div><div class="cm-icust" data-r="cu"><span data-r="face"></span></div><div class="cm-ibub" data-r="bub"></div>';
+c.panel('<div class="cm-itubs">'+FL.map(function(f,i){return '<button class="cm-itub" data-f="'+i+'" style="--pc:'+f[1]+'"><i></i><small>'+f[0]+'</small></button>';}).join('')+'<button class="cm-itub" data-f="ch"><em>🍒</em><small>Cherry</small></button></div><div class="cm-row cm-ibtns"><button class="cm-bigbtn" data-r="serve">Serve ✓</button><button class="cm-bigbtn alt" data-r="trash">🗑️ Start over</button></div>');
+var mkA=q(c.lay,'mk'),cu=q(c.lay,'cu'),bub=q(c.lay,'bub'),face=q(c.lay,'face');
+function paint(){mkA.innerHTML=cone.length||cherry?coneHTML(cone,cherry):'<div class="cm-icone empty"><b></b></div>';}
+function info(){c.setProb('🍦 Customer '+Math.min(n+1,N)+' / '+N+'   ·   🪙 '+tips+' tips');}
+function showOrder(){bub.innerHTML='<small>One of these, please!</small>'+coneHTML(order.s,order.ch);}
+function next(){
+var size=n<2?1:n<5?2:3,s=[];for(var i=0;i<size;i++)s.push(rnd(0,FL.length-1));order={s:s,ch:n>=3&&Math.random()<.55};
+cone=[];cherry=false;paint();face.textContent=CUST[n%CUST.length];cu.className='cm-icust in';bub.className='cm-ibub';showOrder();t0=Date.now();busy=false;info();
+}
+c.on(c.panelEl,'click',function(e){
+var b=e.target.closest('button');if(!b||busy||!order)return;var f=b.getAttribute('data-f'),r=b.getAttribute('data-r');
+if(f==='ch'){if(!cone.length){bub.innerHTML='<small>Scoops first, then the cherry!</small>';c.T.after(showOrder,1100);return;}cherry=!cherry;tone(1046,.06,'triangle');paint();}
+else if(f!=null){if(cone.length>=3||cherry)return;cone.push(+f);tone(600+cone.length*120,.07,'triangle');paint();}
+else if(r==='trash'){cone=[];cherry=false;paint();tone(300,.08,'sine');}
+else if(r==='serve'){
+if(!cone.length)return;
+var ok=cone.length===order.s.length&&cone.every(function(v,i){return v===order.s[i];})&&cherry===order.ch;
+if(ok){busy=true;var tip=1+(Date.now()-t0<9000?1:0);tips+=tip;n++;sfxGood();bub.innerHTML='<b class="cm-iyum">Yum! ❤️</b><small>+'+tip+' 🪙 tip'+(tip>1?'s':'')+'</small>';cu.classList.add('happy');
+c.say(80,30,'+'+tip+' 🪙');info();c.T.after(function(){cu.className='cm-icust out';},900);
+c.T.after(function(){if(n>=N)c.end('Mochi’s ice cream stand was a hit!','You served <b>'+N+'</b> happy customers and earned <b>'+tips+'</b> tips 🪙');else next();},1500);}
+else{sfxBad();bub.innerHTML='<small>Hmm… that’s not what I ordered!</small>';c.T.after(function(){if(order)showOrder();},1300);}
+}
+});
+next();
+},
+/* ---------- Party: presents + candles ---------- */
+party:function(c){
+var ALL=[['🧸','a teddy bear'],['🪀','a yo-yo'],['🚂','a toy train'],['🎨','a paint set'],['🦄','a unicorn'],['🪁','a kite'],['🎸','a guitar'],['⚽','a soccer ball'],['🔭','a telescope'],['🛼','roller skates'],['🧩','a puzzle'],['🎺','a trumpet'],['🚁','a toy helicopter'],['📚','a stack of books']];
+var G=shuffle(ALL.slice()).slice(0,6),cols=shuffle(['#ef4444','#3b82f6','#22c55e','#a855f7','#f97316','#ec4899']),opened=0,ps=[[44,40],[62,40],[80,40],[44,72],[62,72],[80,72]],stage='gifts';
+c.lay.innerHTML='<img class="cm-pmk" src="'+monkeyURI(S.look)+'" alt=""><div class="cm-pgot" data-r="got"></div>'+G.map(function(g,i){return '<button class="cm-gift cm-ac-party" data-i="'+i+'" data-s="0" style="left:'+ps[i][0]+'%;top:'+ps[i][1]+'%;--pc:'+cols[i]+'" aria-label="Present"><i class="lid"></i><i class="bx"></i></button>';}).join('')+'<div class="cm-preveal" data-r="rv"></div>';
+var got=q(c.lay,'got'),rv=q(c.lay,'rv');
+c.setProb('🎁 Presents opened: 0 / 6');
+c.on(c.lay,'click',function(e){
+var b=e.target.closest('.cm-gift');if(b&&stage==='gifts'){var s=+b.getAttribute('data-s');if(s>=3)return;s++;b.setAttribute('data-s',s);
+if(s===1){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');tone(440,.08,'triangle');}
+else if(s===2){b.classList.add('unr');tone(587,.1,'triangle');c.say(+b.style.left.replace('%','')*3,+b.style.top.replace('%','')*2-30,'✂️');}
+else{var g=G[+b.getAttribute('data-i')];b.classList.add('open');tone(784,.1,'triangle');tone(1046,.16,'triangle',.08);opened++;c.setProb('🎁 Presents opened: '+opened+' / 6');
+rv.innerHTML='<span>'+g[0]+'</span><b>You got '+g[1]+'!</b>';rv.className='cm-preveal show';
+c.T.after(function(){rv.className='cm-preveal';got.insertAdjacentHTML('beforeend','<i>'+g[0]+'</i>');b.classList.add('gone');if(opened>=6)cake();},1500);}
+return;}
+var cd=e.target.closest('.cm-candle');if(cd&&stage==='cake'&&!cd.classList.contains('out')){cd.classList.add('out');tone(330,.1,'sine');var left=c.lay.querySelectorAll('.cm-candle:not(.out)').length;if(!left){stage='done';sing();}}
+});
+function cake(){stage='cake';c.setProb('🎂 Tap the candles to blow them out!');
+var cs='';for(var i=0;i<5;i++)cs+='<button class="cm-candle" style="left:'+(22+i*14)+'%" aria-label="Candle"><i></i></button>';
+c.lay.insertAdjacentHTML('beforeend','<div class="cm-cake">'+cs+'<div class="t2"></div><div class="t1"></div></div>');}
+function sing(){c.setProb('🎉 Happy Birthday, '+esc(S.mname)+'!');confetti(c.f);
+var HB=[[392,.3],[392,.15],[440,.45],[392,.45],[523,.45],[494,.9],[392,.3],[392,.15],[440,.45],[392,.45],[587,.45],[523,.9]],tt=.2;HB.forEach(function(n){tone(n[0],n[1]*.95,'triangle',tt);tt+=n[1]+.05;});
+c.T.after(function(){c.end('Happy Birthday, '+esc(S.mname)+'!','You opened all 6 presents and blew out every candle! 🎂',true);},Math.round(tt*1000)+300);}
+},
+/* ---------- Snow: Ski Run ---------- */
+snow:function(c){
+var LEN=3300,cam=0,v=118,y=0,vy=0,air=false,crash=0,flakes=0,done=false,X=82,objs=[],wx=420;
+while(wx<LEN-250){objs.push({x:wx,k:Math.random()<.6?'rock':'snow'});var fx=wx+rnd(70,110);if(fx<LEN-200)objs.push({x:fx,k:'flake',h:rnd(26,62)});wx+=rnd(190,300);}
+var trees=[];for(var tx=0;tx<LEN+300;tx+=rnd(50,90))trees.push(tx);
+var mt='<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">'+BG.snow+'</svg>';
+c.lay.innerHTML='<div class="cm-kmts" data-r="mts">'+mt+mt+'</div><div class="cm-ktrees" data-r="tr">'+trees.map(function(){return '<span>🌲</span>';}).join('')+'</div><svg class="cm-kground" viewBox="0 0 300 200" preserveAspectRatio="none"><path data-r="g" fill="#fff" stroke="#bfdbfe" stroke-width="2"/></svg>'+
+objs.map(function(o){return '<span class="cm-kob '+o.k+'">'+(o.k==='rock'?'🪨':o.k==='snow'?'⛄':'❄️')+'</span>';}).join('')+'<span class="cm-kob lodge">🏠🚩</span><div class="cm-skier" data-r="sk"><img src="'+monkeyURI(S.look)+'" alt=""><i></i></div>';
+var mts=q(c.lay,'mts'),tr=q(c.lay,'tr'),gp=q(c.lay,'g'),sk=q(c.lay,'sk'),oEls=c.lay.querySelectorAll('.cm-kob'),tEls=tr.querySelectorAll('span');
+c.f.classList.add('cm-skirun');
+function gy(sx){return 112+0.22*(sx-150)+10*Math.sin((sx+cam)/48);}
+function jump(){if(!air&&!done&&crash<=0){air=true;vy=-235;tone(660,.08,'triangle');}}
+c.on(c.f,'pointerdown',function(e){if(e.target.closest('.cm-overlay'))return;jump();});
+c.on(document,'keydown',function(e){if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump();}});
+c.loop(function(dt){
+if(!done){cam+=(crash>0?40:v)*dt;if(crash>0)crash-=dt;}
+var s=c.W()/300,d='M0 200 ';for(var sx=0;sx<=300;sx+=10)d+='L'+sx+' '+gy(sx).toFixed(1)+' ';gp.setAttribute('d',d+'L300 200 Z');
+mts.style.transform='translateX('+(-(cam*0.12*s)%(c.W()))+'px)';
+tEls.forEach(function(e,i){var sx=trees[i]-cam*0.55;if(sx<-20||sx>320){e.style.display='none';return;}e.style.display='';vpos(e,sx,gy(sx)-58+((i*37)%14));});
+var g=gy(X);if(air){vy+=640*dt;y+=vy*dt;if(y>=0){y=0;air=false;}}
+var slope=Math.atan((gy(X+4)-gy(X-4))/8);
+sk.style.left=(X/3)+'%';sk.style.top=((g+Math.min(0,y))/2)+'%';sk.style.transform='translate(-50%,-100%) rotate('+(crash>0?crash*720:slope*57.3)+'deg)';
+objs.forEach(function(o,i){var e=oEls[i],sx=o.x-cam;if(sx<-20||sx>320){e.style.display='none';return;}e.style.display='';vpos(e,sx,gy(sx)-(o.k==='flake'?o.h:0));
+if(o.done)return;
+if(o.k==='flake'){if(Math.abs(sx-X)<14&&Math.abs((-y)-(o.h-14))<22){o.done=true;e.classList.add('got');flakes++;tone(1175,.08,'triangle');}}
+else if(Math.abs(sx-X)<11&&-y<14){o.done=true;e.classList.add('hit');crash=0.75;tone(180,.25,'sine');c.say(X,gy(X)-60,'Whoops!');}
+});
+var le=oEls[oEls.length-1],lx=LEN-cam;if(lx<330){le.style.display='';vpos(le,lx,gy(lx));}else le.style.display='none';
+c.setProb('⛷️ '+Math.min(100,Math.round(cam/(LEN-80)*100))+'% down the mountain   ·   ❄️ '+flakes);
+if(!done&&cam>=LEN-80){done=true;c.T.after(function(){c.end('What a run!','Mochi skied all the way down the mountain and caught <b>'+flakes+'</b> snowflake'+(flakes===1?'':'s')+'! ❄️ Hot cocoa time at the lodge ☕');},700);}
+});
+},
+/* ---------- Soccer: Stadium Shootout ---------- */
+soccer:function(c){
+var N=8,shot=0,goals=0,busy=false;
+c.lay.innerHTML='<div class="cm-sgoal" data-r="goal"><div class="cm-gk" data-r="gk"><svg viewBox="0 0 60 70" aria-hidden="true"><circle cx="30" cy="16" r="12" fill="#f6c995"/><path d="M14 66 Q12 34 30 30 Q48 34 46 66 Z" fill="#f97316"/><circle cx="8" cy="34" r="7" fill="#22c55e"/><circle cx="52" cy="34" r="7" fill="#22c55e"/><circle cx="26" cy="15" r="2" fill="#2a1a10"/><circle cx="34" cy="15" r="2" fill="#2a1a10"/></svg></div></div><div class="cm-sball" data-r="ball">⚽</div><img class="cm-smk" src="'+monkeyURI(S.look)+'" alt="">';
+var goal=q(c.lay,'goal'),gk=q(c.lay,'gk'),ball=q(c.lay,'ball');
+function info(){c.setProb('⚽ Goals: '+goals+'   ·   Shot '+Math.min(shot+1,N)+' of '+N);}
+info();
+c.on(goal,'pointerdown',function(e){
+if(busy||shot>=N)return;busy=true;var r=goal.getBoundingClientRect(),gr=gk.getBoundingClientRect(),tx=(e.clientX-r.left)/r.width*100,ty=(e.clientY-r.top)/r.height*100;
+tx=Math.max(6,Math.min(94,tx));ty=Math.max(8,Math.min(92,ty));
+var gx=(gr.left+gr.width/2-r.left)/r.width*100,reach=20+rnd(0,12)-(ty<35?7:0)-((tx<18||tx>82)?6:0),dist=Math.abs(gx-tx),saved=dist<reach;
+gk.classList.add('dive');gk.style.left=(saved?tx:gx+Math.sign(tx-gx)*reach*0.8)+'%';gk.style.transform='translateX(-50%) rotate('+(tx<gx?-35:35)+'deg)';
+var fx=18+64*tx/100,fy=10+44*ty/100;ball.classList.add('kick');ball.style.left=fx+'%';ball.style.top=fy+'%';tone(330,.06,'square');shot++;
+c.T.after(function(){
+if(saved){ball.style.top=(fy+30)+'%';c.say(fx*3,fy*2,'Saved! 🧤');tone(220,.2,'sine');}
+else{goals++;goal.classList.remove('net');void goal.offsetWidth;goal.classList.add('net');c.say(fx*3-20,fy*2,'GOOOAL!');confetti(c.f);[523,659,784,1047].forEach(function(f,i){tone(f,.15,'triangle',i*.08);});}
+info();
+},560);
+c.T.after(function(){ball.classList.remove('kick');ball.style.left='';ball.style.top='';gk.classList.remove('dive');gk.style.left='';gk.style.transform='';busy=false;
+if(shot>=N)c.end('Full time!','You scored <b>'+goals+'</b> of '+N+' shots! '+(goals>=6?'What a superstar! 🌟':goals>=3?'Great shooting! ⚽':'The crowd loved it! 📣'));},1600);
+});
+},
+/* ---------- Opera: Opera Star ---------- */
+opera:function(c){
+var C4=261.6,D4=293.7,E4=329.6,F4=349.2,G4=392,A4=440,L1=[C4,C4,G4,G4,A4,A4,G4],L2=[F4,F4,E4,E4,D4,D4,C4],L3=[G4,G4,F4,F4,E4,E4,D4];
+var song=[].concat(L1,L2,L3,L3,L1,L2),notes=[],tt=2.4,TRAV=2.3,hits=0,perf=0,t0=0,over=false;
+song.forEach(function(f,i){notes.push({t:tt,f:f});tt+=(i%7===6)?1.05:0.52;});
+c.lay.innerHTML='<div class="cm-olane"><div class="cm-oring"></div><div data-r="nl"></div></div><img class="cm-omk" data-r="mk" src="'+monkeyURI(S.look)+'" alt=""><div class="cm-ometer"><i data-r="m"></i></div><div class="cm-oaud">'+seq(16).map(function(i){return '<i style="--h:'+(70+((i*37)%30))+'%"></i>';}).join('')+'</div>';
+var nl=q(c.lay,'nl'),mk=q(c.lay,'mk'),meter=q(c.lay,'m');
+notes.forEach(function(n){var e=document.createElement('span');e.className='cm-onote2';e.textContent='♪';nl.appendChild(e);n.el=e;});
+t0=performance.now()/1000;
+function now(){return performance.now()/1000-t0;}
+var cool=0;function tap(){if(over)return;var t=now(),best=null,bd=1;if(t<cool)return;notes.forEach(function(n){if(n.hit||n.miss)return;var d=Math.abs(t-n.t);if(d<bd){bd=d;best=n;}});
+if(!best||bd>=0.24){cool=t+0.35;return;}
+if(best&&bd<0.24){best.hit=true;hits++;if(bd<0.1)perf++;best.el.classList.add('hit');tone(best.f*2,.38,'sine');mk.classList.remove('sing');void mk.offsetWidth;mk.classList.add('sing');c.say(34,70,bd<0.1?'Perfect! ♪':'♪');meter.style.width=Math.round(hits/notes.length*100)+'%';}}
+c.on(c.f,'pointerdown',function(e){if(e.target.closest('.cm-overlay'))return;tap();});
+c.on(document,'keydown',function(e){if(e.code==='Space'){e.preventDefault();tap();}});
+c.loop(function(){var t=now();notes.forEach(function(n){var u=(n.t-t)/TRAV;if(u>1.05||n.hit&&t-n.t>.4){n.el.style.display='none';return;}n.el.style.display='';n.el.style.left=(22+u*76)+'%';if(!n.hit&&!n.miss&&t-n.t>0.26){n.miss=true;n.el.classList.add('miss');}});
+c.setProb('🎭 Notes sung: '+hits+' / '+notes.length);
+if(!over&&t>tt+0.8){over=true;bravo();}});
+function bravo(){c.setProb('🌹 Bravo! Bravo!');mk.classList.add('bow');var roses='';for(var i=0;i<26;i++)roses+='<span class="cm-rose" style="left:'+rnd(4,96)+'%;animation-delay:'+(Math.random()*1.4).toFixed(2)+'s">'+pick(['🌹','🌹','💐','🌸'])+'</span>';c.lay.insertAdjacentHTML('beforeend',roses);
+for(var k=0;k<22;k++)tone(rnd(900,1600),.03,'square',k*.07);
+c.T.after(function(){c.end('Bravo! Bravissimo!',esc(S.mname)+' sang <b>'+hits+'</b> of '+notes.length+' notes'+(perf?' ('+perf+' perfect!)':'')+' and the audience threw roses! 🌹');},2800);}
+},
+/* ---------- Space: Star Flight ---------- */
+space:function(c){
+var DUR=34,t=0,y=100,ty=100,stars=0,objs=[],spawn=0,bump=0,done=false,keys={};
+var bg='<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">'+BG.space+'</svg>';
+c.lay.innerHTML='<div class="cm-sfar" data-r="far">'+bg+bg+'</div><div data-r="ob"></div><div class="cm-srk" data-r="rk"><svg viewBox="0 0 120 60" aria-hidden="true"><path d="M8 30 L0 14 L22 22 Z M8 30 L0 46 L22 38 Z" fill="#ef4444"/><path d="M14 30 Q30 8 80 10 Q108 16 118 30 Q108 44 80 50 Q30 52 14 30 Z" fill="#f1f5f9"/><path d="M92 12 Q110 18 118 30 Q110 42 92 48 Q102 30 92 12 Z" fill="#ef4444"/><circle cx="60" cy="30" r="15" fill="#bae6fd" stroke="#64748b" stroke-width="3"/></svg><div class="cm-srkw"><img src="'+monkeyURI(S.look)+'" alt=""></div><i class="fl"></i></div><div class="cm-splanet" data-r="pl"><span class="flag">🚩</span></div>';
+var far=q(c.lay,'far'),ob=q(c.lay,'ob'),rk=q(c.lay,'rk'),pl=q(c.lay,'pl');
+function setTy(e){var r=c.f.getBoundingClientRect();ty=Math.max(22,Math.min(178,(e.clientY-r.top)/r.height*200));}
+c.on(c.f,'pointerdown',function(e){if(e.target.closest('.cm-overlay'))return;setTy(e);});
+c.on(c.f,'pointermove',function(e){if(e.buttons||e.pointerType==='mouse')setTy(e);});
+c.on(document,'keydown',function(e){if(e.code==='ArrowUp'||e.code==='ArrowDown'){e.preventDefault();keys[e.code]=1;}});
+c.on(document,'keyup',function(e){keys[e.code]=0;});
+c.loop(function(dt){
+if(done)return;t+=dt;if(keys.ArrowUp)ty=Math.max(22,ty-170*dt);if(keys.ArrowDown)ty=Math.min(178,ty+170*dt);
+y+=(ty-y)*Math.min(1,dt*6);if(bump>0)bump-=dt;
+far.style.transform='translateX('+(-(t*14*c.W()/300)%c.W())+'px)';
+rk.style.left='20%';rk.style.top=(y/2)+'%';rk.style.transform='translate(-50%,-50%) rotate('+(bump>0?Math.sin(bump*30)*25:(ty-y)*0.25)+'deg)';
+spawn-=dt;if(t<DUR-3&&spawn<=0){spawn=0.55+Math.random()*.4;var rock=Math.random()<.38,e=document.createElement('span');e.className='cm-sob '+(rock?'rock':'star');e.innerHTML=rock?'<i></i>':'⭐';ob.appendChild(e);objs.push({x:320,y:rnd(24,176),v:rock?rnd(80,115):rnd(90,120),rock:rock,el:e});}
+objs=objs.filter(function(o){o.x-=o.v*dt;if(o.x<-20||o.gone){o.el.remove();return false;}vpos(o.el,o.x,o.y);
+if(Math.abs(o.x-60)<(o.rock?20:18)&&Math.abs(o.y-y)<(o.rock?18:20)){if(o.rock){if(bump<=0){bump=0.6;tone(150,.2,'sine');c.say(60,y-30,'Bonk!');}}else{o.gone=true;stars++;tone(1046+((stars%5)*80),.07,'triangle');}}
+return true;});
+c.setProb('🚀 ⭐ '+stars+' stars   ·   '+Math.max(0,Math.ceil(DUR-t))+'s to the planet');
+if(t>=DUR){done=true;pl.classList.add('in');rk.style.transition='left 1.4s ease-in-out,top 1.4s ease-in-out,transform 1.4s';c.T.after(function(){rk.style.left='76%';rk.style.top='44%';rk.style.transform='translate(-50%,-50%) rotate(20deg) scale(.8)';},500);
+c.T.after(function(){pl.classList.add('flagged');tone(784,.12,'triangle');tone(1046,.2,'triangle',.12);},2100);
+c.T.after(function(){c.end('Touchdown on a new planet!',esc(S.mname)+' collected <b>'+stars+'</b> star'+(stars===1?'':'s')+' on the way! ⭐');},3000);}
+});
+},
+/* ---------- Palace: Royal Fireworks ---------- */
+palace:function(c){
+var DUR=30,t0=performance.now()/1000,n=0,combo=0,best=0,last=0,over=false,COL=['#f43f5e','#facc15','#22d3ee','#a3e635','#c084fc','#fb923c','#f472b6','#ffffff'];
+c.lay.innerHTML='<div class="cm-fnight">'+seq(30).map(function(i){return '<i style="left:'+((i*37)%100)+'%;top:'+((i*53)%60)+'%;animation-delay:'+(i%7)*.3+'s"></i>';}).join('')+'</div><div data-r="fx"></div><img class="cm-fmk" src="'+monkeyURI(S.look,'')+'" alt="">';
+var fx=q(c.lay,'fx');
+function burst(x,y,big){
+var col=pick(COL),col2=pick(COL),k=big?28:20,r=big?34:24,e=document.createElement('div');e.className='cm-fwb';vpos(e,x,y);
+var h='<b style="--c:'+col+'"></b>';for(var i=0;i<k;i++){var a=i/k*Math.PI*2,rr=r*(0.7+Math.random()*0.5);h+='<i style="--c:'+(i%3?col:col2)+';--dx:'+(Math.cos(a)*rr).toFixed(1)+'cqw;--dy:'+(Math.sin(a)*rr).toFixed(1)+'cqw"></i>';}
+e.innerHTML=h;fx.appendChild(e);tone(rnd(140,220),.18,'sawtooth');tone(rnd(1200,1800),.05,'triangle',.05);setTimeout(function(){e.remove();},1300);}
+function launch(x,y,big){var s=document.createElement('span');s.className='cm-fws';vpos(s,x,200);fx.appendChild(s);void s.offsetWidth;s.style.top=(y/2)+'%';tone(500,.12,'sine');setTimeout(function(){s.remove();burst(x,y,big);},420);}
+c.on(c.f,'pointerdown',function(e){if(over||e.target.closest('.cm-overlay'))return;var r=c.f.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*300,y=Math.min(130,(e.clientY-r.top)/r.height*200);
+var t=performance.now()/1000;combo=t-last<0.8?combo+1:1;last=t;best=Math.max(best,combo);n++;launch(x,y,combo>=4);if(combo>=3)c.say(x,y-20,'×'+combo+' combo!');});
+c.loop(function(){var t=performance.now()/1000-t0;c.setProb('🎆 '+n+' fireworks   ·   ⏱ '+Math.max(0,Math.ceil(DUR-t))+'s');
+if(!over&&t>=DUR){over=true;c.setProb('👑 Grand finale!');for(var i=0;i<14;i++)(function(i){c.T.after(function(){launch(rnd(30,270),rnd(25,110),true);},i*160);})(i);
+c.T.after(function(){c.end('What a royal celebration!','You launched <b>'+n+'</b> fireworks over the palace'+(best>=3?' — best combo ×'+best+'!':'!')+' 🎆');},3400);}});
+}
+};
+function gFun(box,id){
+var F=FUN[id];
+box.innerHTML=gHead(F.icon+' '+F.name)+'<div class="cm-af cm-fun cm-fn-'+id+'" data-r="f"><svg class="cm-afbg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+(ADV_TH[id]&&ADV_TH[id].bg?ADV_TH[id].bg():(BG[id]||''))+'</svg><div class="cm-aflay" data-r="lay"></div><div class="cm-overlay hide" data-r="ov"></div></div><div data-r="panel"></div><p class="cm-tip">'+F.tip+'</p>';
+var c={f:q(box,'f'),lay:q(box,'lay'),ov:q(box,'ov'),probEl:q(box,'prob'),panelEl:q(box,'panel'),T:null,_loops:[],_h:[]};
+c.W=function(){return c.f.clientWidth||300;};
+c.setProb=function(t){c.probEl.textContent=t;};
+c.panel=function(h){c.panelEl.innerHTML='<div class="cm-funpanel">'+h+'</div>';};
+c.say=function(x,y,t){floatText(c.f,c.W()*x/300-30,c.f.clientHeight*y/200,t);};
+c.loop=function(fn){var me={on:true},last=0;function step(ts){if(!me.on)return;var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;try{fn(dt);}catch(err){me.on=false;if(window.console)console.error(err);}requestAnimationFrame(step);}requestAnimationFrame(step);c._loops.push(me);};
+c.on=function(el,ev,fn){el.addEventListener(ev,fn);c._h.push([el,ev,fn]);};
+c.stop=function(){c._loops.forEach(function(m){m.on=false;});c._loops=[];if(c.T)c.T.clear();c._h.forEach(function(h){h[0].removeEventListener(h[1],h[2]);});c._h=[];};
+c.end=function(title,msg){c.stop();sfxWin();confetti(c.f);showOv2(c.ov,yayMochi()+'<h3>'+title+'</h3><p>'+msg+'</p>',[['Play again',start],['👕 Dress up',function(){go('kids/monkey');},'alt'],['🎮 Math games',function(){go('kids');},'alt']]);};
+onCleanup(function(){c.stop();});
+function start(){c.stop();c.T=timers();c.lay.innerHTML='';c.panelEl.innerHTML='';c.f.classList.remove('cm-skirun');FUN_G[id](c);}
+c.setProb(F.icon+' '+F.name);box.querySelector('[data-r="stats"]').innerHTML=chip('🎉 Just for fun');
+showOv(c.ov,'<div class="cm-ovemoji">'+F.icon+'</div><h3>'+F.name+'</h3><p>'+F.intro+'</p>','Let’s go! ▶',start);
+}
+function vFun(id){
+var sc=SCENES.filter(function(s){return s.id===id;})[0];if(!sc||!FUN[id])return go('kids/monkey');
+var back='<a href="#cm/kids/monkey" data-go="kids/monkey">← Back to '+esc(S.mname)+'’s Adventures</a>';
+if(!sceneOpen(sc)){view.innerHTML='<div class="cm-crumbs">'+back+'</div><div class="cm-game" style="text-align:center"><div class="cm-ovemoji">🔒</div><h2 class="cm-gtitle">'+FUN[id].name+'</h2><p style="font-weight:700">This game comes with the <b>'+sc.icon+' '+sc.name+'</b> trip. Earn <b>'+(sc.need-S.bananas)+'</b> more bananas to unlock it!</p><p><a class="cm-bigbtn" href="#cm/kids" data-go="kids">Go play ▶</a></p></div>';return;}
+view.innerHTML='<div class="cm-crumbs">'+back+'<span class="cm-chip">'+sc.icon+' '+sc.name+'</span></div><div class="cm-game" id="cm-g"></div>';
+gFun(view.querySelector('#cm-g'),id);
+}
+
+var MATHX=[{id:'vine',th:'jungle',c:'#bbf7d0'},{id:'scoops',th:'beach',c:'#fde68a'},{id:'gifts',th:'party',c:'#fbcfe8'},{id:'lift',th:'snow',c:'#bae6fd'},{id:'kicks',th:'soccer',c:'#86efac'},{id:'notes',th:'opera',c:'#fecaca'},{id:'planets',th:'space',c:'#c7d2fe'},{id:'jewels',th:'palace',c:'#e9d5ff'}];
+function mxById(id){return MATHX.filter(function(m){return m.id===id;})[0];}
+function mxCards(mini){return MATHX.map(function(m){var A=ADV[m.th];return '<a href="#cm/kids/'+m.id+'" data-go="kids/'+m.id+'" class="cm-kcard'+(mini?' mini':'')+'" style="--c:'+m.c+'"><div class="cm-kicon">'+A.icon+'</div><h3>'+A.game+'</h3>'+(mini?'':'<p>'+A.d+'</p>')+'<span class="cm-play">Play ▶</span></a>';}).join('');}
 /* ================= VIEWS ================= */
 function vHome(){
 var topics=COURSES.reduce(function(s,c){return s+c.topics.length;},0),nThink=Object.keys(THINK).length;
@@ -2002,7 +2251,7 @@ view.innerHTML='<section class="cm-hero"><div><h1>Math is way more fun with a <s
 }
 function myBanner(){
 var nx=nextScene(),prev=SCENES.filter(function(s){return s.need<=S.bananas;}).pop(),pct=nx?Math.round((S.bananas-prev.need)/(nx.need-prev.need)*100):100;
-return '<section class="cm-mybar"><div class="cm-mbscene" data-go="kids/monkey" role="link" tabindex="0" aria-label="Dress up your monkey">'+sceneSVG(S.scene,S.look)+'<span class="cm-mbtag">'+sceneById(S.scene).icon+' '+sceneById(S.scene).name+'</span><a class="cm-advplay" href="#cm/kids/adv-'+S.scene+'" data-go="kids/adv-'+S.scene+'">🎮 Play '+ADV[S.scene].icon+' '+ADV[S.scene].game+'</a></div>'+
+return '<section class="cm-mybar"><div class="cm-mbscene" data-go="kids/monkey" role="link" tabindex="0" aria-label="Dress up your monkey">'+sceneSVG(S.scene,S.look)+'<span class="cm-mbtag">'+sceneById(S.scene).icon+' '+sceneById(S.scene).name+'</span><a class="cm-advplay" href="#cm/kids/fun-'+S.scene+'" data-go="kids/fun-'+S.scene+'">🎉 Play '+FUN[S.scene].icon+' '+FUN[S.scene].name+'</a></div>'+
 '<div class="cm-mbinfo"><p class="cm-mbkick">🐒 Your monkey</p><h1 class="cm-h1">'+esc(S.mname)+'’s <span class="cm-hl">Adventures</span></h1>'+
 '<p class="cm-lead">Every right answer earns a banana. Bananas send '+esc(S.mname)+' on new trips — with new clothes to wear there!</p>'+
 '<div class="cm-mbban">🍌 <b>'+S.bananas+'</b> banana'+(S.bananas===1?'':'s')+' earned</div>'+
@@ -2017,24 +2266,26 @@ view.innerHTML=myBanner()+
 '<h2 class="cm-h2">1. Pick your grade</h2><div class="cm-grades">'+[1,2,3,4,5,6].map(function(n){return '<button data-grade="'+n+'" class="'+(n===g?'is-on':'')+'" aria-label="Grade '+n+'"><b>'+n+'</b><small>'+ord(n)+'</small></button>';}).join('')+'</div><p class="cm-gdesc">'+GRADE_DESC[g]+'</p>'+
 '<h2 class="cm-h2">⚡ Quick Skills <small>Fast facts you can do in your head: '+QUICK_DESC[g]+'</small></h2><div class="cm-kgrid">'+KGAMES.map(function(k){return '<a href="#cm/kids/'+k.id+'" data-go="kids/'+k.id+'" class="cm-kcard" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3><p>'+k.d+'</p><span class="cm-play">Play ▶</span></a>';}).join('')+'</div>'+
 '<h2 class="cm-h2">🧠 Think It Through <small>Grade '+g+' — bigger problems, step by step. Take your time!</small></h2><div class="cm-kgrid">'+THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3><p>'+k.d[g]+'</p><span class="cm-play">Start ▶</span></a>';}).join('')+'</div>'+
-'<h2 class="cm-h2">🗺️ Adventure Games <small>Every trip '+esc(S.mname)+' unlocks comes with its own mini game!</small></h2><div class="cm-kgrid">'+SCENES.map(function(sc){var A=ADV[sc.id],o=sceneOpen(sc);return o?'<a href="#cm/kids/adv-'+sc.id+'" data-go="kids/adv-'+sc.id+'" class="cm-kcard adv" style="--c:#c4f0ff"><div class="cm-kicon">'+A.icon+'</div><h3>'+A.game+'</h3><p>'+A.d+'</p><span class="cm-play">'+sc.icon+' '+sc.name+' ▶</span></a>':'<div class="cm-kcard adv locked" style="--c:#e5e7eb"><div class="cm-kicon">🔒</div><h3>'+A.game+'</h3><p>'+A.d+'</p><span class="cm-play">Unlocks with '+sc.icon+' '+sc.name+' at '+sc.need+' 🍌</span></div>';}).join('')+'</div>';
+'<h2 class="cm-h2">🎪 More Math Games <small>Grade '+g+' facts in 8 more ways to play!</small></h2><div class="cm-kgrid">'+mxCards(false)+'</div>'+
+'<h2 class="cm-h2">🎉 Adventure Fun <small>Just-for-fun games — every trip '+esc(S.mname)+' unlocks comes with one!</small></h2><div class="cm-kgrid">'+SCENES.map(function(sc){var F=FUN[sc.id],o=sceneOpen(sc);return o?'<a href="#cm/kids/fun-'+sc.id+'" data-go="kids/fun-'+sc.id+'" class="cm-kcard adv" style="--c:#c4f0ff"><div class="cm-kicon">'+F.icon+'</div><h3>'+F.name+'</h3><p>'+F.d+'</p><span class="cm-play">'+sc.icon+' '+sc.name+' ▶</span></a>':'<div class="cm-kcard adv locked" style="--c:#e5e7eb"><div class="cm-kicon">🔒</div><h3>'+F.name+'</h3><p>'+F.d+'</p><span class="cm-play">Unlocks with '+sc.icon+' '+sc.name+' at '+sc.need+' 🍌</span></div>';}).join('')+'</div>';
 view.querySelectorAll('[data-grade]').forEach(function(b){b.onclick=function(){S.grade=+b.getAttribute('data-grade');store.set('grade',S.grade);tone(600,.08,'triangle');vKids();};});
 }
 var CUR_GAME='';
-function gameOrder(){return KGAMES.map(function(k){return k.id;}).concat(THINK_BY_GRADE[S.grade]||[]);}
-function gameInfo(id){var k=KGAMES.filter(function(x){return x.id===id;})[0];if(k)return k;return THINK[id]||KGAMES[0];}
+function gameOrder(){return KGAMES.map(function(k){return k.id;}).concat(THINK_BY_GRADE[S.grade]||[],MATHX.map(function(m){return m.id;}));}
+function gameInfo(id){var k=KGAMES.filter(function(x){return x.id===id;})[0];if(k)return k;var m=mxById(id);if(m)return {icon:ADV[m.th].icon,name:ADV[m.th].game};return THINK[id]||KGAMES[0];}
 function nextBtn(){var o=gameOrder(),n=o[(o.indexOf(CUR_GAME)+1)%o.length],g=gameInfo(n);return ['Next: '+g.icon+' '+g.name+' ▶',function(){go('kids/'+n);},'alt'];}
 function kCards(g,mini){return KGAMES.map(function(k){return '<a href="#cm/kids/'+k.id+'" data-go="kids/'+k.id+'" class="cm-kcard'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d+'</p>')+'<span class="cm-play">Play ▶</span></a>';}).join('')+
-THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d[g]+'</p>')+'<span class="cm-play">Start ▶</span></a>';}).join('');}
+THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d[g]+'</p>')+'<span class="cm-play">Start ▶</span></a>';}).join('')+mxCards(mini);}
 function vKidGame(id){
-if(id!=='monkey'&&id.indexOf('adv-')!==0)CUR_GAME=id;
 if(id==='monkey')return vMonkey();
-if(id.indexOf('adv-')===0)return vAdv(id.slice(4));
-var think=THINK[id];if(!KG_FN[id]&&!think)return go('kids');
+if(id.indexOf('fun-')===0)return vFun(id.slice(4));
+if(id.indexOf('adv-')===0)return go('kids/fun-'+id.slice(4));
+CUR_GAME=id;
+var think=THINK[id],mx=mxById(id);if(!KG_FN[id]&&!think&&!mx)return go('kids');
 var grades=think?think.grades:[1,2,3,4,5,6],cur=grades.indexOf(+S.grade)>-1?+S.grade:grades[0];
 view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Back to the Kids Jungle</a><label style="font-weight:800">Grade <select class="cm-gsel">'+grades.map(function(n){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label></div><div class="cm-game" id="cm-g"></div>';
 view.querySelector('.cm-gsel').onchange=function(){S.grade=+this.value;store.set('grade',S.grade);render();};
-if(think)gThink(view.querySelector('#cm-g'),id);else KG_FN[id](view.querySelector('#cm-g'));
+if(think)gThink(view.querySelector('#cm-g'),id);else if(mx)gAdv(view.querySelector('#cm-g'),mx.th);else KG_FN[id](view.querySelector('#cm-g'));
 }
 var closetSlot='top';
 function vMonkey(){
@@ -2049,7 +2300,7 @@ view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Bac
 '<div class="cm-row cm-closetbtns"><button class="cm-bigbtn" data-r="preset"></button><button class="cm-bigbtn alt" data-r="rand">🎲 Surprise me</button><button class="cm-bigbtn alt" data-r="none">Take it all off</button></div></div></section>'+
 '<h2 class="cm-h2">🎮 Back to the games <small>Grade '+S.grade+' — earn more bananas for new trips! <a href="#cm/kids" data-go="kids">Change grade</a></small></h2><div class="cm-kgrid mini">'+kCards(+S.grade,true)+'</div>';
 function save(){store.set('look',S.look);store.set('scene',S.scene);}
-function paintScene(){sc=sceneById(S.scene);var A0=ADV[S.scene];q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big')+'<a class="cm-advplay" href="#cm/kids/adv-'+S.scene+'" data-go="kids/adv-'+S.scene+'">🎮 Play '+A0.icon+' '+A0.game+'</a>';q(view,'post').innerHTML='<b>'+sc.icon+' '+sc.name+':</b> '+sc.blurb;q(view,'preset').textContent='✨ Dress for '+sc.name;}
+function paintScene(){sc=sceneById(S.scene);var A0=FUN[S.scene];q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big')+'<a class="cm-advplay" href="#cm/kids/fun-'+S.scene+'" data-go="kids/fun-'+S.scene+'">🎉 Play '+A0.icon+' '+A0.name+'</a>';q(view,'post').innerHTML='<b>'+sc.icon+' '+sc.name+':</b> '+sc.blurb;q(view,'preset').textContent='✨ Dress for '+sc.name;}
 function paintAdv(){q(view,'advs').innerHTML=SCENES.map(function(s){var o=sceneOpen(s);return '<button class="cm-adv'+(s.id===S.scene?' is-on':'')+(o?'':' locked')+'" data-s="'+s.id+'"><span class="ic">'+(o?s.icon:'🔒')+'</span><b>'+s.name+'</b><small>'+(o?(s.id===S.scene?'You are here!':'Visit ▶'):'Unlocks at '+s.need+' 🍌')+'</small></button>';}).join('');}
 function paintTabs(){q(view,'tabs').innerHTML=SLOTS.map(function(s){return '<button class="'+(s[0]===closetSlot?'is-on':'')+'" data-t="'+s[0]+'">'+s[1]+' '+s[2]+'</button>';}).join('');}
 function paintItems(){
