@@ -264,7 +264,7 @@ var old=root.querySelector('.cm-toast');if(old)old.remove();
 var t=document.createElement('div');t.className='cm-toast';
 t.innerHTML='<div class="cm-toast-ic">'+sc.icon+'</div><div><b>🎉 NEW ADVENTURE UNLOCKED!</b><span>'+S.mname+' can go to '+sc.name+' — with new clothes and a new fun game: '+FUN[sc.id].icon+' '+FUN[sc.id].name+'!</span></div><button>See it ▶</button><button class="x" aria-label="Close">✕</button>';
 PENDING_ADV=sc;root.appendChild(t);sfxWin();
-t.querySelector('button').onclick=function(){S.scene=sc.id;store.set('scene',sc.id);t.remove();go('kids/monkey');};
+t.querySelector('button').onclick=function(){t.remove();announceAdv();};
 t.querySelector('.x').onclick=function(){t.remove();};
 setTimeout(function(){if(t.parentNode)t.classList.add('out');setTimeout(function(){if(t.parentNode)t.remove();},500);},9000);
 }
@@ -2474,6 +2474,7 @@ else if(sec==='tools')vTools(p[1]);
 else if(sec==='arcade')p[1]?vLabGame(p[1]):vArcade();
 else vHome();
 }catch(err){view.innerHTML='<p style="padding:20px">Oops — something went wrong loading this page. <a href="#cm/home" data-go="home"><b>Go home</b></a></p>';if(window.console)console.error(err);}
+if(PENDING_ADV&&!(sec==='kids'&&p[1]&&p[1]!=='monkey'))setTimeout(announceAdv,500);
 if(!firstRender){var top=root.getBoundingClientRect().top;if(top<0)window.scrollTo({top:window.pageYOffset+top-10,behavior:'smooth'});}
 firstRender=false;
 }
