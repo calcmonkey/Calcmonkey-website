@@ -253,7 +253,8 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 /* monkey world page */
 .cm-mworld{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
 .cm-mwscene{border:3px solid var(--ink);border-radius:24px;overflow:hidden;line-height:0;box-shadow:0 7px 0 var(--ink);background:#fff}
-.cm-postcard{background:#fff;border:2px dashed var(--ink);border-radius:14px;padding:8px 12px;margin-top:14px!important;font-weight:700}
+.cm-postcard{background:#fef9c3;border-radius:12px;padding:6px 12px;margin-top:10px!important;font-weight:700;font-size:14px;text-align:center;animation:cm-in .25s}
+.cm-postcard:empty{display:none}
 .cm-namerow{margin-top:10px;font-weight:800}
 .cm-namerow input{border:2px solid var(--ink);border-radius:10px;padding:4px 10px;font-weight:800;width:160px;margin-left:6px;color:var(--ink);background:#fff}
 .cm-h3{font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:800;margin:16px 0 8px}

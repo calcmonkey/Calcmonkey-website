@@ -2315,7 +2315,8 @@ view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Bac
 '<div class="cm-row cm-closetbtns"><button class="cm-bigbtn" data-r="preset"></button><button class="cm-bigbtn alt" data-r="rand">🎲 Surprise me</button><button class="cm-bigbtn alt" data-r="none">Take it all off</button></div></div></section>'+
 '<h2 class="cm-h2">🎮 Back to the games <small>Grade '+S.grade+' — earn more bananas for new trips! <a href="#cm/kids" data-go="kids">Change grade</a></small></h2><div class="cm-kgrid mini">'+kCards(+S.grade,true)+'</div>';
 function save(){store.set('look',S.look);store.set('scene',S.scene);}
-function paintScene(){sc=sceneById(S.scene);var A0=FUN[S.scene];q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big')+'<a class="cm-advplay" href="#cm/kids/fun-'+S.scene+'" data-go="kids/fun-'+S.scene+'">🎉 <span class="cm-hidesm">Play </span>'+A0.icon+' '+A0.name+'</a>';q(view,'post').innerHTML='<b>'+sc.icon+' '+sc.name+':</b> '+sc.blurb;q(view,'preset').textContent='✨ Dress for '+sc.name;}
+var postT=null;function postNote(h){var p=q(view,'post');p.innerHTML=h;clearTimeout(postT);postT=setTimeout(function(){if(p.isConnected)p.innerHTML='';},4000);}
+function paintScene(){sc=sceneById(S.scene);var A0=FUN[S.scene];q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big')+'<a class="cm-advplay" href="#cm/kids/fun-'+S.scene+'" data-go="kids/fun-'+S.scene+'">🎉 <span class="cm-hidesm">Play </span>'+A0.icon+' '+A0.name+'</a>';q(view,'post').innerHTML='';q(view,'preset').textContent='✨ Dress for '+sc.name;}
 function paintAdv(){q(view,'advs').innerHTML=SCENES.map(function(s){var o=sceneOpen(s);return '<button class="cm-adv'+(s.id===S.scene?' is-on':'')+(o?'':' locked')+'" data-s="'+s.id+'"><span class="ic">'+(o?s.icon:'🔒')+'</span><b>'+s.name+'</b><small>'+(o?(s.id===S.scene?'You are here!':'Visit ▶'):'Unlocks at '+s.need+' 🍌')+'</small></button>';}).join('');}
 function paintTabs(){q(view,'tabs').innerHTML=SLOTS.map(function(s){return '<button class="'+(s[0]===closetSlot?'is-on':'')+'" data-t="'+s[0]+'">'+s[1]+' '+s[2]+'</button>';}).join('');}
 function paintItems(){
@@ -2324,7 +2325,7 @@ q(view,'items').innerHTML=opt.concat(ids).map(function(id){
 var it=ITEMS[id],o=itemOpen(id),on=(S.look[closetSlot]||'')===id,L={};if(id)L[closetSlot]=id;
 return '<button class="cm-item'+(on?' is-on':'')+(o?'':' locked')+'" data-id="'+id+'">'+monkeyFull(L)+'<span>'+(id?it.name:'Nothing')+'</span><em>'+(o?(on?'Wearing':''):sceneById(it.scene).icon+' '+sceneById(it.scene).need+' 🍌')+'</em></button>';}).join('');
 }
-q(view,'advs').onclick=function(e){var b=e.target.closest('.cm-adv');if(!b)return;var s=sceneById(b.getAttribute('data-s'));if(!sceneOpen(s)){sfxBad();q(view,'post').innerHTML='🔒 <b>'+s.name+'</b> unlocks at '+s.need+' bananas. You need <b>'+(s.need-S.bananas)+'</b> more — go play!';return;}S.scene=s.id;save();sfxGood();paintScene();paintAdv();};
+q(view,'advs').onclick=function(e){var b=e.target.closest('.cm-adv');if(!b)return;var s=sceneById(b.getAttribute('data-s'));if(!sceneOpen(s)){sfxBad();postNote('🔒 <b>'+s.name+'</b> unlocks at '+s.need+' bananas. You need <b>'+(s.need-S.bananas)+'</b> more — go play!');return;}S.scene=s.id;save();sfxGood();paintScene();paintAdv();};
 q(view,'tabs').onclick=function(e){var b=e.target.closest('button');if(!b)return;closetSlot=b.getAttribute('data-t');paintTabs();paintItems();};
 function slotAt(bx,by){
 if(bx<-12||bx>212||by<-30||by>272)return null;
@@ -2346,7 +2347,7 @@ var it=q(view,'items');it.classList.remove('cm-itemsflash');void it.offsetWidth;
 var tb=q(view,'tabs').querySelector('.is-on');if(tb){tb.classList.remove('cm-tabpop');void tb.offsetWidth;tb.classList.add('cm-tabpop');}
 if(window.innerWidth<820){var tr=q(view,'tabs').getBoundingClientRect();if(tr.top>window.innerHeight*0.7||tr.top<0)q(view,'tabs').scrollIntoView({behavior:'smooth',block:'start'});}
 });
-q(view,'items').onclick=function(e){var b=e.target.closest('.cm-item');if(!b)return;var id=b.getAttribute('data-id');if(!itemOpen(id)){sfxBad();var it=ITEMS[id];q(view,'post').innerHTML='🔒 The <b>'+it.name+'</b> comes with the <b>'+sceneById(it.scene).name+'</b> trip ('+sceneById(it.scene).need+' 🍌).';return;}S.look[closetSlot]=id;save();tone(700,.06,'triangle');paintScene();paintItems();};
+q(view,'items').onclick=function(e){var b=e.target.closest('.cm-item');if(!b)return;var id=b.getAttribute('data-id');if(!itemOpen(id)){sfxBad();var it=ITEMS[id];postNote('🔒 The <b>'+it.name+'</b> comes with the <b>'+sceneById(it.scene).name+'</b> trip ('+sceneById(it.scene).need+' 🍌).');return;}S.look[closetSlot]=id;save();tone(700,.06,'triangle');paintScene();paintItems();};
 q(view,'preset').onclick=function(){var L=sceneById(S.scene).look,n={};SLOTS.forEach(function(s){n[s[0]]=L[s[0]]||'';});S.look=n;save();sfxWin();paintScene();paintItems();};
 q(view,'rand').onclick=function(){SLOTS.forEach(function(s){var ids=Object.keys(ITEMS).filter(function(id){return ITEMS[id].slot===s[0]&&itemOpen(id);});if(s[0]!=='top'&&s[0]!=='bottom')ids.push('','');S.look[s[0]]=ids.length?pick(ids):'';});save();sfxGood();paintScene();paintItems();};
 q(view,'none').onclick=function(){SLOTS.forEach(function(s){S.look[s[0]]='';});save();paintScene();paintItems();};
