@@ -109,6 +109,7 @@ def page(pg):
 <meta name="description" content="{esc(pg["desc"])}">
 <link rel="canonical" href="{url}">
 <meta name="robots" content="index,follow">
+<meta name="google-site-verification" content="Vf-iQBoaQ2gMOSYRkQLpvMV1r0GQvJIDkxXGD0jtucw">
 <link rel="icon" href="/favicon.png" type="image/png">
 <link rel="icon" href="/assets/calcmonkey-app-icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
