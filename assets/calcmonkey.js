@@ -2536,14 +2536,12 @@ function shell(h){d.innerHTML='<div class="cm-annbox cm-acctbox"><button class="
 function signedOut(msg){
 shell('<div class="cm-annburst">☁️</div><h2>Save your progress</h2><p class="cm-acctlead">Grown-ups: sign in to save bananas, outfits, adventures and Lab stars — and pick up on any phone, tablet or computer.</p>'+
 '<label class="cm-acctchk"><input type="checkbox" id="cm-acct-adult"> I’m a parent or guardian, 18 or older</label>'+
-'<button class="cm-bigbtn cm-acctg" data-a="google" disabled>Continue with Google</button>'+
-'<div class="cm-acctor"><span>or use email</span></div>'+
 '<input id="cm-acct-email" type="email" autocomplete="email" placeholder="Parent’s email" disabled><input id="cm-acct-pw" type="password" autocomplete="current-password" placeholder="Password (6+ characters)" disabled>'+
 '<div class="cm-acctrow"><button class="cm-bigbtn" data-a="in" disabled>Sign in</button><button class="cm-bigbtn alt" data-a="new" disabled>Create account</button></div>'+
 '<button class="cm-acctlink" data-a="reset">Forgot password?</button>'+
 '<p class="cm-acctmsg" data-r="msg">'+(msg||'')+'</p>'+
 '<p class="cm-acctfine">We only save game progress and the parent’s email — never a child’s name or email. <a href="/privacy/" target="_blank" rel="noopener">Privacy policy</a></p>');
-var chk=d.querySelector('#cm-acct-adult');chk.onchange=function(){d.querySelectorAll('[data-a=google],[data-a=in],[data-a=new],#cm-acct-email,#cm-acct-pw').forEach(function(x){x.disabled=!chk.checked;});};
+var chk=d.querySelector('#cm-acct-adult');chk.onchange=function(){d.querySelectorAll('[data-a=in],[data-a=new],#cm-acct-email,#cm-acct-pw').forEach(function(x){x.disabled=!chk.checked;});};
 }
 function signedIn(msg){
 var u=cloud.user;shell('<div class="cm-annburst">✅</div><h2>Progress is saving</h2><p class="cm-acctlead">Signed in as <b>'+esc(u.email||'parent account')+'</b>. Bananas, outfits, adventures and Lab stars save automatically.</p>'+
@@ -2556,8 +2554,7 @@ if(e.target===d){close();return;}
 var b=e.target.closest('[data-a]');if(!b)return;var a=b.getAttribute('data-a'),A=window.firebase&&window.firebase.auth();
 if(a==='x'){close();return;}
 var em=(d.querySelector('#cm-acct-email')||{}).value,pw=(d.querySelector('#cm-acct-pw')||{}).value;
-if(a==='google'){say('Opening Google…');A.signInWithPopup(new window.firebase.auth.GoogleAuthProvider()).then(function(){paint('Welcome! Your progress is now saved.');}).catch(function(err){if(err.code==='auth/popup-blocked'){A.signInWithRedirect(new window.firebase.auth.GoogleAuthProvider());return;}say(authMsg(err));});}
-else if(a==='in'){say('Signing in…');A.signInWithEmailAndPassword(em,pw).then(function(){paint('Welcome back! Your progress is loaded.');}).catch(function(err){say(authMsg(err));});}
+if(a==='in'){say('Signing in…');A.signInWithEmailAndPassword(em,pw).then(function(){paint('Welcome back! Your progress is loaded.');}).catch(function(err){say(authMsg(err));});}
 else if(a==='new'){say('Creating your account…');A.createUserWithEmailAndPassword(em,pw).then(function(){paint('Account created! Your progress is now saved.');}).catch(function(err){say(authMsg(err));});}
 else if(a==='reset'){if(!em){say('Type your email above first, then tap “Forgot password?” again.');return;}A.sendPasswordResetEmail(em).then(function(){say('Check your email for a link to reset your password.');}).catch(function(err){say(authMsg(err));});}
 else if(a==='out'){saveUp(true);A.signOut().then(function(){paint('Signed out. Progress stays on this device too.');});}
