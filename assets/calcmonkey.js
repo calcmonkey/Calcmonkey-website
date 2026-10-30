@@ -88,7 +88,7 @@ SCENES.forEach(function(sc){if(sc.need>before&&sc.need<=S.bananas){S.newsc=sc.id
 function addXP(n){S.xp+=n;store.set('xp',S.xp);updStats('xp');}
 
 /* ================= the monkey (original art) ================= */
-var INK='#2b2350',O=' stroke="#5a3a28" stroke-width="2.5" stroke-linejoin="round"',O2=' stroke="#5a3a28" stroke-width="1.8" stroke-linejoin="round"';
+var INK='#2b2350',O=' stroke="#3b2414" stroke-opacity=".26" stroke-width="2.2" stroke-linejoin="round"',O2=' stroke="#3b2414" stroke-opacity=".26" stroke-width="1.6" stroke-linejoin="round"';
 var HEAD_ACC={
 party:'<polygon points="60,0 43,30 77,30" fill="#ff5fa2"'+O+'/><path d="M50 20 L70 20 M47 26 L73 26" stroke="#ffd23f" stroke-width="3"/><circle cx="60" cy="2" r="6" fill="#ffd23f" stroke="#2b2350" stroke-width="2.5"/>',
 shades:'<rect x="34" y="45" width="24" height="15" rx="6" fill="#1b1838"/><rect x="62" y="45" width="24" height="15" rx="6" fill="#1b1838"/><path d="M57 50 h6" stroke="#1b1838" stroke-width="3"/><path d="M38 49 h8 M66 49 h8" stroke="#fff" stroke-width="2" opacity=".55"/>',
@@ -121,10 +121,10 @@ function monkeySVG(acc,cls){return '<svg xmlns="http://www.w3.org/2000/svg" view
 function refreshLogo(){root.querySelector('#cm-logo').innerHTML=monkeySVG('');}
 
 /* ---------- full-body monkey + clothes ---------- */
-var TEE='M74 120 Q100 132 126 120 L146 138 L137 158 L131 153 L132 196 Q100 208 68 196 L69 153 L63 158 L54 138 Z';
-var SHORTS='M68 184 Q100 196 132 184 L134 220 L105 222 L100 206 L95 222 L66 220 Z';
-var PANTS='M68 184 Q100 196 132 184 L131 246 L107 246 L100 208 L93 246 L69 246 Z';
-var SHOE_L='M63 258 Q62 244 76 242 Q90 241 93 252 L93 258 Z',SHOE_R='M107 258 L107 252 Q110 241 124 242 Q138 244 137 258 Z';
+var TEE='M74 124 Q100 138 126 124 C134 128 139 140 139 158 C139 174 136 186 130 195 Q100 207 70 195 C64 186 61 174 61 158 C61 140 66 128 74 124 Z';
+var SHORTS='M66 186 Q100 198 134 186 C136 196 135 206 133 218 Q120 225 106 220 L103 211 Q100 207 97 211 L94 220 Q80 225 67 218 C65 206 64 196 66 186 Z';
+var PANTS='M66 186 Q100 198 134 186 C136 196 134 206 131 214 L130 243 Q118 251 106 243 L104 215 Q100 208 96 215 L94 243 Q82 251 70 243 L69 214 C66 206 64 196 66 186 Z';
+var SHOE_L='M61 258 C58 244 70 238 79 239 C90 240 96 248 95 258 Q78 263 61 258 Z',SHOE_R='M139 258 C142 244 130 238 121 239 C110 240 104 248 105 258 Q122 263 139 258 Z';
 function tg(acc){return '<g transform="translate(40,12)">'+acc+'</g>';}
 function sleeves(col){var a='M72 132 Q54 158 56 182',b='M128 132 Q146 158 144 182';return '<path d="'+a+'" stroke="#2b2350" stroke-width="19" fill="none" stroke-linecap="round"/><path d="'+b+'" stroke="#2b2350" stroke-width="19" fill="none" stroke-linecap="round"/><path d="'+a+'" stroke="'+col+'" stroke-width="13" fill="none" stroke-linecap="round"/><path d="'+b+'" stroke="'+col+'" stroke-width="13" fill="none" stroke-linecap="round"/>';}
 function shoes(fill,extra){return '<path d="'+SHOE_L+'" fill="'+fill+'"'+O+'/><path d="'+SHOE_R+'" fill="'+fill+'"'+O+'/>'+(extra||'');}
@@ -132,15 +132,15 @@ function heart(x,y){return '<path d="M'+x+' '+(y+6)+' C'+(x-13)+' '+(y-3)+' '+(x
 function ring(n,rx,ry,cy,fn){var s='';for(var i=0;i<n;i++){var a=Math.PI*(i/(n-1));s+=fn(100+Math.cos(a)*rx,cy+Math.sin(a)*ry,i);}return s;}
 var ITEMS={
 /* tops */
-tee:{slot:'top',name:'Banana Tee',scene:'jungle',svg:'<path d="'+TEE+'" fill="#ffd23f"'+O+'/><path d="M90 160 Q100 174 114 158" stroke="#f59e0b" stroke-width="6" fill="none" stroke-linecap="round"/>'},
-hawaii:{slot:'top',name:'Hawaiian Shirt',scene:'beach',svg:'<path d="'+TEE+'" fill="#14b8a6"'+O+'/><path d="M86 123 L100 142 L114 123" fill="#fff"'+O2+'/>'+[[82,150],[114,148],[96,172],[122,180],[78,184],[106,192],[60,146],[140,146]].map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5" fill="#fb7185"/><circle cx="'+p[0]+'" cy="'+p[1]+'" r="2" fill="#fde047"/>';}).join('')},
-striped:{slot:'top',name:'Party Shirt',scene:'party',svg:'<path d="'+TEE+'" fill="#f472b6"'+O+'/><path d="M70 142 H130 M69 158 H131 M69 174 H131 M70 189 H130" stroke="#fff" stroke-width="5"/><path d="'+TEE+'" fill="none"'+O+'/>'},
-puffer:{slot:'top',name:'Puffy Coat',scene:'snow',sl:'#ef4444',svg:'<path d="'+TEE+'" fill="#ef4444"'+O+'/><path d="M70 148 Q100 156 130 148 M69 170 Q100 178 131 170 M60 152 Q66 156 70 152 M130 152 Q134 156 140 152" stroke="#b91c1c" stroke-width="3" fill="none"/><path d="M100 128 L100 203" stroke="#fde047" stroke-width="3"/><path d="M80 120 Q100 134 120 120 L122 128 Q100 142 78 128 Z" fill="#fca5a5"'+O2+'/>'},
-jersey:{slot:'top',name:'Team Jersey',scene:'soccer',svg:'<path d="'+TEE+'" fill="#2563eb"'+O+'/><path d="M88 123 L100 136 L112 123" fill="#fff"'+O2+'/><path d="M57 142 L64 156 M143 142 L136 156" stroke="#fff" stroke-width="4"/><text x="100" y="182" font-size="30" font-weight="900" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif">10</text>'},
+tee:{slot:'top',pf:'#ffd23f',name:'Banana Tee',scene:'jungle',svg:'<path d="'+TEE+'" fill="#ffd23f"'+O+'/><path d="M90 160 Q100 174 114 158" stroke="#f59e0b" stroke-width="6" fill="none" stroke-linecap="round"/>'},
+hawaii:{slot:'top',pf:'#14b8a6',name:'Hawaiian Shirt',scene:'beach',svg:'<path d="'+TEE+'" fill="#14b8a6"'+O+'/><path d="M86 123 L100 142 L114 123" fill="#fff"'+O2+'/>'+[[82,150],[114,148],[96,172],[122,180],[78,184],[106,192],[68,140],[132,140]].map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5" fill="#fb7185"/><circle cx="'+p[0]+'" cy="'+p[1]+'" r="2" fill="#fde047"/>';}).join('')},
+striped:{slot:'top',pf:'#f472b6',name:'Party Shirt',scene:'party',svg:'<path d="'+TEE+'" fill="#f472b6"'+O+'/><path d="M64 142 H136 M62 158 H138 M63 174 H137 M68 189 H132" stroke="#fff" stroke-width="5" stroke-linecap="round" clip-path="url(#CLIP)"/><path d="'+TEE+'" fill="none"'+O+'/>'},
+puffer:{slot:'top',pf:'#ef4444',name:'Puffy Coat',scene:'snow',sl:'#ef4444',svg:'<path d="'+TEE+'" fill="#ef4444"'+O+'/><path d="M70 148 Q100 156 130 148 M69 170 Q100 178 131 170" stroke="#b91c1c" stroke-width="3" fill="none"/><path d="M100 128 L100 203" stroke="#fde047" stroke-width="3"/><path d="M80 120 Q100 134 120 120 L122 128 Q100 142 78 128 Z" fill="#fca5a5"'+O2+'/>'},
+jersey:{slot:'top',pf:'#2563eb',name:'Team Jersey',scene:'soccer',svg:'<path d="'+TEE+'" fill="#2563eb"'+O+'/><path d="M88 123 L100 136 L112 123" fill="#fff"'+O2+'/><text x="100" y="182" font-size="30" font-weight="900" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif">10</text>'},
 tux:{slot:'top',name:'Tuxedo Jacket',scene:'opera',sl:'#1f2937',svg:'<path d="'+TEE+'" fill="#1f2937"'+O+'/><path d="M85 121 L100 168 L115 121 Q100 131 85 121 Z" fill="#fff"/><path d="M85 121 L95 160 M115 121 L105 160" stroke="#6b7280" stroke-width="3"/><circle cx="100" cy="178" r="2.5" fill="#e5e7eb"/><circle cx="100" cy="190" r="2.5" fill="#e5e7eb"/><path d="M116 146 L126 146 L121 140 Z" fill="#ef4444"/>'},
-gown:{slot:'top',name:'Sparkly Gown',scene:'opera',svg:'<path d="M68 176 Q100 186 132 176 L154 246 Q100 262 46 246 Z" fill="#9333ea"'+O+'/><path d="M76 120 Q100 130 124 120 L131 180 Q100 190 69 180 Z" fill="#a855f7"'+O+'/><path d="M70 178 Q100 188 130 178" stroke="#fbbf24" stroke-width="4" fill="none"/>'+[[80,214],[118,224],[98,236],[66,236],[134,236],[104,204]].map(function(p){return '<text x="'+p[0]+'" y="'+p[1]+'" font-size="10" fill="#fde68a" text-anchor="middle">✦</text>';}).join('')},
-spacesuit:{slot:'top',name:'Space Suit',scene:'space',sl:'#e2e8f0',svg:'<path d="'+TEE+'" fill="#f8fafc"'+O+'/><path d="M58 166 L66 166 M134 166 L142 166" stroke="#f97316" stroke-width="5"/><rect x="85" y="146" width="30" height="22" rx="4" fill="#cbd5e1"'+O2+'/><circle cx="93" cy="157" r="3.5" fill="#ef4444"/><circle cx="103" cy="157" r="3.5" fill="#22c55e"/><circle cx="111" cy="152" r="2.5" fill="#3b82f6"/>'},
-robe:{slot:'top',name:'Royal Robe',scene:'palace',back:'<path d="M70 116 Q100 108 130 116 L164 270 Q100 286 36 270 Z" fill="#b91c1c"'+O+'/>',svg:'<path d="'+TEE+'" fill="#7c3aed"'+O+'/><rect x="68" y="180" width="64" height="9" fill="#fbbf24"'+O2+'/><path d="M64 116 Q100 150 136 116 L132 130 Q100 156 68 130 Z" fill="#fff"'+O2+'/><circle cx="80" cy="130" r="2" fill="#111"/><circle cx="100" cy="141" r="2" fill="#111"/><circle cx="120" cy="130" r="2" fill="#111"/>'},
+gown:{slot:'top',pf:'#a855f7',name:'Sparkly Gown',scene:'opera',svg:'<path d="M70 176 Q100 188 130 176 C146 196 158 222 156 244 Q100 264 44 244 C42 222 54 196 70 176 Z" fill="#9333ea"'+O+'/><path d="M76 122 Q100 134 124 122 C132 138 134 160 131 180 Q100 192 69 180 C66 160 68 138 76 122 Z" fill="#a855f7"'+O+'/><path d="M70 178 Q100 188 130 178" stroke="#fbbf24" stroke-width="4" fill="none"/>'+[[80,214],[118,224],[98,236],[66,236],[134,236],[104,204]].map(function(p){return '<text x="'+p[0]+'" y="'+p[1]+'" font-size="10" fill="#fde68a" text-anchor="middle">✦</text>';}).join('')},
+spacesuit:{slot:'top',pf:'#f8fafc',name:'Space Suit',scene:'space',sl:'#e2e8f0',svg:'<path d="'+TEE+'" fill="#f8fafc"'+O+'/><path d="M58 166 L66 166 M134 166 L142 166" stroke="#f97316" stroke-width="5"/><rect x="85" y="146" width="30" height="22" rx="4" fill="#cbd5e1"'+O2+'/><circle cx="93" cy="157" r="3.5" fill="#ef4444"/><circle cx="103" cy="157" r="3.5" fill="#22c55e"/><circle cx="111" cy="152" r="2.5" fill="#3b82f6"/>'},
+robe:{slot:'top',pf:'#7c3aed',name:'Royal Robe',scene:'palace',back:'<path d="M70 116 Q100 108 130 116 L164 270 Q100 286 36 270 Z" fill="#b91c1c"'+O+'/>',svg:'<path d="'+TEE+'" fill="#7c3aed"'+O+'/><rect x="68" y="180" width="64" height="9" fill="#fbbf24"'+O2+'/><path d="M64 116 Q100 150 136 116 L132 130 Q100 156 68 130 Z" fill="#fff"'+O2+'/><circle cx="80" cy="130" r="2" fill="#111"/><circle cx="100" cy="141" r="2" fill="#111"/><circle cx="120" cy="130" r="2" fill="#111"/>'},
 /* bottoms */
 jeans:{slot:'bottom',name:'Blue Jeans',scene:'jungle',svg:'<path d="'+PANTS+'" fill="#3b82f6"'+O+'/><path d="M80 200 L80 243 M120 200 L120 243" stroke="#1d4ed8" stroke-width="2"/><path d="M74 194 Q80 200 88 196 M112 196 Q120 200 126 194" stroke="#1d4ed8" stroke-width="2" fill="none"/>'},
 trunks:{slot:'bottom',name:'Swim Trunks',scene:'beach',svg:'<path d="'+SHORTS+'" fill="#fb923c"'+O+'/><path d="M72 192 L70 218 M128 192 L130 218" stroke="#fff" stroke-width="4"/><circle cx="114" cy="206" r="5" fill="#fde047"/><circle cx="86" cy="202" r="4" fill="#fff"/>'},
@@ -158,7 +158,7 @@ dressshoes:{slot:'feet',name:'Shiny Shoes',scene:'opera',svg:shoes('#111827','<e
 moonboots:{slot:'feet',name:'Moon Boots',scene:'space',svg:'<rect x="59" y="230" width="38" height="32" rx="12" fill="#f8fafc"'+O+'/><rect x="103" y="230" width="38" height="32" rx="12" fill="#f8fafc"'+O+'/><rect x="60" y="243" width="36" height="6" fill="#94a3b8"/><rect x="104" y="243" width="36" height="6" fill="#94a3b8"/>'},
 goldslippers:{slot:'feet',name:'Golden Slippers',scene:'palace',svg:shoes('#fbbf24','<circle cx="80" cy="249" r="3" fill="#ef4444"/><circle cx="120" cy="249" r="3" fill="#ef4444"/>')},
 /* hats */
-cap:{slot:'head',name:'Ball Cap',scene:'jungle',svg:'<path d="M62 60 Q62 28 100 28 Q138 28 138 60 Z" fill="#ef4444"'+O+'/><path d="M118 54 Q150 50 166 60 Q148 67 118 62 Z" fill="#dc2626"'+O+'/><circle cx="100" cy="28" r="4" fill="#38bdf8"'+O2+'/>'},
+cap:{slot:'head',name:'Ball Cap',scene:'jungle',svg:'<path d="M60 60 C58 32 78 24 100 24 C122 24 142 32 140 60 Q100 52 60 60 Z" fill="#ef4444"'+O+'/><path d="M116 55 Q148 48 166 58 Q166 66 150 66 Q132 66 116 62 Z" fill="#dc2626"'+O+'/><circle cx="100" cy="24" r="4.5" fill="#38bdf8"'+O2+'/>'},
 sunhat:{slot:'head',name:'Sun Hat',scene:'beach',svg:'<path d="M70 44 Q72 12 100 12 Q128 12 130 44 Z" fill="#fde68a"'+O+'/><path d="M71 34 Q100 40 129 34 L130 42 Q100 48 70 42 Z" fill="#ef4444"/><ellipse cx="100" cy="46" rx="62" ry="8" fill="#fde68a"'+O+'/><circle cx="124" cy="36" r="6" fill="#f472b6"'+O2+'/>'},
 party:{slot:'head',name:'Party Hat',scene:'party',svg:tg(HEAD_ACC.party)},
 beanie:{slot:'head',name:'Beanie',scene:'snow',svg:'<path d="M60 56 Q60 20 100 20 Q140 20 140 56 Z" fill="#10b981"'+O+'/><path d="M80 26 L80 48 M100 22 L100 48 M120 26 L120 48" stroke="#059669" stroke-width="3"/><rect x="57" y="46" width="86" height="13" rx="6" fill="#059669"'+O+'/><circle cx="100" cy="17" r="10" fill="#fff"'+O+'/>'},
@@ -195,18 +195,18 @@ var DEFAULT_LOOK={head:'cap',eyes:'',neck:'',top:'tee',bottom:'jeans',feet:'snea
 function monkeyBody(L,mood){
 L=L||{};var yay=mood==='yay',id='cmm'+(++MID),F='url(#'+id+'f)',C='url(#'+id+'s)';function it(s){var i=ITEMS[L[s]];return i||null;}
 var back='';SLOTS.forEach(function(s){if(yay&&s[0]==='hand')return;var i=it(s[0]);if(i&&i.back)back+=i.back;});
-function part(s){if(yay&&s==='hand')return '';var i=it(s);return i?i.svg:'';}
-var top=it('top'),sl=top&&top.sl,ac=sl||FUR,ae=sl?'#5a3a28':FUR_D;
+function part(s){if(yay&&s==='hand')return '';var i=it(s);return i?i.svg.replace(/CLIP/g,id+'c'):'';}
+var top=it('top'),sl=top&&top.sl,pf=top&&top.pf,puffs=pf?'<ellipse cx="67" cy="139" rx="12.5" ry="10.5" fill="'+pf+'"'+O+' transform="rotate(-30 67 139)"/><ellipse cx="133" cy="139" rx="12.5" ry="10.5" fill="'+pf+'"'+O+' transform="rotate(30 133 139)"/><path d="M60 135 Q65 131 70 133 M140 135 Q135 131 130 133" stroke="#fff" stroke-opacity=".45" stroke-width="2.5" fill="none" stroke-linecap="round"/>':'',shine=top?'<ellipse cx="80" cy="152" rx="6" ry="14" fill="#fff" opacity=".2" transform="rotate(18 80 152)"/>':'',ac=sl||FUR,ae=sl?'#5a3a28':FUR_D;
 var ARMS=yay?'M74 134 Q38 106 42 40 M126 134 Q162 106 158 40':'M72 132 Q54 158 56 186 M128 132 Q146 158 144 186';
 var arms='<path d="'+ARMS+'" stroke="'+ae+'" stroke-width="'+(sl?19:18)+'" fill="none" stroke-linecap="round"/><path d="'+ARMS+'" stroke="'+ac+'" stroke-width="'+(sl?14.5:14)+'" fill="none" stroke-linecap="round"/>';
 var hands=yay?'<circle cx="42" cy="32" r="10.5" fill="'+C+'"/><circle cx="158" cy="32" r="10.5" fill="'+C+'"/>':'<circle cx="56" cy="192" r="9.5" fill="'+C+'"/><circle cx="144" cy="192" r="9.5" fill="'+C+'"/>';
-return mDefs(id)+back+
+return mDefs(id).replace('</defs>','<clipPath id="'+id+'c"><path d="'+TEE+'"/></clipPath></defs>')+back+
 '<path d="M120 206 C150 226 186 228 187 204 C188 188 168 186 167 199" stroke="'+FUR_D+'" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M120 206 C150 226 186 228 187 204 C188 188 168 186 167 199" stroke="'+FUR+'" stroke-width="8" fill="none" stroke-linecap="round"/>'+
 '<path d="M86 192 L82 246 M114 192 L118 246" stroke="'+FUR_D+'" stroke-width="22" stroke-linecap="round"/><path d="M86 192 L82 246 M114 192 L118 246" stroke="'+FUR+'" stroke-width="18" stroke-linecap="round"/>'+
 '<ellipse cx="78" cy="254" rx="16" ry="9" fill="'+C+'" stroke="#d9a066" stroke-width="1.5"/><ellipse cx="122" cy="254" rx="16" ry="9" fill="'+C+'" stroke="#d9a066" stroke-width="1.5"/>'+
 '<ellipse cx="100" cy="160" rx="36" ry="48" fill="'+F+'"/><ellipse cx="100" cy="168" rx="24" ry="31" fill="'+C+'"/>'+
 part('feet')+part('bottom')+
-(yay?arms+hands+part('top'):part('top')+arms+hands)+
+(yay?arms+hands+part('top')+puffs:part('top')+arms+puffs+hands)+shine+
 part('hand')+
 part('neck')+
 '<g transform="translate(100 72) scale(1.18) translate(-100 -72)"><g transform="translate(40,12)">'+headInner(id,mood)+'</g>'+part('eyes')+part('head')+'</g>';
