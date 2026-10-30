@@ -913,3 +913,10 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-tabpop{animation:cm-pop-in .35s}
 @media(max-width:700px){.cm-mwscene .cm-advplay{left:3%;bottom:3%;transform:none;font-size:13px;padding:4px 10px;border-width:2px;box-shadow:0 3px 0 var(--ink);animation:cm-pulse2 1.6s ease-in-out infinite}.cm-hidesm{display:none}}
 @keyframes cm-pulse2{50%{transform:scale(1.06)}}
+.cm-icust,.cm-ibub{cursor:pointer}
+.cm-icust.want::after{content:"👉";position:absolute;right:100%;top:50%;transform:translateY(-50%);font-size:.4em;animation:cm-tapme .9s ease-in-out infinite}
+@keyframes cm-tapme{50%{transform:translate(18%,-50%)}}
+.cm-icust.want{filter:drop-shadow(0 0 10px #fde047)}
+.cm-icust.nope{animation:cm-acno .35s}
+.cm-imake{transition:left .55s ease-in-out,bottom .55s ease-in-out,transform .55s}
+.cm-imake.give{left:76%;bottom:44%;transform:translateX(-50%) rotate(12deg) scale(.9)}

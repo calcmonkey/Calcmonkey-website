@@ -1995,7 +1995,7 @@ gAdv(view.querySelector('#cm-g'),id);
 /* ================= ADVENTURE REWARD GAMES (just for fun, no math) ================= */
 var FUN={
 jungle:{name:'Treetop Leap',icon:'🐒',d:'Swing from vine to vine and leap all the way to the treehouse!',intro:'Mochi is swinging through the jungle! Tap when Mochi swings <b>forward</b> to let go and leap to the next vine. Grab the jungle snacks on the way!',tip:'Tap anywhere (or press the space bar) to let go of the vine.'},
-beach:{name:'Ice Cream Stand',icon:'🍦',d:'Run Mochi’s beach ice cream stand and make every customer’s cone.',intro:'Mochi is running the ice cream stand at the beach! Look at each customer’s order and build the same cone — then tap <b>Serve</b>.',tip:'Tap flavors to stack scoops (bottom first), add a cherry if they want one, then tap Serve.'},
+beach:{name:'Ice Cream Stand',icon:'🍦',d:'Run Mochi’s beach ice cream stand and make every customer’s cone.',intro:'Mochi is running the ice cream stand at the beach! Look at each customer’s order, build the same cone — then tap the <b>customer</b> to give it to them!',tip:'Tap flavors to stack scoops (bottom first), add a cherry if they want one, then tap the customer to hand it over!'},
 party:{name:'Party Time!',icon:'🎁',d:'Open Mochi’s birthday presents and blow out the candles.',intro:'It’s Mochi’s birthday party! Tap each present to shake it, pull off the ribbon and open it. Then blow out the candles!',tip:'Tap a present three times to open it.'},
 snow:{name:'Ski Run',icon:'⛷️',d:'Ski down the mountain, jump the rocks and catch snowflakes.',intro:'Mochi is skiing down the mountain! Tap to <b>jump</b> over rocks and snowmen, and catch the snowflakes in the air.',tip:'Tap anywhere (or press the space bar or ↑) to jump.'},
 soccer:{name:'Stadium Shootout',icon:'⚽',d:'Take 8 shots at the big stadium and beat the goalie.',intro:'The crowd is cheering for Mochi! Tap anywhere inside the goal to shoot. The goalie is quick — aim away from them and try the corners!',tip:'Tap inside the goal to shoot.'},
@@ -2045,9 +2045,9 @@ var FL=[['Strawberry','#f9a8d4'],['Mint','#a7f3d0'],['Chocolate','#b7793f'],['Va
 CUST=shuffle(['🐶','🐱','🐰','🐸','🐼','🦊','🐨','🐯','🐷','🐧','🦁','🐻']),N=8,n=0,tips=0,order=null,cone=[],cherry=false,busy=false,t0=0;
 function coneHTML(a,ch){return '<div class="cm-icone">'+(ch?'<em>🍒</em>':'')+a.slice().reverse().map(function(i){return '<i style="--pc:'+FL[i][1]+'"></i>';}).join('')+'<b></b></div>';}
 c.lay.innerHTML='<div class="cm-iawn"></div><img class="cm-imk" src="'+monkeyURI(S.look)+'" alt=""><div class="cm-icounter"></div><div class="cm-imake" data-r="mk"></div><div class="cm-icust" data-r="cu"><span data-r="face"></span></div><div class="cm-ibub" data-r="bub"></div>';
-c.panel('<div class="cm-itubs">'+FL.map(function(f,i){return '<button class="cm-itub" data-f="'+i+'" style="--pc:'+f[1]+'"><i></i><small>'+f[0]+'</small></button>';}).join('')+'<button class="cm-itub" data-f="ch"><em>🍒</em><small>Cherry</small></button></div><div class="cm-row cm-ibtns"><button class="cm-bigbtn" data-r="serve">Serve ✓</button><button class="cm-bigbtn alt" data-r="trash">🗑️ Start over</button></div>');
+c.panel('<div class="cm-itubs">'+FL.map(function(f,i){return '<button class="cm-itub" data-f="'+i+'" style="--pc:'+f[1]+'"><i></i><small>'+f[0]+'</small></button>';}).join('')+'<button class="cm-itub" data-f="ch"><em>🍒</em><small>Cherry</small></button></div><div class="cm-row cm-ibtns"><button class="cm-bigbtn alt" data-r="trash">🗑️ Start over</button></div>');
 var mkA=q(c.lay,'mk'),cu=q(c.lay,'cu'),bub=q(c.lay,'bub'),face=q(c.lay,'face');
-function paint(){mkA.innerHTML=cone.length||cherry?coneHTML(cone,cherry):'<div class="cm-icone empty"><b></b></div>';}
+function paint(){mkA.innerHTML=cone.length||cherry?coneHTML(cone,cherry):'<div class="cm-icone empty"><b></b></div>';if(typeof ready==='function')ready();}
 function info(){c.setProb('🍦 Customer '+Math.min(n+1,N)+' / '+N+'   ·   🪙 '+tips+' tips');}
 function showOrder(){bub.innerHTML='<small>One of these, please!</small>'+coneHTML(order.s,order.ch);}
 function next(){
@@ -2059,15 +2059,17 @@ var b=e.target.closest('button');if(!b||busy||!order)return;var f=b.getAttribute
 if(f==='ch'){if(!cone.length){bub.innerHTML='<small>Scoops first, then the cherry!</small>';c.T.after(showOrder,1100);return;}cherry=!cherry;tone(1046,.06,'triangle');paint();}
 else if(f!=null){if(cone.length>=3||cherry)return;cone.push(+f);tone(600+cone.length*120,.07,'triangle');paint();}
 else if(r==='trash'){cone=[];cherry=false;paint();tone(300,.08,'sine');}
-else if(r==='serve'){
-if(!cone.length)return;
+});
+function ready(){cu.classList.toggle('want',cone.length>0);}
+c.on(cu,'click',serve);c.on(bub,'click',serve);
+function serve(){
+if(busy||!order)return;if(!cone.length){bub.innerHTML='<small>Make my ice cream first! 🍦</small>';c.T.after(function(){if(order&&!busy)showOrder();},1100);return;}
 var ok=cone.length===order.s.length&&cone.every(function(v,i){return v===order.s[i];})&&cherry===order.ch;
-if(ok){busy=true;var tip=1+(Date.now()-t0<9000?1:0);tips+=tip;n++;sfxGood();bub.innerHTML='<b class="cm-iyum">Yum! ❤️</b><small>+'+tip+' 🪙 tip'+(tip>1?'s':'')+'</small>';cu.classList.add('happy');
+if(ok){busy=true;cu.classList.remove('want');mkA.classList.add('give');c.T.after(function(){mkA.classList.remove('give');cone=[];cherry=false;paint();},800);var tip=1+(Date.now()-t0<9000?1:0);tips+=tip;n++;sfxGood();bub.innerHTML='<b class="cm-iyum">Yum! ❤️</b><small>+'+tip+' 🪙 tip'+(tip>1?'s':'')+'</small>';cu.classList.add('happy');
 c.say(80,30,'+'+tip+' 🪙');info();c.T.after(function(){cu.className='cm-icust out';},900);
 c.T.after(function(){if(n>=N)c.end('Mochi’s ice cream stand was a hit!','You served <b>'+N+'</b> happy customers and earned <b>'+tips+'</b> tips 🪙');else next();},1500);}
-else{sfxBad();bub.innerHTML='<small>Hmm… that’s not what I ordered!</small>';c.T.after(function(){if(order)showOrder();},1300);}
+else{sfxBad();bub.innerHTML='<small>Hmm… that’s not what I ordered!</small>';cu.classList.remove('nope');void cu.offsetWidth;cu.classList.add('nope');c.T.after(function(){if(order)showOrder();},1300);}
 }
-});
 next();
 },
 /* ---------- Party: presents + candles ---------- */
