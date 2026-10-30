@@ -1000,3 +1000,28 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 @media(max-width:560px){.cm-mini{display:grid;grid-template-columns:84px 1fr;gap:8px 10px;padding:8px 10px}.cm-miniscene{grid-row:span 1}.cm-miniinfo{gap:4px 8px}.cm-mininame{font-size:17px}.cm-miniban{font-size:13px;padding:0 8px}.cm-mininext{font-size:12px}.cm-mininext .cm-kmeter{height:8px}.cm-minibtns{grid-column:1/-1;flex-wrap:nowrap}.cm-minibtn{font-size:13px;padding:3px 10px;white-space:nowrap}}
 .cm-mini > .cm-minibtns{flex:0 0 auto;flex-direction:column;align-items:stretch}.cm-mini > .cm-minibtns .cm-minibtn{text-align:center}@media(max-width:560px){.cm-mini > .cm-minibtns{flex-direction:row}}
 @media(max-width:560px){.cm-grades{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.cm-grades button{width:auto;height:54px;border-radius:14px}.cm-grades button b{font-size:24px}}
+/* parent sign-in */
+.cm-acct{cursor:pointer;color:var(--ink)}
+.cm-acct.on{background:#dcfce7}
+.cm-acct[hidden]{display:none!important}
+.cm-acctbox{max-width:420px;text-align:left}
+.cm-acctbox h2,.cm-acctbox .cm-annburst{text-align:center}
+.cm-acctx{position:absolute;z-index:3;right:10px;top:8px;border:0;background:none;font-size:20px;cursor:pointer;color:var(--ink)}
+.cm-acctlead{font-weight:700;margin:6px 0 12px!important}
+.cm-acctchk{display:flex;gap:8px;align-items:center;font-weight:800;background:#fef9c3;border-radius:12px;padding:8px 10px;margin-bottom:10px;cursor:pointer}
+.cm-acctchk input{width:20px;height:20px;accent-color:#16a34a}
+.cm-acctbox .cm-bigbtn{width:100%;font-size:18px!important;padding:8px 14px!important}
+.cm-acctbox .cm-bigbtn:disabled{opacity:.45;cursor:not-allowed}
+.cm-acctg{background:#fff!important;color:var(--ink)!important}
+.cm-acctor{display:flex;align-items:center;gap:8px;margin:12px 0 8px;color:#6b6890;font-weight:800;font-size:13px}
+.cm-acctor::before,.cm-acctor::after{content:"";flex:1;height:2px;background:#e5e3f3}
+.cm-acctbox input[type=email],.cm-acctbox input[type=password]{display:block;width:100%;box-sizing:border-box;font:700 16px 'Nunito',system-ui,sans-serif;border:2px solid var(--ink);border-radius:12px;padding:9px 12px;margin-bottom:8px;color:var(--ink);background:#fff}
+.cm-acctbox input:disabled{background:#f3f4f6}
+.cm-acctrow{display:flex;gap:8px}
+.cm-acctrow .cm-bigbtn{flex:1}
+.cm-acctlink{display:block;margin:10px auto 0;border:0;background:none;color:#6d28d9;font-weight:800;text-decoration:underline;cursor:pointer}
+.cm-acctlink.danger{color:#b91c1c;font-size:13px}
+.cm-acctmsg{min-height:1.2em;font-weight:800;color:#15803d;text-align:center;margin:8px 0 0!important}
+.cm-acctfine{font-size:12px;color:#6b6890;text-align:center;margin:10px 0 0!important}
+.cm-acctfine a{color:#6d28d9}
+@media(max-width:560px){.cm-acct{font-size:12px;padding:3px 8px}}

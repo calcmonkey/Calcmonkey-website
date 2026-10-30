@@ -2474,5 +2474,104 @@ root.querySelector('#cm-snd').addEventListener('click',function(){S.sound=!S.sou
 window.addEventListener('popstate',render);
 window.addEventListener('hashchange',function(){if((location.hash||'').indexOf('#cm/')===0)render();});
 
-refreshLogo();updStats();render();
+/* ================= parent sign-in: save progress to the cloud (Firebase) ================= */
+/* Paste the Firebase web config here. null = sign-in is hidden. */
+var FB_CONFIG=null;
+var FB_VER='10.12.2',SYNC_KEYS=['grade','bananas','xp','look','scene','mname','best','labprog'];
+var cloud={user:null,ready:false,loading:null,saving:false,timer:null,applying:false,db:null};
+function acctBtn(){return root.querySelector('#cm-acct');}
+function paintAcct(state){var b=acctBtn();if(!b)return;if(!FB_CONFIG){b.hidden=true;return;}b.hidden=false;
+b.innerHTML=cloud.user?(state==='saving'?'☁️ Saving…':'☁️ Saved'):'👤 Save progress';b.title=cloud.user?'Progress is saved to your parent account':'Parents: sign in to save progress on any device';b.classList.toggle('on',!!cloud.user);}
+function loadScript(src){return new Promise(function(ok,bad){var s=document.createElement('script');s.src=src;s.async=true;s.onload=ok;s.onerror=function(){bad(new Error('load '+src));};document.head.appendChild(s);});}
+function fbLoad(){
+if(!FB_CONFIG)return Promise.reject(new Error('no config'));
+if(cloud.loading)return cloud.loading;
+var base='https://www.gstatic.com/firebasejs/'+FB_VER+'/';
+cloud.loading=loadScript(base+'firebase-app-compat.js').then(function(){return Promise.all([loadScript(base+'firebase-auth-compat.js'),loadScript(base+'firebase-firestore-compat.js')]);}).then(function(){
+if(!window.firebase.apps.length)window.firebase.initializeApp(FB_CONFIG);
+cloud.db=window.firebase.firestore();
+window.firebase.auth().onAuthStateChanged(function(u){var was=cloud.user;cloud.user=u||null;store.set('acct',!!u);paintAcct();if(u&&(!was||was.uid!==u.uid))syncDown();});
+cloud.ready=true;
+});
+cloud.loading.catch(function(){cloud.loading=null;});
+return cloud.loading;
+}
+function localSnap(){var o={};SYNC_KEYS.forEach(function(k){o[k]=k==='labprog'?PROG:S[k];});return JSON.parse(JSON.stringify(o));}
+function score(o){return (+o.bananas||0)+(+o.xp||0);}
+function mergeProg(a,b){var o=JSON.parse(JSON.stringify(a||{}));Object.keys(b||{}).forEach(function(g){var x=o[g]||[],y=b[g]||[];for(var i=0;i<Math.max(x.length,y.length);i++)x[i]=Math.max(x[i]||0,y[i]||0);o[g]=x;});return o;}
+function mergeAll(loc,cl){
+var main=score(cl)>=score(loc)?cl:loc,m={};
+['grade','look','scene','mname'].forEach(function(k){m[k]=main[k]!=null?main[k]:loc[k];});
+m.bananas=Math.max(+loc.bananas||0,+cl.bananas||0);m.xp=Math.max(+loc.xp||0,+cl.xp||0);
+m.best=Object.assign({},loc.best||{},cl.best||{});m.labprog=mergeProg(loc.labprog,cl.labprog);return m;}
+function applyState(m){
+cloud.applying=true;
+['grade','bananas','xp','look','scene','mname','best'].forEach(function(k){if(m[k]!=null){S[k]=m[k];store.set(k,m[k]);}});
+if(m.labprog){Object.keys(PROG).forEach(function(k){delete PROG[k];});Object.assign(PROG,m.labprog);store.set('labprog',PROG);}
+cloud.applying=false;updStats();render();
+}
+function syncDown(){
+var u=cloud.user;if(!u)return;
+cloud.db.collection('progress').doc(u.uid).get().then(function(d){
+var loc=localSnap();
+if(d.exists){var m=mergeAll(loc,d.data());applyState(m);}
+saveUp(true);
+}).catch(function(e){if(window.console)console.warn('CalcMonkey sync',e);});
+}
+function saveUp(now){
+if(!cloud.user||!cloud.db)return;clearTimeout(cloud.timer);
+var go=function(){paintAcct('saving');var data=localSnap();data.updated=window.firebase.firestore.FieldValue.serverTimestamp();data.v=1;
+cloud.db.collection('progress').doc(cloud.user.uid).set(data).then(function(){paintAcct();}).catch(function(e){paintAcct();if(window.console)console.warn('CalcMonkey save',e);});};
+if(now)go();else cloud.timer=setTimeout(go,2500);
+}
+/* every local save also schedules a cloud save */
+(function(){var orig=store.set;store.set=function(k,v){orig(k,v);if(!cloud.applying&&cloud.user&&SYNC_KEYS.indexOf(k)>-1)saveUp(false);};})();
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&cloud.user&&cloud.timer)saveUp(true);});
+function authMsg(e){var c=(e&&e.code)||'';return ({'auth/invalid-email':'That email address doesn’t look right.','auth/missing-password':'Please type a password.','auth/weak-password':'Please use a password with at least 6 characters.','auth/email-already-in-use':'There’s already an account with that email — tap “Sign in” instead.','auth/invalid-credential':'That email and password don’t match. Try again or reset your password.','auth/wrong-password':'That password isn’t right. Try again or reset your password.','auth/user-not-found':'No account with that email yet — tap “Create account”.','auth/too-many-requests':'Too many tries. Please wait a few minutes and try again.','auth/popup-closed-by-user':'The Google window was closed before signing in.','auth/network-request-failed':'No internet connection. Please check it and try again.','auth/requires-recent-login':'For safety, please sign out, sign back in, and then delete.'})[c]||'Something went wrong. Please try again.';}
+function acctModal(){
+var old=root.querySelector('.cm-acctm');if(old)old.remove();
+var d=document.createElement('div');d.className='cm-annc cm-acctm';root.appendChild(d);
+function close(){d.remove();}
+function shell(h){d.innerHTML='<div class="cm-annbox cm-acctbox"><button class="cm-acctx" data-a="x" aria-label="Close">✕</button>'+h+'</div>';}
+function signedOut(msg){
+shell('<div class="cm-annburst">☁️</div><h2>Save your progress</h2><p class="cm-acctlead">Grown-ups: sign in to save bananas, outfits, adventures and Lab stars — and pick up on any phone, tablet or computer.</p>'+
+'<label class="cm-acctchk"><input type="checkbox" id="cm-acct-adult"> I’m a parent or guardian, 18 or older</label>'+
+'<button class="cm-bigbtn cm-acctg" data-a="google" disabled>Continue with Google</button>'+
+'<div class="cm-acctor"><span>or use email</span></div>'+
+'<input id="cm-acct-email" type="email" autocomplete="email" placeholder="Parent’s email" disabled><input id="cm-acct-pw" type="password" autocomplete="current-password" placeholder="Password (6+ characters)" disabled>'+
+'<div class="cm-acctrow"><button class="cm-bigbtn" data-a="in" disabled>Sign in</button><button class="cm-bigbtn alt" data-a="new" disabled>Create account</button></div>'+
+'<button class="cm-acctlink" data-a="reset">Forgot password?</button>'+
+'<p class="cm-acctmsg" data-r="msg">'+(msg||'')+'</p>'+
+'<p class="cm-acctfine">We only save game progress and the parent’s email — never a child’s name or email. <a href="/privacy/" target="_blank" rel="noopener">Privacy policy</a></p>');
+var chk=d.querySelector('#cm-acct-adult');chk.onchange=function(){d.querySelectorAll('[data-a=google],[data-a=in],[data-a=new],#cm-acct-email,#cm-acct-pw').forEach(function(x){x.disabled=!chk.checked;});};
+}
+function signedIn(msg){
+var u=cloud.user;shell('<div class="cm-annburst">✅</div><h2>Progress is saving</h2><p class="cm-acctlead">Signed in as <b>'+esc(u.email||'parent account')+'</b>. Bananas, outfits, adventures and Lab stars save automatically.</p>'+
+'<div class="cm-acctrow"><button class="cm-bigbtn" data-a="x">Keep playing ▶</button><button class="cm-bigbtn alt" data-a="out">Sign out</button></div>'+
+'<button class="cm-acctlink danger" data-a="del">Delete this account and its saved progress</button><p class="cm-acctmsg" data-r="msg">'+(msg||'')+'</p>');}
+function say(t){var m=d.querySelector('[data-r=msg]');if(m)m.textContent=t;}
+function paint(msg){cloud.user?signedIn(msg):signedOut(msg);}
+d.onclick=function(e){
+if(e.target===d){close();return;}
+var b=e.target.closest('[data-a]');if(!b)return;var a=b.getAttribute('data-a'),A=window.firebase&&window.firebase.auth();
+if(a==='x'){close();return;}
+var em=(d.querySelector('#cm-acct-email')||{}).value,pw=(d.querySelector('#cm-acct-pw')||{}).value;
+if(a==='google'){say('Opening Google…');A.signInWithPopup(new window.firebase.auth.GoogleAuthProvider()).then(function(){paint('Welcome! Your progress is now saved.');}).catch(function(err){if(err.code==='auth/popup-blocked'){A.signInWithRedirect(new window.firebase.auth.GoogleAuthProvider());return;}say(authMsg(err));});}
+else if(a==='in'){say('Signing in…');A.signInWithEmailAndPassword(em,pw).then(function(){paint('Welcome back! Your progress is loaded.');}).catch(function(err){say(authMsg(err));});}
+else if(a==='new'){say('Creating your account…');A.createUserWithEmailAndPassword(em,pw).then(function(){paint('Account created! Your progress is now saved.');}).catch(function(err){say(authMsg(err));});}
+else if(a==='reset'){if(!em){say('Type your email above first, then tap “Forgot password?” again.');return;}A.sendPasswordResetEmail(em).then(function(){say('Check your email for a link to reset your password.');}).catch(function(err){say(authMsg(err));});}
+else if(a==='out'){saveUp(true);A.signOut().then(function(){paint('Signed out. Progress stays on this device too.');});}
+else if(a==='del'){if(!b.classList.contains('sure')){b.classList.add('sure');b.textContent='Tap again to permanently delete the account and saved progress';return;}
+var uid=cloud.user.uid;say('Deleting…');cloud.db.collection('progress').doc(uid).delete().then(function(){return cloud.user.delete();}).then(function(){paint('Your account and saved progress were deleted.');}).catch(function(err){say(authMsg(err));});}
+};
+d.innerHTML='<div class="cm-annbox cm-acctbox"><p class="cm-acctlead">Loading sign-in…</p></div>';
+fbLoad().then(function(){paint();}).catch(function(){d.innerHTML='';shell('<div class="cm-annburst">☁️</div><h2>Sign-in isn’t available</h2><p class="cm-acctlead">We couldn’t reach the sign-in service. Please check your internet connection and try again. Progress is still saved on this device.</p><div class="cm-acctrow"><button class="cm-bigbtn" data-a="x">OK</button></div>');});
+}
+function cloudInit(){
+var b=acctBtn();if(!b)return;paintAcct();if(!FB_CONFIG)return;
+b.addEventListener('click',acctModal);
+if(store.get('acct',false))setTimeout(function(){fbLoad().catch(function(){});},1200);
+}
+
+refreshLogo();updStats();render();cloudInit();
 })();

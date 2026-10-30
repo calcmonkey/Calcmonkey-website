@@ -6,6 +6,7 @@ css = open(os.path.join(ROOT, 'assets', 'calcmonkey.css')).read()
 js = open(os.path.join(ROOT, 'assets', 'calcmonkey.js')).read()
 markup = open(os.path.join(ROOT, 'tools', 'app-markup.html')).read()
 import re
+js = js.replace('var FB_CONFIG=', 'var FB_CONFIG=null&&', 1)  # sign-in is not available inside the Claude preview page
 hook = 'refreshLogo();updStats();render();'
 assert js.count(hook) == 1
 # preview-only testing helper (never part of the live site)

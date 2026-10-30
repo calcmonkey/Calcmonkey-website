@@ -66,7 +66,7 @@ PAGES = [
              ('Tangent Hunter and Area Hunter','Discover derivatives by tilting tangent lines, and integrals by stacking rectangles under curves.',None)],
     ld=dict(level='Grade 7 – College', kind='Game', about=['Algebra','Geometry','Derivatives','Integrals'])),
 ]
-NAV = [('Free math games for kids','/kids-math-games/'),('Math help','/math-help/'),('Math solvers','/math-solvers/'),('Math games for teens','/math-games-for-teens/'),('Contact','/contact/')]
+NAV = [('Free math games for kids','/kids-math-games/'),('Math help','/math-help/'),('Math solvers','/math-solvers/'),('Math games for teens','/math-games-for-teens/'),('Contact','/contact/'),('Privacy','/privacy/')]
 
 SEO_CSS = """<style>
 html,body{margin:0;padding:0}body{background:#f4f8ff;padding:16px 12px 24px}@media(max-width:560px){body{padding:8px 6px 16px}}
