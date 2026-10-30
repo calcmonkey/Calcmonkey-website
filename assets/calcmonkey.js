@@ -14,7 +14,7 @@ var store={
 get:function(k,d){try{var v=localStorage.getItem('cm_'+k);return v===null?d:JSON.parse(v);}catch(e){return d;}},
 set:function(k,v){try{localStorage.setItem('cm_'+k,JSON.stringify(v));}catch(e){}}
 };
-var S={grade:store.get('grade',2),bananas:store.get('bananas',0),xp:store.get('xp',0),look:store.get('look',{head:'cap',eyes:'',neck:'',top:'tee',bottom:'jeans',feet:'sneakers',hand:'banana'}),scene:store.get('scene','jungle'),mname:(function(n){return !n||n==='Milo'?'Mochi':n;})(store.get('mname','Mochi')),newsc:store.get('newsc',''),sound:store.get('sound',true),best:store.get('best',{})};
+var S={grade:store.get('grade',2),bananas:store.get('bananas',0),xp:store.get('xp',0),look:store.get('look',{head:'cap',eyes:'',neck:'',top:'tee',bottom:'jeans',feet:'sneakers',hand:'banana'}),scene:store.get('scene','jungle'),mname:(function(n){return !n||n==='Milo'?'Mochi':n;})(store.get('mname','Mochi')),newsc:store.get('newsc',''),sound:store.get('sound',true),best:store.get('best',{}),lth:store.get('lth','violet')};
 function setBest(k,v,lowerIsBetter){var b=S.best[k];if(b==null||(lowerIsBetter?v<b:v>b)){S.best[k]=v;store.set('best',S.best);return true;}return false;}
 
 /* ================= helpers ================= */
@@ -77,7 +77,7 @@ function sfxWin(){[523,659,784,1047].forEach(function(f,i){tone(f,.2,'triangle',
 /* ================= rewards ================= */
 function updStats(bump){
 var b=root.querySelector('#cm-ban'),x=root.querySelector('#cm-xp');
-b.querySelector('b').textContent=S.bananas;x.querySelector('b').textContent=S.xp;
+b.querySelector('b').textContent=S.bananas;x.querySelector('b').textContent=S.xp;var lv=XP_LEVELS[xpLevel(S.xp)];x.title='Level '+(xpLevel(S.xp)+1)+' · '+lv[2]+' — XP earned in the Big Brain Lab';var ic=x.querySelector('.cm-lvic');if(!ic){ic=document.createElement('span');ic.className='cm-lvic';x.appendChild(ic);}ic.textContent=lv[1];
 if(bump){var el=bump==='xp'?x:b;el.classList.remove('cm-bump');void el.offsetWidth;el.classList.add('cm-bump');}
 root.querySelector('#cm-snd').textContent=S.sound?'🔊':'🔇';
 }
@@ -85,7 +85,27 @@ function addBananas(n){
 var before=S.bananas;S.bananas+=n;store.set('bananas',S.bananas);updStats('ban');
 SCENES.forEach(function(sc){if(sc.need>before&&sc.need<=S.bananas){S.newsc=sc.id;store.set('newsc',sc.id);unlockToast(sc);}});
 }
-function addXP(n){S.xp+=n;store.set('xp',S.xp);updStats('xp');}
+var XP_LEVELS=[[0,'🥽','Lab Intern','violet'],[20,'🧪','Lab Assistant','ocean'],[50,'📊','Analyst','forest'],[100,'🔬','Researcher','sunset'],[170,'⚗️','Scientist','berry'],[260,'🎓','Professor','gold'],[380,'🏛️','Department Head','graphite'],[550,'🌌','Math Legend','aurora']];
+var LAB_THEMES={violet:['Violet','#6d4aff','#4f2fd6','#f8f6ff','#eef7ff'],ocean:['Ocean','#0369a1','#075985','#f0f9ff','#ecfeff'],forest:['Forest','#15803d','#166534','#f0fdf4','#f7fee7'],sunset:['Sunset','#ea580c','#c2410c','#fff7ed','#fef2f2'],berry:['Berry','#be185d','#9d174d','#fdf2f8','#faf5ff'],gold:['Gold','#b45309','#92400e','#fffbeb','#fefce8'],graphite:['Graphite','#334155','#1e293b','#f8fafc','#f1f5f9'],aurora:['Aurora','#0d9488','#7c3aed','#f0fdfa','#f5f3ff']};
+function xpLevel(x){var i=0;while(i+1<XP_LEVELS.length&&x>=XP_LEVELS[i+1][0])i++;return i;}
+function themeOpen(t){for(var i=0;i<XP_LEVELS.length;i++)if(XP_LEVELS[i][3]===t)return xpLevel(S.xp)>=i;return false;}
+function applyLabTheme(){var t=LAB_THEMES[S.lth]&&themeOpen(S.lth)?S.lth:'violet',c=LAB_THEMES[t];root.style.setProperty('--lacc',c[1]);root.style.setProperty('--lacc-d',c[2]);root.style.setProperty('--lbg1',c[3]);root.style.setProperty('--lbg2',c[4]);root.style.setProperty('--lgrid',c[1]+'10');}
+function xpCard(){
+var li=xpLevel(S.xp),L=XP_LEVELS[li],N=XP_LEVELS[li+1],pct=N?Math.round((S.xp-L[0])/(N[0]-L[0])*100):100;
+return '<section class="cm-xpcard"><div class="cm-xpic">'+L[1]+'</div><div class="cm-xpmain"><b>Level '+(li+1)+' · '+L[2]+'</b><span class="cm-muted">'+S.xp+' XP'+(N?' · '+(N[0]-S.xp)+' XP to Level '+(li+2)+': '+N[1]+' '+N[2]:' · Top level reached!')+'</span><div class="cm-meter"><i style="width:'+pct+'%"></i></div>'+
+'<small class="cm-muted">Earn XP: finish a lesson’s practice (+5) · earn Lab Arcade stars (+5 each) · use a solver (+1)</small></div>'+
+'<div class="cm-xpthemes"><small>Lab themes</small><div>'+XP_LEVELS.map(function(l,i){var t=LAB_THEMES[l[3]],open=li>=i;return '<button type="button" class="cm-swatch'+(S.lth===l[3]?' on':'')+(open?'':' locked')+'" data-lth="'+l[3]+'" style="--sw:'+t[1]+'" title="'+t[0]+(open?'':' — unlocks at Level '+(i+1)+' ('+l[0]+' XP)')+'" aria-label="'+t[0]+' theme'+(open?'':', locked')+'">'+(open?'':'🔒')+'</button>';}).join('')+'</div></div></section>';
+}
+function levelUp(li){
+var L=XP_LEVELS[li],t=LAB_THEMES[L[3]],o=root.querySelector('.cm-annc');if(o)o.remove();
+var d=document.createElement('div');d.className='cm-annc cm-lvup';
+d.innerHTML='<div class="cm-annbox"><div class="cm-lvbadge">'+L[1]+'</div><p class="cm-lvk">LEVEL UP</p><h2>Level '+(li+1)+' · '+L[2]+'</h2><p>You’ve earned <b>'+S.xp+' XP</b> in the Big Brain Lab. Keep it up!</p>'+
+'<div class="cm-lvtheme"><span class="cm-swatch on" style="--sw:'+t[1]+'"></span><div><b>New Lab theme unlocked: '+t[0]+'</b><small>Switch it on any time from your level card.</small></div></div>'+
+'<div class="cm-ovbtns"><button class="cm-bigbtn next" data-a="use">Use the '+t[0]+' theme</button><button class="cm-bigbtn alt" data-a="ok">Keep going</button></div></div>';
+root.appendChild(d);[[523,.09,0],[659,.09,.09],[784,.09,.18],[988,.09,.27],[1175,.3,.36]].forEach(function(n){tone(n[0],n[1],'sawtooth',n[2]);tone(n[0]*2,n[1],'sine',n[2]);});
+d.onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;if(b.getAttribute('data-a')==='use'){S.lth=L[3];store.set('lth',S.lth);applyLabTheme();render();}d.remove();};
+}
+function addXP(n){var before=xpLevel(S.xp);S.xp+=n;store.set('xp',S.xp);updStats('xp');var after=xpLevel(S.xp);if(after>before)setTimeout(function(){levelUp(after);},700);}
 
 /* ================= the monkey (original art) ================= */
 var INK='#2b2350',O=' stroke="#3b2414" stroke-opacity=".26" stroke-width="2.2" stroke-linejoin="round"',O2=' stroke="#3b2414" stroke-opacity=".26" stroke-width="1.6" stroke-linejoin="round"';
@@ -2410,7 +2430,7 @@ paintScene();paintAdv();paintTabs();paintItems();
 var labF='all',labQ='';
 function vLab(){
 view.innerHTML='<section class="cm-lhero"><div><p class="cm-eyebrow">Grades 7 – College</p><h1 class="cm-lh1">Big Brain <span>Lab</span></h1><p class="cm-llead">Pick your grade or search a topic. Every lesson has the big idea, the key formula and step-by-step examples — most come with endless practice problems.</p></div><div class="cm-lside"><a class="cm-lbtn" href="#cm/tools" data-go="tools">🧪 Step-by-step solvers</a><a class="cm-lbtn alt" href="#cm/arcade" data-go="arcade">🕹️ Lab Arcade games</a></div></section>'+
-'<div class="cm-filter"><div class="cm-chips">'+['all','7','8','9','10','11','12','College'].map(function(g){return '<button data-f="'+g+'" class="'+(labF===g?'is-on':'')+'">'+(g==='all'?'All grades':g==='College'?'College':'Grade '+g)+'</button>';}).join('')+'</div><input class="cm-search" type="search" placeholder="Search a topic… (slope, logs, derivative)" value="'+labQ.replace(/"/g,'&quot;')+'" aria-label="Search topics"></div><div id="cm-labres"></div>'+
+xpCard()+'<div class="cm-filter"><div class="cm-chips">'+['all','7','8','9','10','11','12','College'].map(function(g){return '<button data-f="'+g+'" class="'+(labF===g?'is-on':'')+'">'+(g==='all'?'All grades':g==='College'?'College':'Grade '+g)+'</button>';}).join('')+'</div><input class="cm-search" type="search" placeholder="Search a topic… (slope, logs, derivative)" value="'+labQ.replace(/"/g,'&quot;')+'" aria-label="Search topics"></div><div id="cm-labres"></div>'+
 '<div class="cm-banner"><a href="#cm/tools" data-go="tools"><span class="ic">🧪</span><div><h3>Stuck on homework?</h3><p>Type your own numbers into a solver and see every step.</p></div></a><a href="#cm/arcade" data-go="arcade"><span class="ic">🕹️</span><div><h3>Learn by doing</h3><p>Balance equations, drag shapes, hunt tangent lines and areas.</p></div></a></div>';
 view.querySelectorAll('[data-f]').forEach(function(b){b.onclick=function(){labF=b.getAttribute('data-f');view.querySelectorAll('[data-f]').forEach(function(x){x.classList.toggle('is-on',x===b);});labRes();};});
 var sIn=view.querySelector('.cm-search');sIn.oninput=function(){labQ=sIn.value;labRes();};
@@ -2458,24 +2478,24 @@ var tool=TOOLS.filter(function(x){return x.id===id;})[0]||TOOLS[0];
 view.innerHTML='<div class="cm-crumbs"><a href="#cm/lab" data-go="lab">← Big Brain Lab</a></div><div class="cm-tools"><nav class="cm-tabs">'+TOOLS.map(function(x){return '<a href="#cm/tools/'+x.id+'" data-go="tools/'+x.id+'" class="'+(x===tool?'is-on':'')+'"><span>'+x.icon+'</span>'+x.name+'</a>';}).join('')+'</nav>'+
 '<div><div class="cm-lcard"><h2>'+tool.icon+' '+tool.name+'</h2><p class="cm-muted">'+tool.d+'</p>'+(tool.tpl?'<p class="cm-tpl">'+tool.tpl+'</p>':'')+'<form class="cm-form" novalidate>'+tool.f.map(function(f){var wide=f[3]==='text';return '<div class="cm-field'+(wide?' wide':'')+'"><label for="cm-f-'+f[0]+'">'+f[1]+'</label><input id="cm-f-'+f[0]+'" name="'+f[0]+'" value="'+f[2]+'" '+(wide?'':'inputmode="decimal"')+' autocomplete="off"></div>';}).join('')+'<button class="cm-lbtn" type="submit">Solve step-by-step</button></form><p class="cm-muted" style="font-size:13px">Tip: you can type negatives (−3) and fractions like 1/2.</p></div><div id="cm-tres"></div></div></div>';
 var form=view.querySelector('form'),res=view.querySelector('#cm-tres');
-function solve(){
+function solve(byUser){
 var v={},raw={},miss=false;
 tool.f.forEach(function(f){var val=form.elements[f[0]].value;raw[f[0]]=val;v[f[0]]=numIn(val);if(f[3]!=='text'&&f[3]!=='num'&&!tool.opt&&isNaN(v[f[0]]))miss=true;});
 if(miss){res.innerHTML='<div class="cm-lcard"><p class="cm-err">Please fill in every box with a number.</p></div>';return;}
 var r=tool.run(v,raw);
 if(r.err){res.innerHTML='<div class="cm-lcard"><p class="cm-err">'+r.err+'</p></div>';return;}
 res.innerHTML='<div class="cm-lcard"><div class="cm-ans" style="margin-top:0">Answer: <b>'+r.ans+'</b></div><h2 style="margin-top:12px">Step-by-step</h2><ol class="cm-steps">'+r.steps.map(function(s,i){return '<li style="animation-delay:'+(i*.06)+'s"><div class="say">'+s.s+'</div>'+(s.m?'<div class="m">'+s.m+'</div>':'')+'</li>';}).join('')+'</ol></div>';
-addXP(1);
+if(byUser)addXP(1);
 }
-form.onsubmit=function(e){e.preventDefault();solve();};
-solve();
+form.onsubmit=function(e){e.preventDefault();solve(true);};
+solve(false);
 }
 function vArcade(){
 var tot=allStars(),rk=rankOf(tot),max=0;LGAMES.forEach(function(g){max+=LG_LISTS[g.id].length*3;});
 var pct=rk.nx?Math.round((tot-rk.r[0])/(rk.nx[0]-rk.r[0])*100):100;
 view.innerHTML='<section class="cm-lhero"><div><p class="cm-eyebrow">Big kids like to have fun too</p><h1 class="cm-lh1">Lab <span>Arcade</span></h1><p class="cm-llead">Hands-on challenges where you actually do the math: balance equations, drag shapes, tilt tangent lines and stack rectangles under curves.</p></div>'+
 '<div class="cm-lside"><div class="cm-starkey"><div><span>★</span> Finish the challenge</div><div><span>★</span> Do it efficiently (beat par or skip the hints)</div><div><span>★</span> Answer the 💡 insight question</div></div></div></section>'+
-'<div class="cm-rank"><span class="ic">'+rk.r[1]+'</span><div style="flex:1"><b>'+rk.r[2]+'</b> <span class="cm-muted">· '+tot+' / '+max+' ★ · '+S.xp+' XP</span><div class="cm-meter"><i style="width:'+pct+'%"></i></div><small class="cm-muted">'+(rk.nx?(rk.nx[0]-tot)+' more ★ to become '+rk.nx[1]+' '+rk.nx[2]:'You reached the top rank! 🎉')+'</small></div></div>'+
+xpCard()+'<div class="cm-rank"><span class="ic">'+rk.r[1]+'</span><div style="flex:1"><b>'+rk.r[2]+'</b> <span class="cm-muted">· '+tot+' / '+max+' ★ · '+S.xp+' XP</span><div class="cm-meter"><i style="width:'+pct+'%"></i></div><small class="cm-muted">'+(rk.nx?(rk.nx[0]-tot)+' more ★ to become '+rk.nx[1]+' '+rk.nx[2]:'You reached the top rank! 🎉')+'</small></div></div>'+
 '<div class="cm-agrid">'+LGAMES.map(function(g){var L=LG_LISTS[g.id],s=starsOf(g.id),d=doneOf(g.id);return '<a class="cm-acard" href="#cm/arcade/'+g.id+'" data-go="arcade/'+g.id+'" style="--c:'+g.c+'"><div class="cm-acard-top"><span class="ic">'+g.icon+'</span><span class="cm-badge">'+g.topic+'</span></div><h3>'+g.name+'</h3><p>'+g.d+'</p><div class="cm-meter"><i style="width:'+Math.round(s/(L.length*3)*100)+'%"></i></div><span class="best">'+d+' / '+L.length+' challenges · '+s+' ★</span></a>';}).join('')+'</div>';
 }
 function vLabGame(id){
@@ -2506,7 +2526,8 @@ if(PENDING_ADV&&!(sec==='kids'&&p[1]&&p[1]!=='monkey'))setTimeout(announceAdv,50
 if(!firstRender){var top=root.getBoundingClientRect().top;if(top<0)window.scrollTo({top:window.pageYOffset+top-10,behavior:'smooth'});}
 firstRender=false;
 }
-root.addEventListener('click',function(e){var nt=e.target.closest('[data-newtrip]');if(nt&&root.contains(nt)){e.preventDefault();if(S.newsc&&sceneOpen(sceneById(S.newsc))){S.scene=S.newsc;store.set('scene',S.scene);}tone(880,.08,'triangle');go('kids/monkey');return;}
+root.addEventListener('click',function(e){var sw=e.target.closest('[data-lth]');if(sw&&root.contains(sw)){var t=sw.getAttribute('data-lth');if(themeOpen(t)){S.lth=t;store.set('lth',t);applyLabTheme();tone(760,.06,'triangle');root.querySelectorAll('[data-lth]').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-lth')===t);});}else{sfxBad();}return;}
+var nt=e.target.closest('[data-newtrip]');if(nt&&root.contains(nt)){e.preventDefault();if(S.newsc&&sceneOpen(sceneById(S.newsc))){S.scene=S.newsc;store.set('scene',S.scene);}tone(880,.08,'triangle');go('kids/monkey');return;}
 var a=e.target.closest('[data-go]');if(!a||!root.contains(a))return;e.preventDefault();e.stopPropagation();tone(700,.04,'triangle');go(a.getAttribute('data-go'));});
 root.querySelector('#cm-snd').addEventListener('click',function(){S.sound=!S.sound;store.set('sound',S.sound);updStats();if(S.sound)tone(660,.1,'triangle');});
 window.addEventListener('popstate',render);
@@ -2515,7 +2536,7 @@ window.addEventListener('hashchange',function(){if((location.hash||'').indexOf('
 /* ================= parent sign-in: save progress to the cloud (Firebase) ================= */
 /* Paste the Firebase web config here. null = sign-in is hidden. */
 var FB_CONFIG={apiKey:"AIzaSyB5Ear37v7jUHgJkm7dhyn1kprrnLLWLn8",authDomain:"calc-monkey.firebaseapp.com",projectId:"calc-monkey",storageBucket:"calc-monkey.firebasestorage.app",messagingSenderId:"845993172331",appId:"1:845993172331:web:e9ce3efe63bc292957002e"};
-var FB_VER='10.12.2',SYNC_KEYS=['grade','bananas','xp','look','scene','mname','best','labprog'];
+var FB_VER='10.12.2',SYNC_KEYS=['grade','bananas','xp','look','scene','mname','best','labprog','lth'];
 var cloud={user:null,ready:false,loading:null,saving:false,timer:null,applying:false,db:null};
 function acctBtn(){return root.querySelector('#cm-acct');}
 function paintAcct(state){var b=acctBtn();if(!b)return;if(!FB_CONFIG){b.hidden=true;return;}b.hidden=false;
@@ -2539,12 +2560,12 @@ function score(o){return (+o.bananas||0)+(+o.xp||0);}
 function mergeProg(a,b){var o=JSON.parse(JSON.stringify(a||{}));Object.keys(b||{}).forEach(function(g){var x=o[g]||[],y=b[g]||[];for(var i=0;i<Math.max(x.length,y.length);i++)x[i]=Math.max(x[i]||0,y[i]||0);o[g]=x;});return o;}
 function mergeAll(loc,cl){
 var main=score(cl)>=score(loc)?cl:loc,m={};
-['grade','look','scene','mname'].forEach(function(k){m[k]=main[k]!=null?main[k]:loc[k];});
+['grade','look','scene','mname','lth'].forEach(function(k){m[k]=main[k]!=null?main[k]:loc[k];});
 m.bananas=Math.max(+loc.bananas||0,+cl.bananas||0);m.xp=Math.max(+loc.xp||0,+cl.xp||0);
 m.best=Object.assign({},loc.best||{},cl.best||{});m.labprog=mergeProg(loc.labprog,cl.labprog);return m;}
 function applyState(m){
 cloud.applying=true;
-['grade','bananas','xp','look','scene','mname','best'].forEach(function(k){if(m[k]!=null){S[k]=m[k];store.set(k,m[k]);}});
+['grade','bananas','xp','look','scene','mname','best','lth'].forEach(function(k){if(m[k]!=null){S[k]=m[k];store.set(k,m[k]);}});applyLabTheme();
 if(m.labprog){Object.keys(PROG).forEach(function(k){delete PROG[k];});Object.assign(PROG,m.labprog);store.set('labprog',PROG);}
 cloud.applying=false;updStats();render();
 }
@@ -2608,5 +2629,5 @@ b.addEventListener('click',acctModal);
 if(store.get('acct',false))setTimeout(function(){fbLoad().catch(function(){});},1200);
 }
 
-refreshLogo();updStats();render();cloudInit();
+applyLabTheme();refreshLogo();updStats();render();cloudInit();
 })();

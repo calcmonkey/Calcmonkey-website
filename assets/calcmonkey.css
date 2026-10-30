@@ -440,7 +440,7 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-fban.hint,.cm-fm.hint .cm-fbub{animation:cm-hintf .55s ease-in-out infinite alternate}
 @keyframes cm-hintf{to{background:#bbf7d0;box-shadow:0 0 0 6px #fff36b,0 0 22px 10px rgba(34,197,94,.6);transform:scale(1.08)}}
 /* ---------- Lab (light graph-paper theme) ---------- */
-#cm-app.cm-t-lab{background:linear-gradient(rgba(109,74,255,.06) 1px,transparent 1px) 0 0/26px 26px,linear-gradient(90deg,rgba(109,74,255,.06) 1px,transparent 1px) 0 0/26px 26px,linear-gradient(160deg,#f8f6ff,#eef7ff);color:var(--l-text);font-family:'Space Grotesk',system-ui,sans-serif}
+#cm-app.cm-t-lab{background:linear-gradient(var(--lgrid,rgba(109,74,255,.06)) 1px,transparent 1px) 0 0/26px 26px,linear-gradient(90deg,var(--lgrid,rgba(109,74,255,.06)) 1px,transparent 1px) 0 0/26px 26px,linear-gradient(160deg,var(--lbg1,#f8f6ff),var(--lbg2,#eef7ff));color:var(--l-text);font-family:'Space Grotesk',system-ui,sans-serif}
 .cm-t-lab .cm-brand-txt b{color:var(--acc)}
 .cm-t-lab .cm-nav a:hover{background:rgba(109,74,255,.1)}
 #cm-app.cm-t-lab .cm-nav a.is-on{background:var(--acc);color:#fff;box-shadow:none;border:0;padding:7px 14px}
@@ -1072,3 +1072,32 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-ovshort .cm-cheer{font-size:22px;text-align:left}
 .cm-ovshort .cm-wbar{margin:2px 0 6px;clear:both}.cm-ovshort .cm-wearn{font-size:16px}.cm-ovshort .cm-wbarl{font-size:12px}
 @media(prefers-reduced-motion:reduce){.cm-overlay.cm-ovwin::before,.cm-cheer{animation:none}}
+
+/* each section shows its own points: bananas in the Kids Jungle, XP in the Big Brain Lab */
+.cm-t-kids #cm-xp{display:none}
+.cm-t-lab #cm-ban{display:none}
+.cm-lvic{margin-left:2px}
+/* Lab XP level card + themes */
+.cm-xpcard{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;background:#fff;border:1px solid var(--l-line);border-radius:20px;padding:14px 18px;margin:0 0 16px;box-shadow:0 6px 24px rgba(60,40,160,.06)}
+.cm-xpic{font-size:40px;line-height:1;width:64px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:color-mix(in srgb,var(--acc) 12%,#fff);border:2px solid var(--acc)}
+.cm-xpmain{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cm-xpmain b{font-size:19px;color:var(--l-text)}
+.cm-xpmain .cm-meter{margin:4px 0}
+.cm-xpthemes{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.cm-xpthemes small{font-weight:700;color:var(--l-muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.cm-xpthemes>div{display:grid;grid-template-columns:repeat(4,28px);gap:6px}
+.cm-swatch{width:28px;height:28px;border-radius:50%;background:var(--sw);border:3px solid #fff;box-shadow:0 0 0 1px var(--l-line);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0}
+.cm-swatch.on{box-shadow:0 0 0 3px var(--sw)}
+.cm-swatch.locked{filter:grayscale(.7) opacity(.5);cursor:not-allowed}
+@media(max-width:700px){.cm-xpcard{grid-template-columns:auto 1fr}.cm-xpthemes{grid-column:1/-1;flex-direction:row;align-items:center;gap:10px}.cm-xpthemes>div{grid-template-columns:repeat(8,26px)}.cm-swatch{width:26px;height:26px}.cm-xpic{width:52px;height:52px;font-size:32px}}
+/* level-up pop-up: sleeker, for older students */
+.cm-lvup{background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--acc) 55%,#000 20%),rgba(10,10,30,.88))}
+.cm-lvup .cm-annbox{font-family:'Space Grotesk',system-ui,sans-serif;border:1px solid var(--acc)!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 35%,#fff),0 20px 60px rgba(0,0,0,.35)!important;max-width:440px}
+.cm-lvbadge{width:84px;height:84px;margin:0 auto;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:48px;background:color-mix(in srgb,var(--acc) 14%,#fff);border:3px solid var(--acc);animation:cm-unpop .6s cubic-bezier(.2,1.6,.5,1)}
+.cm-lvk{font-weight:700;letter-spacing:.3em;color:var(--acc);margin:12px 0 0!important;font-size:13px}
+.cm-lvup h2{font-family:'Space Grotesk',system-ui,sans-serif!important;color:var(--l-text)!important;font-size:clamp(24px,5vw,32px)!important}
+.cm-lvtheme{display:flex;gap:12px;align-items:center;text-align:left;background:var(--l-panel2);border-radius:14px;padding:10px 12px;margin:6px 0 14px}
+.cm-lvtheme .cm-swatch{flex:none;width:34px;height:34px;cursor:default}
+.cm-lvtheme small{display:block;color:var(--l-muted)}
+.cm-lvup .cm-bigbtn.next{background:var(--acc)!important;box-shadow:0 4px 0 var(--acc-d)!important;animation:none;font-family:'Space Grotesk',system-ui,sans-serif!important;border-color:var(--acc-d)!important}
+#cm-app.cm-t-lab{--acc:var(--lacc,#6d4aff);--acc-d:var(--lacc-d,#4f2fd6)}.cm-annc.cm-lvup{--acc:var(--lacc,#6d4aff);--acc-d:var(--lacc-d,#4f2fd6)}
