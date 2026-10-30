@@ -9,7 +9,12 @@ search-friendly intro text. Run:  python3 tools/build_pages.py
 import json, os, datetime
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = 'https://www.calcmonkey.com'
-MARKUP = open(os.path.join(ROOT, 'tools', 'app-markup.html')).read()
+import hashlib
+def _ver(rel):
+    return hashlib.md5(open(os.path.join(ROOT, rel), 'rb').read()).hexdigest()[:10]
+JSV, CSSV = _ver('assets/calcmonkey.js'), _ver('assets/calcmonkey.css')
+# version the shared files so browsers always load the newest game code after an update
+MARKUP = open(os.path.join(ROOT, 'tools', 'app-markup.html')).read().replace('href="/assets/calcmonkey.css"', 'href="/assets/calcmonkey.css?v=' + CSSV + '"')
 
 PAGES = [
   dict(path='/', start='home',
@@ -129,7 +134,7 @@ def page(pg):
 </head>
 <body>
 '''
-    return head + app + '\n' + seo + '\n<script src="/assets/calcmonkey.js"></script>\n</body>\n</html>\n'
+    return head + app + '\n' + seo + '\n<script src="/assets/calcmonkey.js?v=' + JSV + '"></script>\n</body>\n</html>\n'
 
 for pg in PAGES:
     d = os.path.join(ROOT, pg['path'].strip('/'))

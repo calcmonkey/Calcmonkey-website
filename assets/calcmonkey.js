@@ -2041,6 +2041,7 @@ c.on(document,'keydown',function(e){if(e.code==='Space'){e.preventDefault();tap(
 c.loop(function(dt){
 t+=dt;var s=c.W()/300;w.style.transform='translateX('+(-cam*s)+'px)';
 vEls.forEach(function(v,i){var th=i===cur&&mode==='swing'?A*Math.sin(phi):(i===cur+1&&mode==='fly'?-0.42*Math.min(1,fl.u*1.3):0.06*Math.sin(t*1.3+i));v.style.left=(vx(i)*s)+'px';v.style.height=(L*s)+'px';v.style.transform='rotate('+(-th)+'rad)';});
+fEls.forEach(function(e,i){e.classList.toggle('next',i===cur&&mode!=='done'&&!e.classList.contains('got'));});
 if(mode==='swing'){phi+=OM*dt;var th=A*Math.sin(phi),p=end(cur,th);placeMk(p[0],p[1],-th);}
 else if(mode==='fly'){fl.u=Math.min(1,fl.u+dt/0.72);var u=fl.u,x=fl.p0[0]+(fl.p1[0]-fl.p0[0])*u,y=fl.p0[1]+(fl.p1[1]-fl.p0[1])*u-fl.hh*Math.sin(Math.PI*u);cam=fl.c0+(fl.c1-fl.c0)*u;placeMk(x,y,0.5*Math.sin(Math.PI*2*u));
 var fe=fEls[cur];if(fe&&!fe.classList.contains('got')&&Math.abs(x-(vx(cur)+GAP/2))<24&&Math.abs(y-fy[cur])<22){fe.classList.add('got');got++;tone(988,.08,'triangle');info();}
@@ -2118,6 +2119,15 @@ objs.map(function(o){return '<span class="cm-kob '+o.k+'">'+(o.k==='rock'?'🪨'
 var mts=q(c.lay,'mts'),tr=q(c.lay,'tr'),gp=q(c.lay,'g'),sk=q(c.lay,'sk'),oEls=c.lay.querySelectorAll('.cm-kob'),tEls=tr.querySelectorAll('span');
 c.f.classList.add('cm-skirun');
 function gy(sx){return 112+0.22*(sx-150)+10*Math.sin((sx+cam)/48);}
+function patrol(){
+var p=document.createElement('div');p.className='cm-patrol';p.innerHTML='<div class="cot"><img src="'+monkeyURI(S.look)+'" alt=""><i class="cross"></i></div><span class="pp">🧑‍⚕️</span><span class="flag">⛑️ SKI PATROL</span>';c.lay.appendChild(p);
+function at(sx,ms){p.style.transition=ms?'left '+ms+'ms ease-in-out,top '+ms+'ms ease-in-out':'none';vpos(p,sx,gy(sx));}
+at(345,0);c.setProb('🚑 Ski patrol is on the way!');[880,660,880,660].forEach(function(f,i){tone(f,.14,'square',i*.18);});
+c.T.after(function(){at(X+14,1100);},350);
+c.T.after(function(){sk.style.visibility='hidden';p.classList.add('loaded');tone(523,.12,'triangle');c.setProb('🤕 Mochi is going to the lodge to rest');},1600);
+c.T.after(function(){at(-70,1700);},2300);
+c.T.after(function(){c.fail('Mochi got hurt!','Mochi bumped into 3 things, so the ski patrol 🚑 carried Mochi to the lodge to rest. Remember to <b>tap to JUMP</b> over the rocks 🪨 and snowmen ⛄! Ready to start over from the top?');},4100);
+}
 function jump(){if(!air&&!done&&crash<=0){air=true;vy=-245;tone(660,.08,'triangle');}}
 c.on(c.f,'pointerdown',function(e){if(e.target.closest('.cm-overlay'))return;jump();});
 c.on(document,'keydown',function(e){if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump();}});
@@ -2132,8 +2142,8 @@ sk.style.left=(X/3)+'%';sk.style.top=((g+Math.min(0,y))/2)+'%';sk.style.transfor
 objs.forEach(function(o,i){var e=oEls[i],sx=o.x-cam;if(sx<-20||sx>320){e.style.display='none';return;}e.style.display='';vpos(e,sx,gy(sx)-(o.k==='flake'?o.h:0));
 if(o.done)return;
 if(o.k==='flake'){if(Math.abs(sx-X)<14&&Math.abs((-y)-(o.h-14))<22){o.done=true;e.classList.add('got');flakes++;tone(1175,.08,'triangle');}}
-else if(!done&&Math.abs(sx-X)<9.5&&-y<13){o.done=true;e.classList.add('hit');crash=0.75;hits++;tone(180,.25,'sine');c.say(X,gy(X)-60,hits>=3?'Ouch! 🤕':'Bump! '+(3-hits)+' ❤️ left');
-if(hits>=3){done=true;sk.classList.add('hurt');c.T.after(function(){c.fail('Ouch! Mochi got hurt!','Mochi bumped into 3 things. Remember to <b>tap to jump</b> over the rocks 🪨 and snowmen ⛄! Let’s try again from the top.');},900);}}
+else if(!done&&Math.abs(sx-X)<11&&-y<(o.k==='snow'?19:15)){o.done=true;e.classList.add('hit');crash=0.75;hits++;tone(180,.25,'sine');c.say(X,gy(X)-60,hits>=3?'Ouch! 🤕':'Bump! '+(3-hits)+' ❤️ left');
+if(hits>=3){done=true;sk.classList.add('hurt');patrol();}}
 });
 var le=oEls[oEls.length-1],lx=LEN-cam;if(lx<330){le.style.display='';vpos(le,lx,gy(lx));}else le.style.display='none';
 c.setProb('❤️'.repeat(Math.max(0,3-hits))+'🤍'.repeat(Math.min(3,hits))+'   ⛷️ '+Math.min(100,Math.round(cam/(LEN-80)*100))+'%   ·   ❄️ '+flakes);
