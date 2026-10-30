@@ -2284,10 +2284,17 @@ return '<section class="cm-mybar"><div class="cm-mbscene" data-go="kids/monkey" 
 '<div class="cm-stamps">'+SCENES.map(function(sc){var o=sceneOpen(sc);return '<span class="'+(o?'on':'')+'" title="'+sc.name+(o?'':' — '+sc.need+' 🍌')+'">'+(o?sc.icon:'🔒')+'</span>';}).join('')+'</div>'+
 '<div class="cm-row"><a class="cm-bigbtn" href="#cm/kids/monkey" data-go="kids/monkey">👕 Dress up &amp; explore</a>'+(S.newsc?'<span class="cm-newb">✨ NEW trip unlocked!</span>':'')+'</div></div></section>';
 }
+function miniBanner(){
+var nx=nextScene(),prev=SCENES.filter(function(s){return s.need<=S.bananas;}).pop(),pct=nx?Math.round((S.bananas-prev.need)/(nx.need-prev.need)*100):100,F=FUN[S.scene],sc=sceneById(S.scene);
+return '<section class="cm-mini"><div class="cm-miniscene" data-go="kids/monkey" role="link" tabindex="0" aria-label="Dress up '+esc(S.mname)+'">'+sceneSVG(S.scene,S.look)+'</div>'+
+'<div class="cm-miniinfo"><b class="cm-mininame">'+esc(S.mname)+'’s rewards</b><span class="cm-miniban">🍌 '+S.bananas+' banana'+(S.bananas===1?'':'s')+'</span>'+
+(nx?'<div class="cm-mininext"><span>Next trip: '+nx.icon+' '+nx.name+' — '+(nx.need-S.bananas)+' more 🍌</span><div class="cm-kmeter"><i style="width:'+pct+'%"></i></div></div>':'<div class="cm-mininext"><span>🏆 Every adventure unlocked!</span></div>')+
+'</div>'+'<div class="cm-minibtns"><a class="cm-minibtn" href="#cm/kids/monkey" data-go="kids/monkey">👕 Dress up</a><a class="cm-minibtn fun" href="#cm/kids/fun-'+S.scene+'" data-go="kids/fun-'+S.scene+'">'+F.icon+' '+F.name+'</a>'+(S.newsc?'<span class="cm-newb">✨ New trip!</span>':'')+'</div></section>';
+}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function vKids(){if(PENDING_ADV)setTimeout(announceAdv,600);
 var g=+S.grade;
-view.innerHTML=myBanner()+
+view.innerHTML=miniBanner()+
 '<h2 class="cm-h2">1. Pick your grade</h2><div class="cm-grades">'+[1,2,3,4,5,6].map(function(n){return '<button data-grade="'+n+'" class="'+(n===g?'is-on':'')+'" aria-label="Grade '+n+'"><b>'+n+'</b><small>'+ord(n)+'</small></button>';}).join('')+'</div><p class="cm-gdesc">'+GRADE_DESC[g]+'</p>'+
 '<h2 class="cm-h2">⚡ Quick Skills <small>Fast facts you can do in your head: '+QUICK_DESC[g]+'</small></h2><div class="cm-kgrid">'+KGAMES.map(function(k){return '<a href="#cm/kids/'+k.id+'" data-go="kids/'+k.id+'" class="cm-kcard" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3><p>'+k.d+'</p><span class="cm-play">Play ▶</span></a>';}).join('')+'</div>'+
 '<h2 class="cm-h2">🧠 Think It Through <small>Grade '+g+' — bigger problems, step by step. Take your time!</small></h2><div class="cm-kgrid">'+THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3><p>'+k.d[g]+'</p><span class="cm-play">Start ▶</span></a>';}).join('')+'</div>'+

@@ -973,3 +973,30 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-patrol.loaded .cot img{display:block}
 .cm-patrol .pp{font-size:clamp(28px,8cqw,62px);line-height:1;margin-left:-4px;transform:scaleX(-1)}
 .cm-patrol .flag{position:absolute;left:0;top:-70%;background:#fff;border:2px solid #ef4444;color:#b91c1c;border-radius:999px;padding:0 8px;font-weight:900;font-size:clamp(9px,2cqw,13px);white-space:nowrap}
+/* ice cream stand on small screens: keep the order bubble clear of the customer */
+@container (max-width:600px){
+.cm-fn-beach .cm-ibub{left:62%;top:2%;padding:3px 6px 5px;min-width:0;border-width:2px;border-radius:12px}
+.cm-fn-beach .cm-ibub small{display:none}
+.cm-fn-beach .cm-ibub .cm-icone{width:22px}
+.cm-fn-beach .cm-ibub::after{right:-8px;bottom:8px;border:7px solid transparent;border-left-color:var(--ink);border-right:0}
+.cm-fn-beach .cm-icust{left:87%;top:55%;font-size:clamp(38px,14cqw,90px)}
+.cm-fn-beach .cm-imk{left:14%}
+.cm-fn-beach .cm-imake{left:38%}
+.cm-fn-beach .cm-iyum{font-size:16px}
+}
+/* compact reward strip on the Kids Jungle page (math games come first) */
+.cm-mini{display:flex;align-items:center;gap:14px;background:#fff;border:3px solid var(--ink);border-radius:20px;padding:10px 14px;box-shadow:0 5px 0 var(--ink);margin-bottom:6px}
+.cm-miniscene{flex:0 0 150px;border:2px solid var(--ink);border-radius:14px;overflow:hidden;line-height:0;cursor:pointer}
+.cm-miniscene svg{width:100%;height:auto}
+.cm-miniinfo{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.cm-mininame{font-family:'Baloo 2',sans-serif;font-size:22px;font-weight:800}
+.cm-miniban{font-weight:900;background:var(--yellow);border:2px solid var(--ink);border-radius:999px;padding:1px 10px}
+.cm-mininext{flex-basis:100%;display:flex;flex-direction:column;gap:3px;font-weight:700;font-size:14px}
+.cm-mininext .cm-kmeter{height:10px;max-width:420px}
+.cm-minibtns{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cm-minibtn{font-weight:900;font-size:14px;text-decoration:none;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:999px;padding:4px 12px;box-shadow:0 3px 0 var(--ink)}
+.cm-minibtn.fun{background:#dcfce7}
+.cm-minibtn:hover{background:#fef9c3}
+@media(max-width:560px){.cm-mini{display:grid;grid-template-columns:84px 1fr;gap:8px 10px;padding:8px 10px}.cm-miniscene{grid-row:span 1}.cm-miniinfo{gap:4px 8px}.cm-mininame{font-size:17px}.cm-miniban{font-size:13px;padding:0 8px}.cm-mininext{font-size:12px}.cm-mininext .cm-kmeter{height:8px}.cm-minibtns{grid-column:1/-1;flex-wrap:nowrap}.cm-minibtn{font-size:13px;padding:3px 10px;white-space:nowrap}}
+.cm-mini > .cm-minibtns{flex:0 0 auto;flex-direction:column;align-items:stretch}.cm-mini > .cm-minibtns .cm-minibtn{text-align:center}@media(max-width:560px){.cm-mini > .cm-minibtns{flex-direction:row}}
+@media(max-width:560px){.cm-grades{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.cm-grades button{width:auto;height:54px;border-radius:14px}.cm-grades button b{font-size:24px}}
