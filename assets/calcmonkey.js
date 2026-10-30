@@ -422,7 +422,7 @@ function start(){st={run:true,hearts:3,score:0,wrong:0,mx:C.w/2,tx:C.w/2,items:[
 function end(){
 st.run=false;st.items=[];st.q=[];var nb=setBest('banana'+S.grade,st.score),hard=st.wrong>=2&&st.score<=st.wrong;
 var html=(hard?'<div class="cm-ovemoji">🤔</div>':yayMochi())+'<h3>'+(hard?'Those were tricky!':'Great job!')+'</h3><p>You grabbed <b>'+st.score+'</b> banana'+(st.score===1?'':'s')+'.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want Coach Monkey to show you a trick for <b>'+st.miss.q+'</b>?':'')+'</p>';
-showOv2(ov,html,hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt']]:[['Play again',start]]);
+showOv2(ov,html,hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt'],nextBtn()]:[['Play again',start],nextBtn()]);
 }
 function mv(e){var r=cv.getBoundingClientRect();st.tx=clamp(e.clientX-r.left,40,C.w-40);}
 listen(cv,'pointerdown',function(e){if(st.run){var r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,hit=null;st.items.forEach(function(it){if(Math.abs(it.x-x)<48&&y>it.y-44&&y<it.y+50)hit=it;});if(hit){st.items.splice(st.items.indexOf(hit),1);st.tx=hit.x;grab(hit);return;}}mv(e);});listen(cv,'pointermove',function(e){if(e.pointerType==='mouse'||e.buttons)mv(e);});
@@ -461,7 +461,7 @@ function resume(){sky.classList.remove('cm-paused');st.streak=0;st.run=true;time
 function offer(){pause();showOv2(ov,'<div class="cm-ovemoji">🤔</div><h3>Tricky ones?</h3><p>Coach Monkey can show you a trick for problems like <b>'+st.miss.q+'</b>. The clock is paused!</p>',[['🐒 Show me how!',function(){factCoach(ov,st.miss,resume);}],['Keep playing',resume,'alt']]);}
 function start(){sky.classList.remove('cm-paused');st={run:true,time:60,score:0,wrong:0,streak:0};hud();newProb();spawn();timersOn();}
 function end(){st.run=false;T.clear();clearB();probEl.textContent='Time!';var nb=setBest('balloon'+S.grade,st.score),hard=struggled(st);if(st.score>0){confetti(sky);sfxWin();}
-showOv2(ov,(hard?'<div class="cm-ovemoji">🤔</div>':yayMochi())+'<h3>Time’s up!</h3><p>You popped <b>'+st.score+'</b> balloon'+(st.score===1?'':'s')+'.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt']]:[['Play again',start]]);}
+showOv2(ov,(hard?'<div class="cm-ovemoji">🤔</div>':yayMochi())+'<h3>Time’s up!</h3><p>You popped <b>'+st.score+'</b> balloon'+(st.score===1?'':'s')+'.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt'],nextBtn()]:[['Play again',start],nextBtn()]);}
 hud();
 showOv(ov,'<div class="cm-ovemoji">🎈</div><h3>Balloon Pop</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>You have 60 seconds. Pop as many right-answer balloons as you can!</p>','Start! ▶',start);
 }
@@ -485,8 +485,8 @@ function pause(){st.run=false;T.clear();}
 function resume(){st.streak=0;st.run=true;T.every(tick,100);}
 function offer(){pause();showOv2(ov,'<div class="cm-ovemoji">🤔</div><h3>Need a hand?</h3><p>The parrot is waiting. Want Coach Monkey to show you how to do <b>'+st.miss.q+'</b>?</p>',[['🐒 Show me how!',function(){factCoach(ov,st.miss,function(){ask();resume();});}],['Keep racing',resume,'alt']]);}
 function start(){st={run:true,me:0,bot:0,right:0,wrong:0,streak:0};place();hud();ask();T.every(tick,100);}
-function win(){st.run=false;T.clear();addBananas(5);sfxWin();confetti(track);showOv(ov,yayMochi()+'<h3>You won!</h3><p>You beat the parrot! <b>+5 bananas</b> 🍌</p>','Race again',start);}
-function lose(){st.run=false;T.clear();addBananas(1);var hard=st.wrong>=3;showOv2(ov,'<div class="cm-ovemoji">🦜</div><h3>So close!</h3><p>The parrot won this time. You got <b>'+st.right+'</b> right. Here’s <b>+1 banana</b> for trying!'+(hard&&st.miss?'<br>Want a quick lesson first?':'')+'</p>',hard&&st.miss?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Race again ▶');}],['Race again',start,'alt']]:[['Race again',start]]);}
+function win(){st.run=false;T.clear();addBananas(5);sfxWin();confetti(track);showOv2(ov,yayMochi()+'<h3>You won!</h3><p>You beat the parrot! <b>+5 bananas</b> 🍌</p>',[['Race again',start],nextBtn()]);}
+function lose(){st.run=false;T.clear();addBananas(1);var hard=st.wrong>=3;showOv2(ov,'<div class="cm-ovemoji">🦜</div><h3>So close!</h3><p>The parrot won this time. You got <b>'+st.right+'</b> right. Here’s <b>+1 banana</b> for trying!'+(hard&&st.miss?'<br>Want a quick lesson first?':'')+'</p>',hard&&st.miss?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Race again ▶');}],['Race again',start,'alt'],nextBtn()]:[['Race again',start],nextBtn()]);}
 place();hud();ans.innerHTML='';
 showOv(ov,'<div class="cm-ovemoji">🏁</div><h3>Jungle Race</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>Answer '+need+' facts before the parrot reaches the finish line!</p>','Ready, set, GO!',start);
 }
@@ -542,7 +542,7 @@ function offer(){pause();showOv2(ov,'<div class="cm-ovemoji">🤔</div><h3>Trick
 function start(){T.clear();st={run:true,fed:0,t:0,wrong:0,streak:0,score:0,slots:[],extra:[]};sel=null;busy=false;st.last=Date.now();for(var i=0;i<3;i++)newMonkey(i);decoy();paint();hud();T.every(tick,1000);}
 function win(){
 st.run=false;T.clear();addBananas(3);sfxWin();confetti(area);var nb=setBest('feed'+S.grade,st.t,true),hard=struggled(st);
-showOv2(ov,yayMochi()+'<h3>Everyone’s full!</h3><p>You fed '+GOAL+' monkeys in <b>'+st.t+' seconds</b>. <b>+3 bonus bananas</b> 🍌'+(nb?'<br>🏆 Fastest time for grade '+S.grade+'!':'<br>Best: '+S.best['feed'+S.grade]+'s')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt']]:[['Play again',start]]);
+showOv2(ov,yayMochi()+'<h3>Everyone’s full!</h3><p>You fed '+GOAL+' monkeys in <b>'+st.t+' seconds</b>. <b>+3 bonus bananas</b> 🍌'+(nb?'<br>🏆 Fastest time for grade '+S.grade+'!':'<br>Best: '+S.best['feed'+S.grade]+'s')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],['Play again',start,'alt'],nextBtn()]:[['Play again',start],nextBtn()]);
 }
 hud();
 showOv(ov,'<div class="cm-ovemoji">🐵</div><h3>Feed the Monkeys</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>Each hungry monkey is holding a problem. Give it the banana with the right answer! Feed '+GOAL+' monkeys as fast as you can.</p>','Start! ▶',start);
@@ -1114,7 +1114,7 @@ if(mist>=3)setTimeout(function(){showOv2(ov,'<div class="cm-ovemoji">🤔</div><
 };
 function load(){mist=0;p=G.gen(g);q(box,'next').classList.add('hide');api.say('');q(box,'area').innerHTML='';hud();trail();G.mount(q(box,'area'),p,api,g);}
 function coach(){runCoach(ov,'How to: '+G.name,G.learn(p,g),{done:'Got it! ✓'});}
-function finish(){confetti(box);showOv2(ov,yayMochi()+'<h3>Expedition complete!</h3><p>You solved '+R+' problems and earned <b>'+earned+' bananas</b>! 🍌</p>',[['Play again',function(){round=0;earned=0;load();}],['Back to the jungle',function(){go('kids');},'alt']]);}
+function finish(){confetti(box);showOv2(ov,yayMochi()+'<h3>Expedition complete!</h3><p>You solved '+R+' problems and earned <b>'+earned+' bananas</b>! 🍌</p>',[['Play again',function(){round=0;earned=0;load();}],nextBtn()]);}
 q(box,'coach').onclick=coach;
 q(box,'next').onclick=function(){if(round>=R)finish();else load();};
 load();
@@ -2020,7 +2020,14 @@ view.innerHTML=myBanner()+
 '<h2 class="cm-h2">🗺️ Adventure Games <small>Every trip '+esc(S.mname)+' unlocks comes with its own mini game!</small></h2><div class="cm-kgrid">'+SCENES.map(function(sc){var A=ADV[sc.id],o=sceneOpen(sc);return o?'<a href="#cm/kids/adv-'+sc.id+'" data-go="kids/adv-'+sc.id+'" class="cm-kcard adv" style="--c:#c4f0ff"><div class="cm-kicon">'+A.icon+'</div><h3>'+A.game+'</h3><p>'+A.d+'</p><span class="cm-play">'+sc.icon+' '+sc.name+' ▶</span></a>':'<div class="cm-kcard adv locked" style="--c:#e5e7eb"><div class="cm-kicon">🔒</div><h3>'+A.game+'</h3><p>'+A.d+'</p><span class="cm-play">Unlocks with '+sc.icon+' '+sc.name+' at '+sc.need+' 🍌</span></div>';}).join('')+'</div>';
 view.querySelectorAll('[data-grade]').forEach(function(b){b.onclick=function(){S.grade=+b.getAttribute('data-grade');store.set('grade',S.grade);tone(600,.08,'triangle');vKids();};});
 }
+var CUR_GAME='';
+function gameOrder(){return KGAMES.map(function(k){return k.id;}).concat(THINK_BY_GRADE[S.grade]||[]);}
+function gameInfo(id){var k=KGAMES.filter(function(x){return x.id===id;})[0];if(k)return k;return THINK[id]||KGAMES[0];}
+function nextBtn(){var o=gameOrder(),n=o[(o.indexOf(CUR_GAME)+1)%o.length],g=gameInfo(n);return ['Next: '+g.icon+' '+g.name+' ▶',function(){go('kids/'+n);},'alt'];}
+function kCards(g,mini){return KGAMES.map(function(k){return '<a href="#cm/kids/'+k.id+'" data-go="kids/'+k.id+'" class="cm-kcard'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d+'</p>')+'<span class="cm-play">Play ▶</span></a>';}).join('')+
+THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d[g]+'</p>')+'<span class="cm-play">Start ▶</span></a>';}).join('');}
 function vKidGame(id){
+if(id!=='monkey'&&id.indexOf('adv-')!==0)CUR_GAME=id;
 if(id==='monkey')return vMonkey();
 if(id.indexOf('adv-')===0)return vAdv(id.slice(4));
 var think=THINK[id];if(!KG_FN[id]&&!think)return go('kids');
@@ -2035,13 +2042,14 @@ if(S.newsc){S.newsc='';store.set('newsc','');}
 if(!sceneOpen(sceneById(S.scene)))S.scene='jungle';
 var sc=sceneById(S.scene);
 view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Back to the Kids Jungle</a><span class="cm-chip">🍌 '+S.bananas+' bananas</span></div>'+
-'<section class="cm-mworld"><div class="cm-mwl"><div class="cm-mwscene" data-r="scene"></div><p class="cm-postcard" data-r="post"></p><a class="cm-bigbtn cm-advplay" data-r="play" href="#cm/kids/adv-jungle" data-go="kids/adv-jungle"></a>'+
+'<section class="cm-mworld"><div class="cm-mwl"><div class="cm-mwscene" data-r="scene"></div><p class="cm-postcard" data-r="post"></p>'+
 '<div class="cm-namerow"><label>Your monkey’s name: <input data-r="nm" maxlength="14" value="'+esc(S.mname)+'"></label></div>'+
 '<h3 class="cm-h3">🗺️ Adventures</h3><div class="cm-advs" data-r="advs"></div></div>'+
 '<div class="cm-mwr"><h3 class="cm-h3">👕 '+esc(S.mname)+'’s Closet</h3><div class="cm-slottabs" data-r="tabs"></div><div class="cm-items" data-r="items"></div>'+
-'<div class="cm-row cm-closetbtns"><button class="cm-bigbtn" data-r="preset"></button><button class="cm-bigbtn alt" data-r="rand">🎲 Surprise me</button><button class="cm-bigbtn alt" data-r="none">Take it all off</button></div></div></section>';
+'<div class="cm-row cm-closetbtns"><button class="cm-bigbtn" data-r="preset"></button><button class="cm-bigbtn alt" data-r="rand">🎲 Surprise me</button><button class="cm-bigbtn alt" data-r="none">Take it all off</button></div></div></section>'+
+'<h2 class="cm-h2">🎮 Back to the games <small>Grade '+S.grade+' — earn more bananas for new trips! <a href="#cm/kids" data-go="kids">Change grade</a></small></h2><div class="cm-kgrid mini">'+kCards(+S.grade,true)+'</div>';
 function save(){store.set('look',S.look);store.set('scene',S.scene);}
-function paintScene(){sc=sceneById(S.scene);q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big');q(view,'post').innerHTML='<b>'+sc.icon+' '+sc.name+':</b> '+sc.blurb;q(view,'preset').textContent='✨ Dress for '+sc.name;var pl=q(view,'play'),A=ADV[sc.id];pl.setAttribute('href','#cm/kids/adv-'+sc.id);pl.setAttribute('data-go','kids/adv-'+sc.id);pl.innerHTML='🎮 Play '+A.icon+' '+A.game;}
+function paintScene(){sc=sceneById(S.scene);var A0=ADV[S.scene];q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big')+'<a class="cm-advplay" href="#cm/kids/adv-'+S.scene+'" data-go="kids/adv-'+S.scene+'">🎮 Play '+A0.icon+' '+A0.game+'</a>';q(view,'post').innerHTML='<b>'+sc.icon+' '+sc.name+':</b> '+sc.blurb;q(view,'preset').textContent='✨ Dress for '+sc.name;}
 function paintAdv(){q(view,'advs').innerHTML=SCENES.map(function(s){var o=sceneOpen(s);return '<button class="cm-adv'+(s.id===S.scene?' is-on':'')+(o?'':' locked')+'" data-s="'+s.id+'"><span class="ic">'+(o?s.icon:'🔒')+'</span><b>'+s.name+'</b><small>'+(o?(s.id===S.scene?'You are here!':'Visit ▶'):'Unlocks at '+s.need+' 🍌')+'</small></button>';}).join('');}
 function paintTabs(){q(view,'tabs').innerHTML=SLOTS.map(function(s){return '<button class="'+(s[0]===closetSlot?'is-on':'')+'" data-t="'+s[0]+'">'+s[1]+' '+s[2]+'</button>';}).join('');}
 function paintItems(){
