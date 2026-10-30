@@ -2293,14 +2293,14 @@ if(S.newsc){S.newsc='';store.set('newsc','');}
 if(!sceneOpen(sceneById(S.scene)))S.scene='jungle';
 var sc=sceneById(S.scene);
 view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Back to the Kids Jungle</a><span class="cm-chip">🍌 '+S.bananas+' bananas</span></div>'+
-'<section class="cm-mworld"><div class="cm-mwl"><div class="cm-mwscene" data-r="scene"></div><p class="cm-postcard" data-r="post"></p>'+
+'<section class="cm-mworld"><div class="cm-mwl"><div class="cm-mwscene" data-r="scene"></div><p class="cm-tapclothes">👆 Tap '+esc(S.mname)+'’s hat, shirt, pants or shoes to change them! 🎩👕👖👟</p><p class="cm-postcard" data-r="post"></p>'+
 '<div class="cm-namerow"><label>Your monkey’s name: <input data-r="nm" maxlength="14" value="'+esc(S.mname)+'"></label></div>'+
 '<h3 class="cm-h3">🗺️ Adventures</h3><div class="cm-advs" data-r="advs"></div></div>'+
 '<div class="cm-mwr"><h3 class="cm-h3">👕 '+esc(S.mname)+'’s Closet</h3><div class="cm-slottabs" data-r="tabs"></div><div class="cm-items" data-r="items"></div>'+
 '<div class="cm-row cm-closetbtns"><button class="cm-bigbtn" data-r="preset"></button><button class="cm-bigbtn alt" data-r="rand">🎲 Surprise me</button><button class="cm-bigbtn alt" data-r="none">Take it all off</button></div></div></section>'+
 '<h2 class="cm-h2">🎮 Back to the games <small>Grade '+S.grade+' — earn more bananas for new trips! <a href="#cm/kids" data-go="kids">Change grade</a></small></h2><div class="cm-kgrid mini">'+kCards(+S.grade,true)+'</div>';
 function save(){store.set('look',S.look);store.set('scene',S.scene);}
-function paintScene(){sc=sceneById(S.scene);var A0=FUN[S.scene];q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big')+'<a class="cm-advplay" href="#cm/kids/fun-'+S.scene+'" data-go="kids/fun-'+S.scene+'">🎉 Play '+A0.icon+' '+A0.name+'</a>';q(view,'post').innerHTML='<b>'+sc.icon+' '+sc.name+':</b> '+sc.blurb;q(view,'preset').textContent='✨ Dress for '+sc.name;}
+function paintScene(){sc=sceneById(S.scene);var A0=FUN[S.scene];q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big')+'<a class="cm-advplay" href="#cm/kids/fun-'+S.scene+'" data-go="kids/fun-'+S.scene+'">🎉 <span class="cm-hidesm">Play </span>'+A0.icon+' '+A0.name+'</a>';q(view,'post').innerHTML='<b>'+sc.icon+' '+sc.name+':</b> '+sc.blurb;q(view,'preset').textContent='✨ Dress for '+sc.name;}
 function paintAdv(){q(view,'advs').innerHTML=SCENES.map(function(s){var o=sceneOpen(s);return '<button class="cm-adv'+(s.id===S.scene?' is-on':'')+(o?'':' locked')+'" data-s="'+s.id+'"><span class="ic">'+(o?s.icon:'🔒')+'</span><b>'+s.name+'</b><small>'+(o?(s.id===S.scene?'You are here!':'Visit ▶'):'Unlocks at '+s.need+' 🍌')+'</small></button>';}).join('');}
 function paintTabs(){q(view,'tabs').innerHTML=SLOTS.map(function(s){return '<button class="'+(s[0]===closetSlot?'is-on':'')+'" data-t="'+s[0]+'">'+s[1]+' '+s[2]+'</button>';}).join('');}
 function paintItems(){
@@ -2311,6 +2311,26 @@ return '<button class="cm-item'+(on?' is-on':'')+(o?'':' locked')+'" data-id="'+
 }
 q(view,'advs').onclick=function(e){var b=e.target.closest('.cm-adv');if(!b)return;var s=sceneById(b.getAttribute('data-s'));if(!sceneOpen(s)){sfxBad();q(view,'post').innerHTML='🔒 <b>'+s.name+'</b> unlocks at '+s.need+' bananas. You need <b>'+(s.need-S.bananas)+'</b> more — go play!';return;}S.scene=s.id;save();sfxGood();paintScene();paintAdv();};
 q(view,'tabs').onclick=function(e){var b=e.target.closest('button');if(!b)return;closetSlot=b.getAttribute('data-t');paintTabs();paintItems();};
+function slotAt(bx,by){
+if(bx<-12||bx>212||by<-30||by>272)return null;
+if((bx>134&&by>148&&by<236)||(bx<66&&by>172&&by<214))return 'hand';
+if(by<52)return 'head';
+if(by<100)return Math.abs(bx-100)<40?'eyes':'head';
+if(by<128)return 'neck';
+if(by<198)return 'top';
+if(by<244)return 'bottom';
+return 'feet';
+}
+var sceneBox=q(view,'scene');
+sceneBox.addEventListener('click',function(e){
+if(e.target.closest('.cm-advplay'))return;var svg=sceneBox.querySelector('svg');if(!svg||!svg.getScreenCTM)return;
+var pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var p=pt.matrixTransform(svg.getScreenCTM().inverse()),bx=(p.x-116)/.84,by=(p.y-36)/.84,sl=slotAt(bx,by);
+if(!sl)return;closetSlot=sl;paintTabs();paintItems();tone(760,.06,'triangle');
+var ic=SLOTS.filter(function(x){return x[0]===sl;})[0];var r=sceneBox.getBoundingClientRect();floatText(sceneBox,e.clientX-r.left-20,e.clientY-r.top-30,ic[1]);
+var it=q(view,'items');it.classList.remove('cm-itemsflash');void it.offsetWidth;it.classList.add('cm-itemsflash');
+var tb=q(view,'tabs').querySelector('.is-on');if(tb){tb.classList.remove('cm-tabpop');void tb.offsetWidth;tb.classList.add('cm-tabpop');}
+if(window.innerWidth<820){var tr=q(view,'tabs').getBoundingClientRect();if(tr.top>window.innerHeight*0.7||tr.top<0)q(view,'tabs').scrollIntoView({behavior:'smooth',block:'start'});}
+});
 q(view,'items').onclick=function(e){var b=e.target.closest('.cm-item');if(!b)return;var id=b.getAttribute('data-id');if(!itemOpen(id)){sfxBad();var it=ITEMS[id];q(view,'post').innerHTML='🔒 The <b>'+it.name+'</b> comes with the <b>'+sceneById(it.scene).name+'</b> trip ('+sceneById(it.scene).need+' 🍌).';return;}S.look[closetSlot]=id;save();tone(700,.06,'triangle');paintScene();paintItems();};
 q(view,'preset').onclick=function(){var L=sceneById(S.scene).look,n={};SLOTS.forEach(function(s){n[s[0]]=L[s[0]]||'';});S.look=n;save();sfxWin();paintScene();paintItems();};
 q(view,'rand').onclick=function(){SLOTS.forEach(function(s){var ids=Object.keys(ITEMS).filter(function(id){return ITEMS[id].slot===s[0]&&itemOpen(id);});if(s[0]!=='top'&&s[0]!=='bottom')ids.push('','');S.look[s[0]]=ids.length?pick(ids):'';});save();sfxGood();paintScene();paintItems();};

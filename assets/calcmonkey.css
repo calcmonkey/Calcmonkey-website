@@ -905,3 +905,11 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-fwb i{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c);animation:cm-fwp 1.1s cubic-bezier(.1,.7,.3,1) forwards}
 @keyframes cm-fwp{70%{opacity:1}to{transform:translate(var(--dx),calc(var(--dy) + 4cqw));opacity:0}}
 @keyframes cm-fwflash{to{transform:scale(2.4);opacity:0}}
+.cm-mwscene{cursor:pointer}
+.cm-mwscene .cm-float{font-size:34px}
+.cm-tapclothes{text-align:center;font-weight:900;margin-top:10px!important;color:#7c3aed}
+.cm-itemsflash{animation:cm-iflash .7s}
+@keyframes cm-iflash{30%{box-shadow:0 0 0 6px #fde047,0 0 22px #fde047}}
+.cm-tabpop{animation:cm-pop-in .35s}
+@media(max-width:700px){.cm-mwscene .cm-advplay{left:3%;bottom:3%;transform:none;font-size:13px;padding:4px 10px;border-width:2px;box-shadow:0 3px 0 var(--ink);animation:cm-pulse2 1.6s ease-in-out infinite}.cm-hidesm{display:none}}
+@keyframes cm-pulse2{50%{transform:scale(1.06)}}
