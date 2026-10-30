@@ -2301,14 +2301,14 @@ return '<section class="cm-mybar"><div class="cm-mbscene" data-go="kids/monkey" 
 '<div class="cm-mbban">🍌 <b>'+S.bananas+'</b> banana'+(S.bananas===1?'':'s')+' earned</div>'+
 (nx?'<div class="cm-next"><div>Next trip: <b>'+nx.icon+' '+nx.name+'</b></div><div class="cm-kmeter"><i style="width:'+pct+'%"></i></div><small><b>'+(nx.need-S.bananas)+'</b> more banana'+(nx.need-S.bananas===1?'':'s')+' to go!</small></div>':'<div class="cm-next"><b>🏆 Every adventure unlocked!</b></div>')+
 '<div class="cm-stamps">'+SCENES.map(function(sc){var o=sceneOpen(sc);return '<span class="'+(o?'on':'')+'" title="'+sc.name+(o?'':' — '+sc.need+' 🍌')+'">'+(o?sc.icon:'🔒')+'</span>';}).join('')+'</div>'+
-'<div class="cm-row"><a class="cm-bigbtn" href="#cm/kids/monkey" data-go="kids/monkey">👕 Dress up &amp; explore</a>'+(S.newsc?'<span class="cm-newb">✨ NEW trip unlocked!</span>':'')+'</div></div></section>';
+'<div class="cm-row"><a class="cm-bigbtn" href="#cm/kids/monkey" data-go="kids/monkey">👕 Dress up &amp; explore</a>'+(S.newsc?'<button type="button" class="cm-newb" data-newtrip="1">✨ NEW trip unlocked! '+sceneById(S.newsc).icon+'</button>':'')+'</div></div></section>';
 }
 function miniBanner(){
 var nx=nextScene(),prev=SCENES.filter(function(s){return s.need<=S.bananas;}).pop(),pct=nx?Math.round((S.bananas-prev.need)/(nx.need-prev.need)*100):100,F=FUN[S.scene],sc=sceneById(S.scene);
 return '<section class="cm-mini"><div class="cm-miniscene" data-go="kids/monkey" role="link" tabindex="0" aria-label="Dress up '+esc(S.mname)+'">'+sceneSVG(S.scene,S.look)+'</div>'+
 '<div class="cm-miniinfo"><b class="cm-mininame">'+esc(S.mname)+'’s rewards</b><span class="cm-miniban">🍌 '+S.bananas+' banana'+(S.bananas===1?'':'s')+'</span>'+
 (nx?'<div class="cm-mininext"><span>Next trip: '+nx.icon+' '+nx.name+' — '+(nx.need-S.bananas)+' more 🍌</span><div class="cm-kmeter"><i style="width:'+pct+'%"></i></div></div>':'<div class="cm-mininext"><span>🏆 Every adventure unlocked!</span></div>')+
-'</div>'+'<div class="cm-minibtns"><a class="cm-minibtn" href="#cm/kids/monkey" data-go="kids/monkey">👕 Dress up</a><a class="cm-minibtn fun" href="#cm/kids/fun-'+S.scene+'" data-go="kids/fun-'+S.scene+'">'+F.icon+' '+F.name+'</a>'+(S.newsc?'<span class="cm-newb">✨ New trip!</span>':'')+'</div></section>';
+'</div>'+'<div class="cm-minibtns"><a class="cm-minibtn" href="#cm/kids/monkey" data-go="kids/monkey">👕 Dress up</a><a class="cm-minibtn fun" href="#cm/kids/fun-'+S.scene+'" data-go="kids/fun-'+S.scene+'">'+F.icon+' '+F.name+'</a>'+(S.newsc?'<button type="button" class="cm-newb" data-newtrip="1">✨ New trip! '+sceneById(S.newsc).icon+' '+sceneById(S.newsc).name+' ▶</button>':'')+'</div></section>';
 }
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function vKids(){if(PENDING_ADV)setTimeout(announceAdv,600);
@@ -2489,7 +2489,8 @@ if(PENDING_ADV&&!(sec==='kids'&&p[1]&&p[1]!=='monkey'))setTimeout(announceAdv,50
 if(!firstRender){var top=root.getBoundingClientRect().top;if(top<0)window.scrollTo({top:window.pageYOffset+top-10,behavior:'smooth'});}
 firstRender=false;
 }
-root.addEventListener('click',function(e){var a=e.target.closest('[data-go]');if(!a||!root.contains(a))return;e.preventDefault();e.stopPropagation();tone(700,.04,'triangle');go(a.getAttribute('data-go'));});
+root.addEventListener('click',function(e){var nt=e.target.closest('[data-newtrip]');if(nt&&root.contains(nt)){e.preventDefault();if(S.newsc&&sceneOpen(sceneById(S.newsc))){S.scene=S.newsc;store.set('scene',S.scene);}tone(880,.08,'triangle');go('kids/monkey');return;}
+var a=e.target.closest('[data-go]');if(!a||!root.contains(a))return;e.preventDefault();e.stopPropagation();tone(700,.04,'triangle');go(a.getAttribute('data-go'));});
 root.querySelector('#cm-snd').addEventListener('click',function(){S.sound=!S.sound;store.set('sound',S.sound);updStats();if(S.sound)tone(660,.1,'triangle');});
 window.addEventListener('popstate',render);
 window.addEventListener('hashchange',function(){if((location.hash||'').indexOf('#cm/')===0)render();});
