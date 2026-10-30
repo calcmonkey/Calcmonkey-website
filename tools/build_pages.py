@@ -64,7 +64,7 @@ PAGES = [
 NAV = [('Free math games for kids','/kids-math-games/'),('Math help','/math-help/'),('Math solvers','/math-solvers/'),('Math games for teens','/math-games-for-teens/'),('Contact','/contact/')]
 
 SEO_CSS = """<style>
-html,body{margin:0;padding:0}body{background:#fff7e8;padding:16px 12px 24px}@media(max-width:560px){body{padding:8px 6px 16px}}
+html,body{margin:0;padding:0}body{background:#f4f8ff;padding:16px 12px 24px}@media(max-width:560px){body{padding:8px 6px 16px}}
 .seo{max-width:1200px;margin:22px auto 0;box-sizing:border-box;background:#fff;border:3px solid #2b2350;border-radius:28px;padding:26px 28px;font-family:'Nunito',system-ui,-apple-system,Segoe UI,sans-serif;color:#2b2350;line-height:1.6}
 .seo h1{font-family:'Baloo 2','Nunito',sans-serif;font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0 0 10px}
 .seo p{margin:0 0 16px;font-size:17px;font-weight:600}
