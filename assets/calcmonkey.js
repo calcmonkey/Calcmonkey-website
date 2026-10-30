@@ -2002,7 +2002,7 @@ view.innerHTML='<section class="cm-hero"><div><h1>Math is way more fun with a <s
 }
 function myBanner(){
 var nx=nextScene(),prev=SCENES.filter(function(s){return s.need<=S.bananas;}).pop(),pct=nx?Math.round((S.bananas-prev.need)/(nx.need-prev.need)*100):100;
-return '<section class="cm-mybar"><a class="cm-mbscene" href="#cm/kids/monkey" data-go="kids/monkey" aria-label="Visit your monkey">'+sceneSVG(S.scene,S.look)+'<span class="cm-mbtag">'+sceneById(S.scene).icon+' '+sceneById(S.scene).name+'</span></a>'+
+return '<section class="cm-mybar"><div class="cm-mbscene" data-go="kids/monkey" role="link" tabindex="0" aria-label="Dress up your monkey">'+sceneSVG(S.scene,S.look)+'<span class="cm-mbtag">'+sceneById(S.scene).icon+' '+sceneById(S.scene).name+'</span><a class="cm-advplay" href="#cm/kids/adv-'+S.scene+'" data-go="kids/adv-'+S.scene+'">🎮 Play '+ADV[S.scene].icon+' '+ADV[S.scene].game+'</a></div>'+
 '<div class="cm-mbinfo"><p class="cm-mbkick">🐒 Your monkey</p><h1 class="cm-h1">'+esc(S.mname)+'’s <span class="cm-hl">Adventures</span></h1>'+
 '<p class="cm-lead">Every right answer earns a banana. Bananas send '+esc(S.mname)+' on new trips — with new clothes to wear there!</p>'+
 '<div class="cm-mbban">🍌 <b>'+S.bananas+'</b> banana'+(S.bananas===1?'':'s')+' earned</div>'+
