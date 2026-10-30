@@ -950,3 +950,5 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-ovshort .cm-ovbtns{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:4px}
 .cm-ovshort .cm-ovbtns .cm-bigbtn{font-size:15px!important;padding:4px 12px!important}
 .cm-ovshort .cm-ovbtns .cm-bigbtn.next{font-size:16px!important}
+.cm-overlay.cm-ovfix{position:fixed;inset:0;z-index:1000;padding:16px;background:rgba(43,35,80,.55)}
+.cm-ovfix .cm-ovbox{max-height:calc(100vh - 32px);overflow-y:auto}

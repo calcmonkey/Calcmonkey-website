@@ -260,7 +260,8 @@ function showOv(ov,html,btn,cb){showOv2(ov,html,[[btn,cb]]);}
 function showOv2(ov,html,btns){
 ov.classList.remove('cm-ovcoach');
 ov.innerHTML='<div class="cm-ovbox">'+html+'<div class="cm-ovbtns">'+btns.map(function(b,i){return '<button class="cm-bigbtn'+(b[2]?' '+b[2]:'')+'" data-i="'+i+'">'+b[0]+'</button>';}).join('')+'</div></div>';
-ov.classList.remove('hide');ov.classList.toggle('cm-ovshort',ov.clientHeight>0&&ov.clientHeight<340);
+ov.classList.remove('hide','cm-ovfix');ov.classList.toggle('cm-ovshort',ov.clientHeight>0&&ov.clientHeight<340);
+var obx=ov.querySelector('.cm-ovbox');function fitOv(){if(!obx.isConnected||ov.classList.contains('hide')||ov.classList.contains('cm-ovfix'))return;if(ov.clientHeight>0&&(obx.scrollHeight>obx.clientHeight+2||obx.scrollHeight>ov.clientHeight-6)){ov.classList.remove('cm-ovshort');ov.classList.add('cm-ovfix');}}if(obx){fitOv();requestAnimationFrame(fitOv);setTimeout(fitOv,350);setTimeout(fitOv,1200);setTimeout(function(){if(!obx.isConnected||ov.classList.contains('hide')||ov.classList.contains('cm-ovfix'))return;var bb=obx.getBoundingClientRect();if(bb.bottom>window.innerHeight-8||bb.top<0)obx.scrollIntoView({block:'center',behavior:'smooth'});},800);}
 ov.querySelectorAll('.cm-ovbtns button').forEach(function(el){el.onclick=function(){ov.classList.add('hide');btns[+el.getAttribute('data-i')][1]();};});
 }
 function kNum(s){return numIn(String(s==null?'':s).replace(/[\s,$¢]/g,''));}
