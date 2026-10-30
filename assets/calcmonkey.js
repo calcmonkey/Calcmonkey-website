@@ -245,7 +245,7 @@ function sceneSVG(id,L,cls){return '<svg xmlns="http://www.w3.org/2000/svg" view
 function unlockToast(sc){
 var old=root.querySelector('.cm-toast');if(old)old.remove();
 var t=document.createElement('div');t.className='cm-toast';
-t.innerHTML='<div class="cm-toast-ic">'+sc.icon+'</div><div><b>New adventure unlocked!</b><span>'+S.mname+' can go to '+sc.name+' — with new clothes to try on!</span></div><button>See it ▶</button><button class="x" aria-label="Close">✕</button>';
+t.innerHTML='<div class="cm-toast-ic">'+sc.icon+'</div><div><b>New adventure unlocked!</b><span>'+S.mname+' can go to '+sc.name+' — with new clothes and a new game: '+ADV[sc.id].icon+' '+ADV[sc.id].game+'!</span></div><button>See it ▶</button><button class="x" aria-label="Close">✕</button>';
 root.appendChild(t);sfxWin();
 t.querySelector('button').onclick=function(){S.scene=sc.id;store.set('scene',sc.id);t.remove();go('kids/monkey');};
 t.querySelector('.x').onclick=function(){t.remove();};
@@ -1850,6 +1850,148 @@ tangent:function(b){chShell(b,'tangent','📈 Tangent Hunter',TN_CH,mountTan);},
 area:function(b){chShell(b,'area','∫ Area Hunter',AR_CH,mountArea);}
 };
 
+/* ================= ADVENTURE MINI GAMES (one per trip) ================= */
+var ADV_N=8;
+var ADV={
+jungle:{game:'Vine Swing',icon:'🌿',d:'Swing vine to vine all the way to the treehouse!',intro:'Help Mochi swing through the jungle! Tap the vine with the right answer and Mochi swings to it.',tip:'Tap the vine with the right answer.',winT:'You made it to the treehouse!',winP:'Mochi swung across all 8 vines.'},
+beach:{game:'Ice Cream Tower',icon:'🍦',d:'Stack the right scoops into a giant ice cream tower.',intro:'Mochi wants the tallest ice cream cone on the beach! Tap the scoop with the right answer to stack it on the cone.',tip:'Tap the scoop with the right answer.',winT:'What a tower!',winP:'Eight scoops — Mochi’s favorite!'},
+party:{game:'Present Surprise',icon:'🎁',d:'Open the present with the right answer to find a surprise.',intro:'It’s party time! Each present has a number on it. Open the one with the right answer to find a surprise inside.',tip:'Tap the present with the right answer.',winT:'Best party ever!',winP:'You opened all 8 presents.'},
+snow:{game:'Ski Lift',icon:'🚡',d:'Pick the right lift ticket to ride up the mountain.',intro:'Ride the ski lift to the top of the mountain! Pick the lift ticket with the right answer and Mochi rides up one stop.',tip:'Tap the lift ticket with the right answer.',winT:'You reached the top!',winP:'Time to ski all the way down! ⛷️'},
+soccer:{game:'Penalty Kicks',icon:'⚽',d:'Kick the ball at the right number to score a goal!',intro:'Mochi is taking penalty kicks! Tap the target with the right answer to kick the ball past the goalie.',tip:'Tap the target with the right answer.',winT:'You win the match!',winP:'Mochi scored 8 goals!'},
+opera:{game:'Sing-Along',icon:'🎵',d:'Tap the right notes and Mochi sings a song.',intro:'Mochi is singing at the opera! Tap the music note with the right answer and listen to the song come together.',tip:'Tap the music note with the right answer.',winT:'Bravo! Encore!',winP:'Mochi sang the whole song. Listen!'},
+space:{game:'Planet Hop',icon:'🪐',d:'Fly your rocket to the planet with the right answer.',intro:'Blast off! Tap the planet with the right answer and Mochi’s rocket flies there to plant a flag.',tip:'Tap the planet with the right answer.',winT:'Mission complete!',winP:'Mochi visited 8 planets.'},
+palace:{game:'Crown Jewels',icon:'💎',d:'Find the right jewels to fill the royal crown.',intro:'The royal crown is missing its jewels! Tap the jewel with the right answer to put it in the crown.',tip:'Tap the jewel with the right answer.',winT:'The crown is complete!',winP:'All 8 jewels are back where they belong.'}
+};
+var FLAV=['#f9a8d4','#a7f3d0','#fde68a','#c4b5fd','#fdba74','#bae6fd','#fca5a5','#d9f99d'];
+var PRIZES=['🧸','🪀','🍭','🚂','🎨','🦄','🍰','🪁','🎈','🚗','🍩','🎺'];
+var GEMS=['#ef4444','#3b82f6','#22c55e','#a855f7','#ec4899','#14b8a6','#f97316','#eab308'];
+var TUNE=[329.6,329.6,349.2,392,392,349.2,329.6,293.7];
+function slots8(cls,inner){var s='';for(var i=0;i<ADV_N;i++)s+='<i>'+(inner||'')+'</i>';return '<div class="'+cls+'">'+s+'</div>';}
+function onSlot(c,cls,i,html){var el=c.lay.querySelectorAll('.'+cls+' i')[i];if(el){el.classList.add('on');if(html!=null)el.innerHTML=html;}}
+var ADV_TH={
+jungle:{
+setup:function(c){c.lay.innerHTML='<div class="cm-jbranch"></div>'+slots8('cm-jtrail')+'<div class="cm-jhouse">🏡</div>';c.home();},
+home:[10,66],
+choices:function(v){var xs=[34,58,82];return v.map(function(n,k){return {x:xs[k],y:0,html:'<i class="vn"></i><b>'+num(n)+'</b>'};});},
+right:function(c,b,i,done){var x=+b.getAttribute('data-x');c.mk.classList.add('mv');c.setMk(x,52,' rotate(-14deg)');b.classList.add('swing');
+c.T.after(function(){c.setMk(x+5,44,' rotate(14deg)');},460);c.T.after(function(){c.home();onSlot(c,'cm-jtrail',i-1);},950);c.T.after(function(){c.mk.classList.remove('mv');done();},1450);}
+},
+beach:{
+setup:function(c){c.lay.innerHTML='<div class="cm-bcn"></div><div data-r="stack"></div>';c.home();},
+sy:function(k){return 72-k*9.2;},
+home:[80,62],
+choices:function(v){var ps=[[16,22],[16,50],[16,78]];return v.map(function(n,k){return {x:ps[k][0],y:ps[k][1],style:'--pc:'+FLAV[(Math.random()*FLAV.length)|0],html:'<b>'+num(n)+'</b>'};});},
+right:function(c,b,i,done){var col=b.style.getPropertyValue('--pc');b.style.visibility='hidden';
+var y=this.sy(i-1);c.fly('<i class="cm-scoop" style="--pc:'+col+'"></i>',+b.getAttribute('data-x'),+b.getAttribute('data-y'),50,y,520,function(){q(c.lay,'stack').insertAdjacentHTML('beforeend','<i class="cm-bsc" style="--pc:'+col+';top:'+y+'%"></i>');tone(880,.08,'triangle');done();});},
+win:function(c){q(c.lay,'stack').insertAdjacentHTML('beforeend','<em class="cm-bch" style="top:'+(this.sy(ADV_N)+3)+'%">🍒</em>');}
+},
+party:{
+bg:function(){return BG.party.replace(/<rect x="292"[\s\S]*?r="3" fill="#fb923c"\/>(?![\s\S]*r="3" fill="#fb923c")/,'');},
+setup:function(c){c.lay.innerHTML=slots8('cm-pshelf','?');c.home();},
+home:[11,56],
+choices:function(v){var xs=[36,60,84],cols=shuffle(['#ef4444','#3b82f6','#22c55e','#a855f7','#f97316','#ec4899']);return v.map(function(n,k){return {x:xs[k],y:52,style:'--pc:'+cols[k],html:'<i class="lid"></i><i class="bx"></i><b>'+num(n)+'</b>'};});},
+right:function(c,b,i,done){var pz=c.st.prizes[i-1],x=+b.getAttribute('data-x');b.classList.add('open');b.insertAdjacentHTML('beforeend','<span class="pz">'+pz+'</span>');tone(1046,.15,'triangle',.1);
+c.T.after(function(){c.fly('<span class="cm-pzf">'+pz+'</span>',x,30,15+8.75*(i-.5),90,520,function(){onSlot(c,'cm-pshelf',i-1,pz);done();});},700);}
+},
+snow:{
+setup:function(c){c.lay.innerHTML='<svg class="cm-scable" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="4" y1="92" x2="96" y2="10" stroke="#334155" stroke-width=".7"/></svg><div class="cm-stop">🏁</div><div class="cm-schair" data-r="chair"></div>';this.place(c,0);},
+pos:function(s){var x=10+74*s/ADV_N;return [x,92-82*(x-4)/92];},
+place:function(c,s){var p=this.pos(s),ch=q(c.lay,'chair');ch.style.left=p[0]+'%';ch.style.top=p[1]+'%';c.setMk(p[0],p[1]+15);},
+choices:function(v){var ps=[[58,84],[78,84],[88,58]];return v.map(function(n,k){return {x:ps[k][0],y:ps[k][1],html:'<span>🎟️ LIFT</span><b>'+num(n)+'</b>'};});},
+right:function(c,b,i,done){c.mk.classList.add('mv');q(c.lay,'chair').classList.add('mv');this.place(c,i);c.T.after(function(){c.mk.classList.remove('mv');q(c.lay,'chair').classList.remove('mv');done();},700);}
+},
+soccer:{
+bg:function(){return BG.soccer.replace(/<rect x="300" y="150"[\s\S]*$/,'');},
+setup:function(c){c.lay.innerHTML='<div class="cm-sgoal"><div class="cm-gk" data-r="gk"><svg viewBox="0 0 60 70" aria-hidden="true"><circle cx="30" cy="16" r="12" fill="#f6c995"/><path d="M14 66 Q12 34 30 30 Q48 34 46 66 Z" fill="#f97316"/><circle cx="8" cy="34" r="7" fill="#22c55e"/><circle cx="52" cy="34" r="7" fill="#22c55e"/><circle cx="26" cy="15" r="2" fill="#2a1a10"/><circle cx="34" cy="15" r="2" fill="#2a1a10"/></svg></div></div><div class="cm-sball" data-r="ball">⚽</div>';c.home();},
+home:[33,80],
+choices:function(v){var ps=[[30,26],[70,26],[50,42]];return v.map(function(n,k){return {x:ps[k][0],y:ps[k][1],html:'<b>'+num(n)+'</b>'};});},
+right:function(c,b,i,done){var x=+b.getAttribute('data-x'),y=+b.getAttribute('data-y'),ball=q(c.lay,'ball'),gk=q(c.lay,'gk');
+gk.classList.add('dive');gk.style.left=(x<50?78:22)+'%';ball.classList.add('kick');ball.style.left=x+'%';ball.style.top=y+'%';c.say(x,y-10,'GOAL! ⚽');
+c.T.after(function(){ball.classList.remove('kick');ball.style.left='';ball.style.top='';gk.classList.remove('dive');gk.style.left='';done();},1000);},
+wrong:function(c,b){var x=+b.getAttribute('data-x'),gk=q(c.lay,'gk');gk.classList.add('dive');gk.style.left=((x-18)/64*100)+'%';c.say(x,+b.getAttribute('data-y')-10,'Saved!');c.T.after(function(){gk.classList.remove('dive');gk.style.left='';},800);}
+},
+opera:{
+quiet:true,
+setup:function(c){c.lay.innerHTML='<div class="cm-ostaff"><i></i><i></i><i></i><i></i><i></i></div>'+slots8('cm-osong','♪');c.home();},
+home:[11,60],
+choices:function(v){var xs=[38,60,82],ys=shuffle([30,38,46]);return v.map(function(n,k){return {x:xs[k],y:ys[k],html:'<i class="hd"></i><b>'+num(n)+'</b>'};});},
+right:function(c,b,i,done){tone(TUNE[i-1],.45,'sine');c.mk.classList.remove('sing');void c.mk.offsetWidth;c.mk.classList.add('sing');
+c.fly('<span class="cm-onote">♪</span>',+b.getAttribute('data-x'),+b.getAttribute('data-y'),22+74*(i-.5)/ADV_N,88,520,function(){onSlot(c,'cm-osong',i-1);done();});},
+win:function(){TUNE.concat([293.7,329.6,329.6,293.7,293.7]).forEach(function(f,k){tone(f,.3,'sine',.4+k*.33);});}
+},
+space:{
+setup:function(c){c.lay.innerHTML='<div class="cm-rocket" data-r="rk">🚀</div>'+slots8('cm-smap');c.home();},
+home:[24,80],
+choices:function(v){var xs=[20,50,80],cols=shuffle(['#f472b6','#60a5fa','#34d399','#fbbf24','#a78bfa','#fb923c']);return v.map(function(n,k){return {x:xs[k],y:rnd(42,54),style:'--pc:'+cols[k],html:'<i class="pl'+(Math.random()<.4?' ring':'')+'"></i><b>'+num(n)+'</b>'};});},
+right:function(c,b,i,done){var rk=q(c.lay,'rk'),col=b.style.getPropertyValue('--pc');rk.classList.add('fly');rk.style.left=b.getAttribute('data-x')+'%';rk.style.top=(+b.getAttribute('data-y')+8)+'%';
+c.T.after(function(){b.insertAdjacentHTML('beforeend','<span class="flag">🚩</span>');tone(784,.12,'triangle');onSlot(c,'cm-smap',i-1);var s=c.lay.querySelectorAll('.cm-smap i')[i-1];if(s)s.style.background=col;},650);
+c.T.after(function(){rk.style.left='';rk.style.top='';},1150);c.T.after(function(){rk.classList.remove('fly');done();},1650);}
+},
+palace:{
+setup:function(c){var s='';for(var k=0;k<ADV_N;k++)s+='<circle class="sk" cx="'+(24+k*21.7).toFixed(1)+'" cy="73" r="7"/>';
+c.lay.innerHTML='<svg class="cm-crown" viewBox="0 0 200 90" aria-hidden="true"><path d="M12 82 C10 60 12 40 16 20 Q34 38 52 46 Q74 26 100 6 Q126 26 148 46 Q166 38 184 20 C188 40 190 60 188 82 Q100 90 12 82 Z" fill="#fbbf24" stroke="#b45309" stroke-opacity=".5" stroke-width="2" stroke-linejoin="round"/><circle cx="16" cy="18" r="6" fill="#fbbf24"/><circle cx="100" cy="5" r="7" fill="#fbbf24"/><circle cx="184" cy="18" r="6" fill="#fbbf24"/><path d="M14 64 Q100 72 186 64" stroke="#f59e0b" stroke-width="3" fill="none"/>'+s+'</svg>';c.home();},
+home:[10,66],
+gem:function(col){return '<svg viewBox="0 0 40 36" aria-hidden="true"><path d="M9 2 H31 L39 12 L20 35 L1 12 Z" fill="'+col+'" stroke="#000" stroke-opacity=".2" stroke-linejoin="round"/><path d="M1 12 H39 M9 2 L14 12 L20 35 L26 12 L31 2" stroke="#fff" stroke-opacity=".55" fill="none"/></svg>';},
+choices:function(v){var xs=[34,57,80],cols=shuffle(GEMS.slice()),me=this;return v.map(function(n,k){return {x:xs[k],y:70,style:'--pc:'+cols[k],html:me.gem(cols[k])+'<b>'+num(n)+'</b>'};});},
+right:function(c,b,i,done){var col=b.style.getPropertyValue('--pc'),sx=24+(i-1)*21.7;b.style.visibility='hidden';
+c.fly('<span class="cm-gemf">'+this.gem(col)+'</span>',+b.getAttribute('data-x'),70,22+56*sx/200,3+37.8*73/90,560,function(){var s=c.lay.querySelectorAll('.cm-crown .sk')[i-1];if(s){s.style.fill=col;s.classList.add('on');}tone(1175,.12,'triangle');done();});}
+}
+};
+function gAdv(box,id){
+var A=ADV[id],TH=ADV_TH[id];
+box.innerHTML=gHead(A.icon+' '+A.game)+'<div class="cm-af cm-af-'+id+'" data-r="f"><svg class="cm-afbg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+(TH.bg?TH.bg():(BG[id]||''))+'</svg><div class="cm-aflay" data-r="lay"></div><div data-r="ch"></div><img class="cm-am" data-r="mk" alt=""><div class="cm-overlay hide" data-r="ov"></div></div><p class="cm-tip">'+A.tip+'</p>';
+var f=q(box,'f'),ch=q(box,'ch'),ov=q(box,'ov'),probEl=q(box,'prob'),statEl=q(box,'stats'),T=timers(),st={done:0,ban:0},busy=false;
+var c={f:f,lay:q(box,'lay'),mk:q(box,'mk'),T:T,st:st};
+c.mk.src=monkeyURI(S.look);
+c.setMk=function(x,y,extra){c.mk.style.left=x+'%';c.mk.style.top=y+'%';c.mk.style.transform='translate(-50%,-50%)'+(extra||'');};
+c.home=function(){if(TH.home)c.setMk(TH.home[0],TH.home[1]);};
+c.fly=function(html,x0,y0,x1,y1,ms,cb){var d=document.createElement('div');d.className='cm-afly';d.innerHTML=html;d.style.left=x0+'%';d.style.top=y0+'%';f.appendChild(d);void d.offsetWidth;d.style.transition='left '+ms+'ms ease-in-out,top '+ms+'ms cubic-bezier(.5,-0.4,.6,1)';d.style.left=x1+'%';d.style.top=y1+'%';T.after(function(){d.remove();if(cb)cb();},ms+40);};
+c.say=function(x,y,t){var r=f.getBoundingClientRect();floatText(f,r.width*x/100-30,r.height*y/100,t);};
+function hud(){statEl.innerHTML=chip(A.icon+' '+st.done+' / '+ADV_N)+chip('🍌 +'+st.ban);}
+function next(){
+busy=false;st.tries=0;st.hinted=false;st.p=factProblem(S.grade);st.t0=Date.now();
+probEl.textContent=st.p.q+' = ?';
+var vals=choicesFor(st.p.a,3);
+ch.innerHTML=TH.choices(vals).map(function(o,k){return '<button class="cm-ac cm-ac-'+id+'" data-v="'+vals[k]+'" data-x="'+o.x+'" data-y="'+o.y+'" style="left:'+o.x+'%;top:'+o.y+'%;'+(o.style||'')+'" aria-label="'+num(vals[k])+'">'+o.html+'</button>';}).join('');
+}
+function hint(){if(st.hinted)return;st.hinted=true;var b=ch.querySelector('[data-v="'+st.p.a+'"]');if(b)b.classList.add('hint');}
+ch.addEventListener('click',function(e){
+var b=e.target.closest('.cm-ac');if(!b||!st.run||busy)return;var v=+b.getAttribute('data-v');
+if(v===st.p.a){
+busy=true;st.done++;st.score=st.done;st.ban++;st.streak=0;addBananas(1);if(!TH.quiet)sfxGood();
+b.classList.remove('hint');b.classList.add('right');ch.querySelectorAll('.cm-ac').forEach(function(x){if(x!==b)x.classList.add('gone');});
+probEl.textContent=st.p.q+' = '+num(st.p.a)+' ✓';hud();
+TH.right(c,b,st.done,function(){if(!st.run)return;if(st.done>=ADV_N)win();else next();});
+}else{
+st.wrong++;st.streak++;st.tries++;st.miss=st.p;sfxBad();b.classList.remove('no');void b.offsetWidth;b.classList.add('no');
+if(TH.wrong)TH.wrong(c,b);
+if(st.tries>=2)hint();
+if(st.streak>=3)offer();
+}
+});
+function tick(){if(st.run&&!busy&&S.grade<=2&&Date.now()-st.t0>6000)hint();}
+function pause(){st.run=false;T.clear();}
+function resume(){st.streak=0;st.run=true;st.t0=Date.now();T.every(tick,1000);}
+function offer(){pause();showOv2(ov,'<div class="cm-ovemoji">🤔</div><h3>Tricky ones?</h3><p>Coach Monkey can show you how to solve <b>'+st.miss.q+'</b>.</p>',[['🐒 Show me how!',function(){factCoach(ov,st.miss,resume);}],['Keep playing',resume,'alt']]);}
+function start(){T.clear();st={run:true,done:0,ban:0,wrong:0,streak:0,score:0,tries:0,prizes:shuffle(PRIZES.slice())};c.st=st;c.mk.className='cm-am';TH.setup(c);hud();next();T.every(tick,1000);}
+function win(){
+st.run=false;T.clear();addBananas(3);st.ban+=3;hud();if(TH.win)TH.win(c);else sfxWin();confetti(f);ch.innerHTML='';
+var hard=struggled(st);
+showOv2(ov,yayMochi()+'<h3>'+A.winT+'</h3><p>'+A.winP+' You earned <b>'+st.ban+' bananas</b> 🍌'+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',
+(hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}]]:[]).concat([['Play again',start,hard?'alt':''],['🗺️ More adventures',function(){go('kids/monkey');},'alt']]));
+}
+hud();
+showOv(ov,'<div class="cm-ovemoji">'+A.icon+'</div><h3>'+A.game+'</h3><p>'+A.intro+'<br>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.</p>','Start! ▶',start);
+}
+function vAdv(id){
+var sc=SCENES.filter(function(s){return s.id===id;})[0];if(!sc||!ADV[id])return go('kids/monkey');
+var back='<a href="#cm/kids/monkey" data-go="kids/monkey">← Back to '+esc(S.mname)+'’s Adventures</a>';
+if(!sceneOpen(sc)){view.innerHTML='<div class="cm-crumbs">'+back+'</div><div class="cm-game" style="text-align:center"><div class="cm-ovemoji">🔒</div><h2 class="cm-gtitle">'+ADV[id].game+'</h2><p style="font-weight:700">This game comes with the <b>'+sc.icon+' '+sc.name+'</b> trip. Earn <b>'+(sc.need-S.bananas)+'</b> more bananas to unlock it!</p><p><a class="cm-bigbtn" href="#cm/kids" data-go="kids">Go play ▶</a></p></div>';return;}
+view.innerHTML='<div class="cm-crumbs">'+back+'<label style="font-weight:800">Grade <select class="cm-gsel">'+[1,2,3,4,5,6].map(function(n){return '<option value="'+n+'"'+(n===+S.grade?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label></div><div class="cm-game" id="cm-g"></div>';
+view.querySelector('.cm-gsel').onchange=function(){S.grade=+this.value;store.set('grade',S.grade);render();};
+gAdv(view.querySelector('#cm-g'),id);
+}
+
 /* ================= VIEWS ================= */
 function vHome(){
 var topics=COURSES.reduce(function(s,c){return s+c.topics.length;},0),nThink=Object.keys(THINK).length;
@@ -1874,11 +2016,13 @@ var g=+S.grade;
 view.innerHTML=myBanner()+
 '<h2 class="cm-h2">1. Pick your grade</h2><div class="cm-grades">'+[1,2,3,4,5,6].map(function(n){return '<button data-grade="'+n+'" class="'+(n===g?'is-on':'')+'" aria-label="Grade '+n+'"><b>'+n+'</b><small>'+ord(n)+'</small></button>';}).join('')+'</div><p class="cm-gdesc">'+GRADE_DESC[g]+'</p>'+
 '<h2 class="cm-h2">⚡ Quick Skills <small>Fast facts you can do in your head: '+QUICK_DESC[g]+'</small></h2><div class="cm-kgrid">'+KGAMES.map(function(k){return '<a href="#cm/kids/'+k.id+'" data-go="kids/'+k.id+'" class="cm-kcard" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3><p>'+k.d+'</p><span class="cm-play">Play ▶</span></a>';}).join('')+'</div>'+
-'<h2 class="cm-h2">🧠 Think It Through <small>Grade '+g+' — bigger problems, step by step. Take your time!</small></h2><div class="cm-kgrid">'+THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3><p>'+k.d[g]+'</p><span class="cm-play">Start ▶</span></a>';}).join('')+'</div>';
+'<h2 class="cm-h2">🧠 Think It Through <small>Grade '+g+' — bigger problems, step by step. Take your time!</small></h2><div class="cm-kgrid">'+THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3><p>'+k.d[g]+'</p><span class="cm-play">Start ▶</span></a>';}).join('')+'</div>'+
+'<h2 class="cm-h2">🗺️ Adventure Games <small>Every trip '+esc(S.mname)+' unlocks comes with its own mini game!</small></h2><div class="cm-kgrid">'+SCENES.map(function(sc){var A=ADV[sc.id],o=sceneOpen(sc);return o?'<a href="#cm/kids/adv-'+sc.id+'" data-go="kids/adv-'+sc.id+'" class="cm-kcard adv" style="--c:#c4f0ff"><div class="cm-kicon">'+A.icon+'</div><h3>'+A.game+'</h3><p>'+A.d+'</p><span class="cm-play">'+sc.icon+' '+sc.name+' ▶</span></a>':'<div class="cm-kcard adv locked" style="--c:#e5e7eb"><div class="cm-kicon">🔒</div><h3>'+A.game+'</h3><p>'+A.d+'</p><span class="cm-play">Unlocks with '+sc.icon+' '+sc.name+' at '+sc.need+' 🍌</span></div>';}).join('')+'</div>';
 view.querySelectorAll('[data-grade]').forEach(function(b){b.onclick=function(){S.grade=+b.getAttribute('data-grade');store.set('grade',S.grade);tone(600,.08,'triangle');vKids();};});
 }
 function vKidGame(id){
 if(id==='monkey')return vMonkey();
+if(id.indexOf('adv-')===0)return vAdv(id.slice(4));
 var think=THINK[id];if(!KG_FN[id]&&!think)return go('kids');
 var grades=think?think.grades:[1,2,3,4,5,6],cur=grades.indexOf(+S.grade)>-1?+S.grade:grades[0];
 view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Back to the Kids Jungle</a><label style="font-weight:800">Grade <select class="cm-gsel">'+grades.map(function(n){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label></div><div class="cm-game" id="cm-g"></div>';
@@ -1891,13 +2035,13 @@ if(S.newsc){S.newsc='';store.set('newsc','');}
 if(!sceneOpen(sceneById(S.scene)))S.scene='jungle';
 var sc=sceneById(S.scene);
 view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Back to the Kids Jungle</a><span class="cm-chip">🍌 '+S.bananas+' bananas</span></div>'+
-'<section class="cm-mworld"><div class="cm-mwl"><div class="cm-mwscene" data-r="scene"></div><p class="cm-postcard" data-r="post"></p>'+
+'<section class="cm-mworld"><div class="cm-mwl"><div class="cm-mwscene" data-r="scene"></div><p class="cm-postcard" data-r="post"></p><a class="cm-bigbtn cm-advplay" data-r="play" href="#cm/kids/adv-jungle" data-go="kids/adv-jungle"></a>'+
 '<div class="cm-namerow"><label>Your monkey’s name: <input data-r="nm" maxlength="14" value="'+esc(S.mname)+'"></label></div>'+
 '<h3 class="cm-h3">🗺️ Adventures</h3><div class="cm-advs" data-r="advs"></div></div>'+
 '<div class="cm-mwr"><h3 class="cm-h3">👕 '+esc(S.mname)+'’s Closet</h3><div class="cm-slottabs" data-r="tabs"></div><div class="cm-items" data-r="items"></div>'+
 '<div class="cm-row cm-closetbtns"><button class="cm-bigbtn" data-r="preset"></button><button class="cm-bigbtn alt" data-r="rand">🎲 Surprise me</button><button class="cm-bigbtn alt" data-r="none">Take it all off</button></div></div></section>';
 function save(){store.set('look',S.look);store.set('scene',S.scene);}
-function paintScene(){sc=sceneById(S.scene);q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big');q(view,'post').innerHTML='<b>'+sc.icon+' '+sc.name+':</b> '+sc.blurb;q(view,'preset').textContent='✨ Dress for '+sc.name;}
+function paintScene(){sc=sceneById(S.scene);q(view,'scene').innerHTML=sceneSVG(S.scene,S.look,'big');q(view,'post').innerHTML='<b>'+sc.icon+' '+sc.name+':</b> '+sc.blurb;q(view,'preset').textContent='✨ Dress for '+sc.name;var pl=q(view,'play'),A=ADV[sc.id];pl.setAttribute('href','#cm/kids/adv-'+sc.id);pl.setAttribute('data-go','kids/adv-'+sc.id);pl.innerHTML='🎮 Play '+A.icon+' '+A.game;}
 function paintAdv(){q(view,'advs').innerHTML=SCENES.map(function(s){var o=sceneOpen(s);return '<button class="cm-adv'+(s.id===S.scene?' is-on':'')+(o?'':' locked')+'" data-s="'+s.id+'"><span class="ic">'+(o?s.icon:'🔒')+'</span><b>'+s.name+'</b><small>'+(o?(s.id===S.scene?'You are here!':'Visit ▶'):'Unlocks at '+s.need+' 🍌')+'</small></button>';}).join('');}
 function paintTabs(){q(view,'tabs').innerHTML=SLOTS.map(function(s){return '<button class="'+(s[0]===closetSlot?'is-on':'')+'" data-t="'+s[0]+'">'+s[1]+' '+s[2]+'</button>';}).join('');}
 function paintItems(){
