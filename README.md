@@ -17,3 +17,9 @@ The CalcMonkey website by Calc Monkey LLC — free math games (grades 1–6) and
 
 ## How updates work
 Ask Claude for a change → Claude saves it to this repository → Netlify publishes it to www.calcmonkey.com in about a minute.
+
+## Preview first, publish later
+- Day-to-day changes go to the **`preview`** branch. Netlify builds it for free at
+  https://preview--meek-cajeta-caa7b7.netlify.app (branch deploys cost 0 credits).
+- Publishing = merging `preview` into **`main`**, which updates www.calcmonkey.com
+  (each production deploy costs 15 Netlify credits, so we publish once per work session).
