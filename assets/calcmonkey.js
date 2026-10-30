@@ -390,14 +390,14 @@ for(var i=0;i<17;i++)leaves.push({x:i/16+Math.random()*.03,y:rnd(-16,24),r:rnd(2
 var st={run:false,hearts:3,score:0,wrong:0,mx:0,tx:0,items:[],q:[],sp:0,parts:[],shake:0};
 function size(){var f=C?st.mx/C.w:.5;C=setupCanvas(cv,H);st.mx=st.tx=f*C.w;}
 size();
-function hud(){statEl.innerHTML=chip('❤️'.repeat(st.hearts)+'🤍'.repeat(3-st.hearts))+chip('🍌 '+st.score);}
+var GOAL=15;function hud(){statEl.innerHTML=chip('❤️'.repeat(st.hearts)+'🤍'.repeat(3-st.hearts))+chip('🍌 '+st.score+' / '+GOAL);}
 function newProb(){st.prob=factProblem(S.grade);st.pt=0;probEl.textContent=st.prob.q+' = ?';st.items=[];wave();hud();}
 function wave(){var n=C.w<520?3:4,ch=choicesFor(st.prob.a,n),lanes=shuffle(seq(n));st.q=ch.map(function(v,i){return {v:v,l:lanes[i],n:n};});st.sp=.2;}
 function spawn(){var o=st.q.shift(),pad=Math.min(44,Math.max(34,C.w*.1)),lw=(C.w-2*pad)/o.n,x=pad+lw*o.l+lw/2+(Math.random()-.5)*lw/4;x=Math.max(pad,Math.min(C.w-pad,x));st.items.push({x:x,y:-30,v:(52+S.grade*6)*(.85+Math.random()*.3),val:o.v,ok:o.v===st.prob.a,rot:Math.random()*6});}
 function burst(x,y,txt,col){st.parts.push({t:txt,x:x,y:y,vx:0,vy:-70,life:1,c:col});for(var i=0;i<14;i++)st.parts.push({x:x,y:y,vx:rnd(-160,160),vy:rnd(-260,-60),life:.8,c:pick(CONF),g:1});}
 function grab(it){
 var my=C.h-140;
-if(it.ok){st.score++;addBananas(1);sfxGood();burst(it.x,my,'+1 🍌','#ff5fa2');newProb();}
+if(it.ok){st.score++;addBananas(1);sfxGood();burst(it.x,my,'+1 🍌','#ff5fa2');hud();if(st.score>=GOAL){win();return;}newProb();}
 else{st.hearts--;st.wrong++;st.miss=st.prob;sfxBad();st.shake=.35;burst(it.x,my,'Oops!','#2b2350');hud();if(st.hearts<=0)end();}
 }
 function update(dt){
@@ -437,9 +437,13 @@ c.restore();
 }
 rafLoop(function(dt){if(st.run)update(dt);draw(dt);});
 function start(){st={run:true,hearts:3,score:0,wrong:0,mx:C.w/2,tx:C.w/2,items:[],q:[],sp:0,parts:[],shake:0};newProb();}
+function win(){
+st.run=false;st.items=[];st.q=[];addBananas(3);sfxWin();confetti(cv.parentNode);var perfect=st.wrong===0;
+showOv2(ov,yayMochi()+'<h3>Basket full! 🧺</h3><p>You grabbed all <b>'+GOAL+'</b> bananas'+(perfect?' without a single wrong one — perfect!':' with '+st.wrong+' oops'+(st.wrong===1?'':'es')+'.')+' <b>+3 bonus bananas</b> 🍌</p>',[nextBtn(),['Play again',start,'alt']]);
+}
 function end(){
 st.run=false;st.items=[];st.q=[];var nb=setBest('banana'+S.grade,st.score),hard=st.wrong>=2&&st.score<=st.wrong;
-var html=(hard?'<div class="cm-ovemoji">🤔</div>':yayMochi())+'<h3>'+(hard?'Those were tricky!':'Great job!')+'</h3><p>You grabbed <b>'+st.score+'</b> banana'+(st.score===1?'':'s')+'.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want Coach Monkey to show you a trick for <b>'+st.miss.q+'</b>?':'')+'</p>';
+var html=(hard?'<div class="cm-ovemoji">🤔</div>':yayMochi())+'<h3>'+(hard?'Those were tricky!':'Out of hearts!')+'</h3><p>You grabbed <b>'+st.score+'</b> of '+GOAL+' bananas.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want Coach Monkey to show you a trick for <b>'+st.miss.q+'</b>?':'')+'</p>';
 showOv2(ov,html,hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],nextBtn(),['Play again',start,'alt']]:[nextBtn(),['Play again',start,'alt']]);
 }
 function mv(e){var r=cv.getBoundingClientRect();st.tx=clamp(e.clientX-r.left,40,C.w-40);}
@@ -448,7 +452,7 @@ listen(window,'keydown',function(e){if(!st.run)return;if(e.key==='ArrowLeft'||e.
 listen(window,'keyup',function(e){if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')keys.l=0;if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')keys.r=0;});
 listen(window,'resize',size);
 hud();
-showOv(ov,'<div class="cm-ovemoji">🍌</div><h3>Banana Grab</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>Catch the banana with the right answer — or just tap it if you know it! Grab a wrong one and you lose a heart.</p>','Start! ▶',start);
+showOv(ov,'<div class="cm-ovemoji">🍌</div><h3>Banana Grab</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>Catch the banana with the right answer — or just tap it if you know it! <b>Grab '+GOAL+' right bananas to fill the basket and win.</b> Grab a wrong one and you lose a heart.</p>','Start! ▶',start);
 }
 
 /* --- Balloon Pop --- */
