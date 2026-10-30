@@ -1996,7 +1996,7 @@ gAdv(view.querySelector('#cm-g'),id);
 var FUN={
 jungle:{name:'Treetop Leap',icon:'🐒',d:'Swing from vine to vine and leap all the way to the treehouse!',intro:'Mochi is swinging through the jungle! 🍌🍓🥭 <b>Your goal: grab ALL the fruit</b> on the way to the treehouse! Tap when Mochi swings <b>forward</b> to leap to the next vine — let go <b>later</b> to jump higher, <b>sooner</b> to stay lower.',tip:'Goal: grab all the fruit! Tap anywhere (or press the space bar) to let go of the vine.'},
 beach:{name:'Ice Cream Stand',icon:'🍦',d:'Run Mochi’s beach ice cream stand and make every customer’s cone.',intro:'Mochi is running the ice cream stand at the beach! Look at each customer’s order, build the same cone — then tap the <b>customer</b> to give it to them!',tip:'Tap flavors to stack scoops (bottom first), add a cherry if they want one, then tap the customer to hand it over!'},
-party:{name:'Party Time!',icon:'🎁',d:'Open Mochi’s birthday presents and blow out the candles.',intro:'It’s Mochi’s birthday party! Tap each present to shake it, pull off the ribbon and open it. Then blow out the candles!',tip:'Tap a present three times to open it.'},
+party:{name:'Party Time!',icon:'🎁',d:'Open Mochi’s birthday presents and blow out the candles.',intro:'It’s Mochi’s birthday party! Tap a present to ✂️ cut the ribbon, tap again to 🎁 rip off the wrapping paper, then tap once more to 📦 open the box. Then blow out the candles!',tip:'✂️ Cut the ribbon → 🎁 rip the paper → 📦 open the box!'},
 snow:{name:'Ski Run',icon:'⛷️',d:'Ski down the mountain, jump the rocks and catch snowflakes.',intro:'Mochi is skiing down the mountain! Tap to <b>jump</b> over rocks and snowmen, and catch the snowflakes in the air.',tip:'Tap anywhere (or press the space bar or ↑) to jump.'},
 soccer:{name:'Stadium Shootout',icon:'⚽',d:'Take 8 shots at the big stadium and beat the goalie.',intro:'The crowd is cheering for Mochi! Tap anywhere inside the goal to shoot. The goalie is quick — aim away from them and try the corners!',tip:'Tap inside the goal to shoot.'},
 opera:{name:'Opera Star',icon:'🎭',d:'Mochi stars at the opera — sing the song and earn roses.',intro:'Mochi is the star of the opera tonight! Tap when each golden note reaches the circle and Mochi will sing it.',tip:'Tap anywhere (or press the space bar) when a note reaches the circle.'},
@@ -2076,14 +2076,15 @@ next();
 party:function(c){
 var ALL=[['🧸','a teddy bear'],['🪀','a yo-yo'],['🚂','a toy train'],['🎨','a paint set'],['🦄','a unicorn'],['🪁','a kite'],['🎸','a guitar'],['⚽','a soccer ball'],['🔭','a telescope'],['🛼','roller skates'],['🧩','a puzzle'],['🎺','a trumpet'],['🚁','a toy helicopter'],['📚','a stack of books']];
 var G=shuffle(ALL.slice()).slice(0,6),cols=shuffle(['#ef4444','#3b82f6','#22c55e','#a855f7','#f97316','#ec4899']),opened=0,ps=[[44,40],[62,40],[80,40],[44,72],[62,72],[80,72]],stage='gifts';
-c.lay.innerHTML='<img class="cm-pmk" src="'+monkeyURI(S.look)+'" alt=""><div class="cm-pgot" data-r="got"></div>'+G.map(function(g,i){return '<button class="cm-gift cm-ac-party" data-i="'+i+'" data-s="0" style="left:'+ps[i][0]+'%;top:'+ps[i][1]+'%;--pc:'+cols[i]+'" aria-label="Present"><i class="lid"></i><i class="bx"></i></button>';}).join('')+'<div class="cm-preveal" data-r="rv"></div>';
+c.lay.innerHTML='<img class="cm-pmk" src="'+monkeyURI(S.look)+'" alt=""><div class="cm-pgot" data-r="got"></div>'+G.map(function(g,i){return '<button class="cm-gift cm-ac-party pat'+(i%5)+'" data-i="'+i+'" data-s="0" style="left:'+ps[i][0]+'%;top:'+ps[i][1]+'%;--pc:'+cols[i]+'" aria-label="Present"><i class="lid"></i><i class="bx"></i><span class="cm-gnext">✂️</span></button>';}).join('')+'<div class="cm-preveal" data-r="rv"></div>';
 var got=q(c.lay,'got'),rv=q(c.lay,'rv');
 c.setProb('🎁 Presents opened: 0 / 6');
 c.on(c.lay,'click',function(e){
 var b=e.target.closest('.cm-gift');if(b&&stage==='gifts'){var s=+b.getAttribute('data-s');if(s>=3)return;s++;b.setAttribute('data-s',s);
-if(s===1){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');tone(440,.08,'triangle');}
-else if(s===2){b.classList.add('unr');tone(587,.1,'triangle');c.say(+b.style.left.replace('%','')*3,+b.style.top.replace('%','')*2-30,'✂️');}
-else{var g=G[+b.getAttribute('data-i')];b.classList.add('open');tone(784,.1,'triangle');tone(1046,.16,'triangle',.08);opened++;c.setProb('🎁 Presents opened: '+opened+' / 6');
+var nx=b.querySelector('.cm-gnext');
+if(s===1){b.insertAdjacentHTML('beforeend','<span class="cm-snip">✂️</span><i class="cm-rib l"></i><i class="cm-rib r"></i>');b.classList.add('unr');tone(880,.05,'square');tone(988,.05,'square',.12);if(nx)nx.textContent='🎁';}
+else if(s===2){var pc=b.style.getPropertyValue('--pc'),sc='';for(var k=0;k<6;k++)sc+='<i class="cm-scrap" style="--pc:'+pc+';--rx:'+rnd(-90,90)+'px;--ry:'+rnd(-90,-30)+'px;--rr:'+rnd(-200,200)+'deg"></i>';b.insertAdjacentHTML('beforeend',sc);b.classList.add('unw');for(var k2=0;k2<4;k2++)tone(rnd(300,700),.04,'sawtooth',k2*.05);if(nx)nx.textContent='📦';}
+else{var g=G[+b.getAttribute('data-i')];if(nx)nx.remove();b.classList.add('open');tone(784,.1,'triangle');tone(1046,.16,'triangle',.08);opened++;c.setProb('🎁 Presents opened: '+opened+' / 6');
 rv.innerHTML='<span>'+g[0]+'</span><b>You got '+g[1]+'!</b>';rv.className='cm-preveal show';
 c.T.after(function(){rv.className='cm-preveal';got.insertAdjacentHTML('beforeend','<i>'+g[0]+'</i>');b.classList.add('gone');if(opened>=6)cake();},1500);}
 return;}
