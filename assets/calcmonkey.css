@@ -1025,3 +1025,33 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-acctfine{font-size:12px;color:#6b6890;text-align:center;margin:10px 0 0!important}
 .cm-acctfine a{color:#6d28d9}
 @media(max-width:560px){.cm-acct{font-size:12px;padding:3px 8px}}
+/* big new-adventure celebration */
+.cm-unlock{background:radial-gradient(circle at 50% 40%,rgba(76,29,149,.82),rgba(17,12,46,.92));overflow:hidden}
+.cm-rays{position:absolute;left:50%;top:42%;width:240vmax;height:240vmax;margin:-120vmax 0 0 -120vmax;background:repeating-conic-gradient(from 0deg,rgba(253,224,71,.28) 0 7deg,transparent 7deg 18deg);animation:cm-spin 18s linear infinite;pointer-events:none}
+.cm-sparks i{position:absolute;font-style:normal;font-size:clamp(18px,3.4vw,32px);animation:cm-twk 1.4s ease-in-out infinite alternate;pointer-events:none}
+@keyframes cm-twk{from{transform:scale(.6) rotate(-10deg);opacity:.5}to{transform:scale(1.2) rotate(10deg);opacity:1}}
+.cm-unbox{position:relative;z-index:2;max-width:500px;border-color:#b45309!important;box-shadow:0 0 0 6px #fde047,0 10px 0 6px #b45309,0 0 60px 20px rgba(253,224,71,.55)!important;animation:cm-unpop .7s cubic-bezier(.2,1.6,.5,1)}
+@keyframes cm-unpop{from{transform:scale(.2) rotate(-8deg);opacity:0}}
+.cm-unbanner{display:flex;flex-direction:column;align-items:center;line-height:.95;margin:2px 0 10px;animation:cm-unbanner .6s .15s cubic-bezier(.2,1.8,.5,1) both}
+@keyframes cm-unbanner{from{transform:translateY(-60px) scale(.6);opacity:0}}
+.cm-unbanner span{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(18px,4vw,26px);color:#7c3aed;letter-spacing:.06em}
+.cm-unbanner b{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(36px,8vw,56px);color:#ff7a1a;text-shadow:0 3px 0 #b45309,0 0 18px #fde047;animation:cm-nextp .9s .8s ease-in-out infinite}
+.cm-ticket{position:relative;display:flex;flex-direction:column;align-items:center;margin:0 auto 10px;max-width:300px;background:linear-gradient(135deg,#fde047,#fbbf24);border:3px dashed #92400e;border-radius:14px;padding:6px 14px;transform:rotate(-3deg);animation:cm-stamp .45s .55s cubic-bezier(.3,1.7,.5,1) both}
+.cm-ticket::before,.cm-ticket::after{content:"";position:absolute;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:#fff}
+.cm-ticket::before{left:-11px}.cm-ticket::after{right:-11px}
+@keyframes cm-stamp{from{transform:scale(2.4) rotate(12deg);opacity:0}}
+.cm-ticket small{font-weight:900;font-size:12px;letter-spacing:.12em;color:#92400e}
+.cm-ticket b{font-family:'Baloo 2',sans-serif;font-size:clamp(22px,4.6vw,30px);line-height:1.1;color:#2b2350}
+.cm-ticket em{font-style:normal;font-weight:900;font-size:10px;letter-spacing:.2em;color:#92400e}
+.cm-unbox .cm-annscene{animation:cm-unscene .5s .95s ease-out both}
+@keyframes cm-unscene{from{transform:scale(.6);opacity:0}}
+.cm-unbox p,.cm-unbox .cm-ovbtns{animation:cm-in .4s 1.25s both}
+.cm-unlock .cm-conf{position:absolute;top:-20px;animation-duration:2.6s}
+.cm-unlock .cm-conf{animation-name:cm-fallbig}
+@keyframes cm-fallbig{to{transform:translateY(110vh) rotate(900deg);opacity:.6}}
+/* mid-game notice: golden and bouncy */
+.cm-toast{background:linear-gradient(135deg,#fef9c3,#fde047)!important;border-color:#b45309!important;animation:cm-toastin .6s cubic-bezier(.2,1.6,.5,1)}
+@keyframes cm-toastin{from{transform:translateX(-50%) translateY(120%) scale(.7)}}
+.cm-toast b{color:#c2410c}
+@media(prefers-reduced-motion:reduce){.cm-rays,.cm-sparks i,.cm-unbanner b{animation:none}}
+.cm-unbanner{margin-bottom:14px}@media(max-width:560px){.cm-unbanner{margin-bottom:16px}.cm-ticket{padding:4px 12px}}

@@ -241,20 +241,28 @@ opera:'<rect width="400" height="300" fill="#3b0a18"/><rect x="40" y="30" width=
 space:'<rect width="400" height="300" fill="#0b1026"/>'+seq(40).map(function(i){return '<circle class="'+(i%3?'':'cm-twinkle')+'" cx="'+((i*97)%400)+'" cy="'+((i*61)%230)+'" r="'+(1+i%2)+'" fill="#fff"/>';}).join('')+'<circle cx="320" cy="70" r="34" fill="#f472b6"/><ellipse cx="320" cy="70" rx="58" ry="12" fill="none" stroke="#fde68a" stroke-width="5" transform="rotate(-18 320 70)"/><circle cx="62" cy="58" r="22" fill="#3b82f6"/><path d="M50 50 Q60 44 66 54 Q58 62 50 58 Z M64 66 Q74 60 78 70 Q70 76 64 66 Z" fill="#22c55e"/><path d="M0 238 Q200 214 400 240 L400 300 L0 300 Z" fill="#94a3b8"/><ellipse cx="70" cy="266" rx="26" ry="8" fill="#64748b"/><ellipse cx="330" cy="276" rx="20" ry="6" fill="#64748b"/><ellipse cx="250" cy="256" rx="12" ry="4" fill="#64748b"/>',
 palace:'<defs><linearGradient id="cmg-k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbcfe8"/><stop offset="1" stop-color="#fde68a"/></linearGradient></defs><rect width="400" height="300" fill="url(#cmg-k)"/><rect x="60" y="110" width="280" height="140" fill="#e9d5ff" stroke="#2b2350" stroke-width="2"/>'+seq(9).map(function(i){return '<rect x="'+(60+i*31)+'" y="98" width="16" height="14" fill="#e9d5ff" stroke="#2b2350" stroke-width="2"/>';}).join('')+[40,330].map(function(x){return '<rect x="'+x+'" y="70" width="40" height="180" fill="#ddd6fe" stroke="#2b2350" stroke-width="2"/><polygon points="'+(x-6)+',70 '+(x+20)+',24 '+(x+46)+',70" fill="#7c3aed" stroke="#2b2350" stroke-width="2"/><path d="M'+(x+20)+' 24 V8" stroke="#2b2350" stroke-width="2"/><path d="M'+(x+20)+' 8 L'+(x+38)+' 13 L'+(x+20)+' 18 Z" fill="#ef4444"/><rect x="'+(x+12)+'" y="110" width="16" height="22" rx="8" fill="#7c3aed"/>';}).join('')+'<path d="M170 250 V190 Q200 160 230 190 V250 Z" fill="#7c3aed" stroke="#2b2350" stroke-width="2"/><polygon points="160,300 240,300 222,250 178,250" fill="#dc2626"/><rect y="250" width="400" height="50" fill="#bbf7d0" opacity=".6"/><polygon points="160,300 240,300 222,250 178,250" fill="#dc2626"/>'
 };
-function sceneSVG(id,L,cls){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" class="cm-scene '+(cls||'')+'" role="img" aria-label="'+sceneById(id).name+'">'+(BG[id]||BG.jungle)+'<g transform="translate(116,36) scale(.84)"><g class="cm-mbob">'+monkeyBody(L)+'</g></g></svg>';}
+function sceneSVG(id,L,cls,mood){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" class="cm-scene '+(cls||'')+'" role="img" aria-label="'+sceneById(id).name+'">'+(BG[id]||BG.jungle)+'<g transform="translate(116,36) scale(.84)"><g class="cm-mbob">'+monkeyBody(L,mood)+'</g></g></svg>';}
 var PENDING_ADV=null;
+function fanfare(){[[392,.12,0],[523,.12,.13],[659,.12,.26],[784,.3,.39],[659,.12,.72],[784,.55,.85],[1047,.7,1.1]].forEach(function(n){tone(n[0],n[1],'triangle',n[2]);tone(n[0]/2,n[1],'sine',n[2]);});}
 function announceAdv(){
 var sc=PENDING_ADV;if(!sc)return;PENDING_ADV=null;var old=root.querySelector('.cm-toast');if(old)old.remove();
 var F=FUN[sc.id],o=root.querySelector('.cm-annc');if(o)o.remove();
-var d=document.createElement('div');d.className='cm-annc';
-d.innerHTML='<div class="cm-annbox"><div class="cm-annburst">🎉</div><h2>New adventure ready to play!</h2><div class="cm-annscene">'+sceneSVG(sc.id,sc.look)+'</div><p>You earned <b>'+sc.need+' bananas</b>! '+esc(S.mname)+' can go to <b>'+sc.icon+' '+sc.name+'</b> — with new clothes to wear and a new game: <b>'+F.icon+' '+F.name+'</b>!</p><div class="cm-ovbtns"><button class="cm-bigbtn next" data-a="play">'+F.icon+' Play '+F.name+' ▶</button><button class="cm-bigbtn alt" data-a="dress">👕 Dress up for '+sc.name+'</button><button class="cm-bigbtn alt" data-a="later">Later</button></div></div>';
-root.appendChild(d);sfxWin();confetti(d.querySelector('.cm-annbox'));
+var d=document.createElement('div');d.className='cm-annc cm-unlock';
+d.innerHTML='<div class="cm-rays"></div><div class="cm-sparks">'+seq(14).map(function(k){return '<i style="left:'+((k*37)%96+2)+'%;top:'+((k*53)%90+3)+'%;animation-delay:'+(k%7)*.2+'s">'+['✨','⭐','🍌','🎉'][k%4]+'</i>';}).join('')+'</div>'+
+'<div class="cm-annbox cm-unbox"><div class="cm-unbanner"><span>NEW ADVENTURE</span><b>UNLOCKED!</b></div>'+
+'<div class="cm-ticket"><small>🎟️ TICKET TO</small><b>'+sc.icon+' '+sc.name+'</b><em>ADMIT ONE MONKEY</em></div>'+
+'<div class="cm-annscene">'+sceneSVG(sc.id,sc.look,'','yay')+'</div>'+
+'<p>You earned <b>'+sc.need+' bananas</b>! '+esc(S.mname)+' is packed and ready to go — with <b>new clothes</b> to wear and a <b>new game</b>: '+F.icon+' <b>'+F.name+'</b>!</p>'+
+'<div class="cm-ovbtns"><button class="cm-bigbtn next" data-a="play">'+F.icon+' Play '+F.name+' ▶</button><button class="cm-bigbtn alt" data-a="dress">👕 Dress up for '+sc.name+'</button><button class="cm-bigbtn alt" data-a="later">Later</button></div></div>';
+root.appendChild(d);fanfare();
+var box=d.querySelector('.cm-unbox');[0,500,1000,1600,2300].forEach(function(t){setTimeout(function(){if(d.isConnected)confetti(d);},t);});
+setTimeout(function(){if(d.isConnected)tone(1568,.08,'square');},950);
 d.onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=b.getAttribute('data-a');d.remove();if(a==='later')return;S.scene=sc.id;store.set('scene',sc.id);go(a==='play'?'kids/fun-'+sc.id:'kids/monkey');};
 }
 function unlockToast(sc){
 var old=root.querySelector('.cm-toast');if(old)old.remove();
 var t=document.createElement('div');t.className='cm-toast';
-t.innerHTML='<div class="cm-toast-ic">'+sc.icon+'</div><div><b>🎉 New adventure ready to play!</b><span>'+S.mname+' can go to '+sc.name+' — with new clothes and a new fun game: '+FUN[sc.id].icon+' '+FUN[sc.id].name+'!</span></div><button>See it ▶</button><button class="x" aria-label="Close">✕</button>';
+t.innerHTML='<div class="cm-toast-ic">'+sc.icon+'</div><div><b>🎉 NEW ADVENTURE UNLOCKED!</b><span>'+S.mname+' can go to '+sc.name+' — with new clothes and a new fun game: '+FUN[sc.id].icon+' '+FUN[sc.id].name+'!</span></div><button>See it ▶</button><button class="x" aria-label="Close">✕</button>';
 PENDING_ADV=sc;root.appendChild(t);sfxWin();
 t.querySelector('button').onclick=function(){S.scene=sc.id;store.set('scene',sc.id);t.remove();go('kids/monkey');};
 t.querySelector('.x').onclick=function(){t.remove();};
@@ -2305,7 +2313,7 @@ view.querySelectorAll('[data-grade]').forEach(function(b){b.onclick=function(){S
 var CUR_GAME='';
 function gameOrder(){return KGAMES.map(function(k){return k.id;}).concat(THINK_BY_GRADE[S.grade]||[],MATHX.map(function(m){return m.id;}));}
 function gameInfo(id){var k=KGAMES.filter(function(x){return x.id===id;})[0];if(k)return k;var m=mxById(id);if(m)return {icon:ADV[m.th].icon,name:ADV[m.th].game};return THINK[id]||KGAMES[0];}
-function nextBtn(){if(PENDING_ADV)setTimeout(announceAdv,1400);var o=gameOrder(),n=o[(o.indexOf(CUR_GAME)+1)%o.length],g=gameInfo(n);return ['Next: '+g.icon+' '+g.name+' ▶',function(){go('kids/'+n);},'next'];}
+function nextBtn(){if(PENDING_ADV)setTimeout(announceAdv,800);var o=gameOrder(),n=o[(o.indexOf(CUR_GAME)+1)%o.length],g=gameInfo(n);return ['Next: '+g.icon+' '+g.name+' ▶',function(){go('kids/'+n);},'next'];}
 function kCards(g,mini){return KGAMES.map(function(k){return '<a href="#cm/kids/'+k.id+'" data-go="kids/'+k.id+'" class="cm-kcard'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d+'</p>')+'<span class="cm-play">Play ▶</span></a>';}).join('')+
 THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d[g]+'</p>')+'<span class="cm-play">Start ▶</span></a>';}).join('')+mxCards(mini);}
 function vKidGame(id){
