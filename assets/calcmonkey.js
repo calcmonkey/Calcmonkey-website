@@ -242,11 +242,20 @@ space:'<rect width="400" height="300" fill="#0b1026"/>'+seq(40).map(function(i){
 palace:'<defs><linearGradient id="cmg-k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbcfe8"/><stop offset="1" stop-color="#fde68a"/></linearGradient></defs><rect width="400" height="300" fill="url(#cmg-k)"/><rect x="60" y="110" width="280" height="140" fill="#e9d5ff" stroke="#2b2350" stroke-width="2"/>'+seq(9).map(function(i){return '<rect x="'+(60+i*31)+'" y="98" width="16" height="14" fill="#e9d5ff" stroke="#2b2350" stroke-width="2"/>';}).join('')+[40,330].map(function(x){return '<rect x="'+x+'" y="70" width="40" height="180" fill="#ddd6fe" stroke="#2b2350" stroke-width="2"/><polygon points="'+(x-6)+',70 '+(x+20)+',24 '+(x+46)+',70" fill="#7c3aed" stroke="#2b2350" stroke-width="2"/><path d="M'+(x+20)+' 24 V8" stroke="#2b2350" stroke-width="2"/><path d="M'+(x+20)+' 8 L'+(x+38)+' 13 L'+(x+20)+' 18 Z" fill="#ef4444"/><rect x="'+(x+12)+'" y="110" width="16" height="22" rx="8" fill="#7c3aed"/>';}).join('')+'<path d="M170 250 V190 Q200 160 230 190 V250 Z" fill="#7c3aed" stroke="#2b2350" stroke-width="2"/><polygon points="160,300 240,300 222,250 178,250" fill="#dc2626"/><rect y="250" width="400" height="50" fill="#bbf7d0" opacity=".6"/><polygon points="160,300 240,300 222,250 178,250" fill="#dc2626"/>'
 };
 function sceneSVG(id,L,cls){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" class="cm-scene '+(cls||'')+'" role="img" aria-label="'+sceneById(id).name+'">'+(BG[id]||BG.jungle)+'<g transform="translate(116,36) scale(.84)"><g class="cm-mbob">'+monkeyBody(L)+'</g></g></svg>';}
+var PENDING_ADV=null;
+function announceAdv(){
+var sc=PENDING_ADV;if(!sc)return;PENDING_ADV=null;var old=root.querySelector('.cm-toast');if(old)old.remove();
+var F=FUN[sc.id],o=root.querySelector('.cm-annc');if(o)o.remove();
+var d=document.createElement('div');d.className='cm-annc';
+d.innerHTML='<div class="cm-annbox"><div class="cm-annburst">🎉</div><h2>New adventure ready to play!</h2><div class="cm-annscene">'+sceneSVG(sc.id,sc.look)+'</div><p>You earned <b>'+sc.need+' bananas</b>! '+esc(S.mname)+' can go to <b>'+sc.icon+' '+sc.name+'</b> — with new clothes to wear and a new game: <b>'+F.icon+' '+F.name+'</b>!</p><div class="cm-ovbtns"><button class="cm-bigbtn next" data-a="play">'+F.icon+' Play '+F.name+' ▶</button><button class="cm-bigbtn alt" data-a="dress">👕 Dress up for '+sc.name+'</button><button class="cm-bigbtn alt" data-a="later">Later</button></div></div>';
+root.appendChild(d);sfxWin();confetti(d.querySelector('.cm-annbox'));
+d.onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=b.getAttribute('data-a');d.remove();if(a==='later')return;S.scene=sc.id;store.set('scene',sc.id);go(a==='play'?'kids/fun-'+sc.id:'kids/monkey');};
+}
 function unlockToast(sc){
 var old=root.querySelector('.cm-toast');if(old)old.remove();
 var t=document.createElement('div');t.className='cm-toast';
-t.innerHTML='<div class="cm-toast-ic">'+sc.icon+'</div><div><b>New adventure unlocked!</b><span>'+S.mname+' can go to '+sc.name+' — with new clothes and a new fun game: '+FUN[sc.id].icon+' '+FUN[sc.id].name+'!</span></div><button>See it ▶</button><button class="x" aria-label="Close">✕</button>';
-root.appendChild(t);sfxWin();
+t.innerHTML='<div class="cm-toast-ic">'+sc.icon+'</div><div><b>🎉 New adventure ready to play!</b><span>'+S.mname+' can go to '+sc.name+' — with new clothes and a new fun game: '+FUN[sc.id].icon+' '+FUN[sc.id].name+'!</span></div><button>See it ▶</button><button class="x" aria-label="Close">✕</button>';
+PENDING_ADV=sc;root.appendChild(t);sfxWin();
 t.querySelector('button').onclick=function(){S.scene=sc.id;store.set('scene',sc.id);t.remove();go('kids/monkey');};
 t.querySelector('.x').onclick=function(){t.remove();};
 setTimeout(function(){if(t.parentNode)t.classList.add('out');setTimeout(function(){if(t.parentNode)t.remove();},500);},9000);
@@ -1998,7 +2007,7 @@ var FUN={
 jungle:{name:'Treetop Leap',icon:'🐒',d:'Swing from vine to vine and leap all the way to the treehouse!',intro:'Mochi is swinging through the jungle! 🍌🍓🥭 <b>Your goal: grab ALL the fruit</b> on the way to the treehouse! Tap when Mochi swings <b>forward</b> to leap to the next vine — let go <b>later</b> to jump higher, <b>sooner</b> to stay lower.',tip:'Goal: grab all the fruit! Tap anywhere (or press the space bar) to let go of the vine.'},
 beach:{name:'Ice Cream Stand',icon:'🍦',d:'Run Mochi’s beach ice cream stand and make every customer’s cone.',intro:'Mochi is running the ice cream stand at the beach! Look at each customer’s order, build the same cone — then tap the <b>customer</b> to give it to them!',tip:'Tap flavors to stack scoops (bottom first), add a cherry if they want one, then tap the customer to hand it over!'},
 party:{name:'Party Time!',icon:'🎁',d:'Open Mochi’s birthday presents and blow out the candles.',intro:'It’s Mochi’s birthday party! Tap a present to ✂️ cut the ribbon, tap again to 🎁 rip off the wrapping paper, then tap once more to 📦 open the box. Then blow out the candles!',tip:'✂️ Cut the ribbon → 🎁 rip the paper → 📦 open the box!'},
-snow:{name:'Ski Run',icon:'⛷️',d:'Ski down the mountain, jump the rocks and catch snowflakes.',intro:'Mochi is skiing down the mountain! Tap to <b>jump</b> over rocks and snowmen, and catch the snowflakes in the air.',tip:'Tap anywhere (or press the space bar or ↑) to jump.'},
+snow:{name:'Ski Run',icon:'⛷️',d:'Ski down the mountain, jump the rocks and catch snowflakes.',intro:'Mochi is skiing down the mountain! 🪨⛄ <b>Tap to JUMP over the rocks and snowmen</b> to make it down safely — and catch snowflakes ❄️ in the air.<br><br>❤️❤️❤️ Be careful! If Mochi bumps into <b>3 things</b>, Mochi gets hurt and has to start over.',tip:'Tap anywhere (or press the space bar or ↑) to jump over rocks and snowmen. Bump into 3 things and you start over!'},
 soccer:{name:'Stadium Shootout',icon:'⚽',d:'Take 8 shots at the big stadium and beat the goalie.',intro:'The crowd is cheering for Mochi! Tap anywhere inside the goal to shoot. The goalie is quick — aim away from them and try the corners!',tip:'Tap inside the goal to shoot.'},
 opera:{name:'Opera Star',icon:'🎭',d:'Mochi stars at the opera — sing the song and earn roses.',intro:'Mochi is the star of the opera tonight! Tap when each golden note reaches the circle and Mochi will sing it.',tip:'Tap anywhere (or press the space bar) when a note reaches the circle.'},
 space:{name:'Star Flight',icon:'🚀',d:'Fly through space collecting stars and land on a new planet.',intro:'Mochi is flying through space! Steer the rocket to collect stars and fly around the space rocks. Land on a brand-new planet at the end!',tip:'Drag up and down, tap above or below the rocket, or use the ↑ ↓ keys.'},
@@ -2100,7 +2109,7 @@ c.T.after(function(){c.end('Happy Birthday, '+esc(S.mname)+'!','You opened all 6
 },
 /* ---------- Snow: Ski Run ---------- */
 snow:function(c){
-var LEN=3300,cam=0,v=118,y=0,vy=0,air=false,crash=0,flakes=0,done=false,X=82,objs=[],wx=420;
+var LEN=3300,cam=0,v=118,y=0,vy=0,air=false,crash=0,flakes=0,done=false,X=82,objs=[],wx=420,hits=0;
 while(wx<LEN-250){objs.push({x:wx,k:Math.random()<.6?'rock':'snow'});var fx=wx+rnd(70,110);if(fx<LEN-200)objs.push({x:fx,k:'flake',h:rnd(26,62)});wx+=rnd(190,300);}
 var trees=[];for(var tx=0;tx<LEN+300;tx+=rnd(50,90))trees.push(tx);
 var mt='<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">'+BG.snow+'</svg>';
@@ -2109,7 +2118,7 @@ objs.map(function(o){return '<span class="cm-kob '+o.k+'">'+(o.k==='rock'?'🪨'
 var mts=q(c.lay,'mts'),tr=q(c.lay,'tr'),gp=q(c.lay,'g'),sk=q(c.lay,'sk'),oEls=c.lay.querySelectorAll('.cm-kob'),tEls=tr.querySelectorAll('span');
 c.f.classList.add('cm-skirun');
 function gy(sx){return 112+0.22*(sx-150)+10*Math.sin((sx+cam)/48);}
-function jump(){if(!air&&!done&&crash<=0){air=true;vy=-235;tone(660,.08,'triangle');}}
+function jump(){if(!air&&!done&&crash<=0){air=true;vy=-245;tone(660,.08,'triangle');}}
 c.on(c.f,'pointerdown',function(e){if(e.target.closest('.cm-overlay'))return;jump();});
 c.on(document,'keydown',function(e){if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump();}});
 c.loop(function(dt){
@@ -2117,17 +2126,18 @@ if(!done){cam+=(crash>0?40:v)*dt;if(crash>0)crash-=dt;}
 var s=c.W()/300,d='M0 200 ';for(var sx=0;sx<=300;sx+=10)d+='L'+sx+' '+gy(sx).toFixed(1)+' ';gp.setAttribute('d',d+'L300 200 Z');
 mts.style.transform='translateX('+(-(cam*0.12*s)%(c.W()))+'px)';
 tEls.forEach(function(e,i){var sx=trees[i]-cam*0.55;if(sx<-20||sx>320){e.style.display='none';return;}e.style.display='';vpos(e,sx,gy(sx)-58+((i*37)%14));});
-var g=gy(X);if(air){vy+=640*dt;y+=vy*dt;if(y>=0){y=0;air=false;}}
+var g=gy(X);if(air){vy+=590*dt;y+=vy*dt;if(y>=0){y=0;air=false;}}
 var slope=Math.atan((gy(X+4)-gy(X-4))/8);
 sk.style.left=(X/3)+'%';sk.style.top=((g+Math.min(0,y))/2)+'%';sk.style.transform='translate(-50%,-100%) rotate('+(crash>0?crash*720:slope*57.3)+'deg)';
 objs.forEach(function(o,i){var e=oEls[i],sx=o.x-cam;if(sx<-20||sx>320){e.style.display='none';return;}e.style.display='';vpos(e,sx,gy(sx)-(o.k==='flake'?o.h:0));
 if(o.done)return;
 if(o.k==='flake'){if(Math.abs(sx-X)<14&&Math.abs((-y)-(o.h-14))<22){o.done=true;e.classList.add('got');flakes++;tone(1175,.08,'triangle');}}
-else if(Math.abs(sx-X)<11&&-y<14){o.done=true;e.classList.add('hit');crash=0.75;tone(180,.25,'sine');c.say(X,gy(X)-60,'Whoops!');}
+else if(!done&&Math.abs(sx-X)<9.5&&-y<13){o.done=true;e.classList.add('hit');crash=0.75;hits++;tone(180,.25,'sine');c.say(X,gy(X)-60,hits>=3?'Ouch! 🤕':'Bump! '+(3-hits)+' ❤️ left');
+if(hits>=3){done=true;sk.classList.add('hurt');c.T.after(function(){c.fail('Ouch! Mochi got hurt!','Mochi bumped into 3 things. Remember to <b>tap to jump</b> over the rocks 🪨 and snowmen ⛄! Let’s try again from the top.');},900);}}
 });
 var le=oEls[oEls.length-1],lx=LEN-cam;if(lx<330){le.style.display='';vpos(le,lx,gy(lx));}else le.style.display='none';
-c.setProb('⛷️ '+Math.min(100,Math.round(cam/(LEN-80)*100))+'% down the mountain   ·   ❄️ '+flakes);
-if(!done&&cam>=LEN-80){done=true;c.T.after(function(){c.end('What a run!','Mochi skied all the way down the mountain and caught <b>'+flakes+'</b> snowflake'+(flakes===1?'':'s')+'! ❄️ Hot cocoa time at the lodge ☕');},700);}
+c.setProb('❤️'.repeat(Math.max(0,3-hits))+'🤍'.repeat(Math.min(3,hits))+'   ⛷️ '+Math.min(100,Math.round(cam/(LEN-80)*100))+'%   ·   ❄️ '+flakes);
+if(!done&&cam>=LEN-80){done=true;sk.classList.add('safe');c.T.after(function(){c.end('You made it down safely!','Mochi skied all the way down the mountain'+(hits?'':' without a single bump')+' and caught <b>'+flakes+'</b> snowflake'+(flakes===1?'':'s')+'! ❄️ Hot cocoa time at the lodge ☕');},700);}
 });
 },
 /* ---------- Soccer: Stadium Shootout ---------- */
@@ -2229,6 +2239,7 @@ c.loop=function(fn){var me={on:true},last=0;function step(ts){if(!me.on)return;v
 c.on=function(el,ev,fn){el.addEventListener(ev,fn);c._h.push([el,ev,fn]);};
 c.stop=function(){c._loops.forEach(function(m){m.on=false;});c._loops=[];if(c.T)c.T.clear();c._h.forEach(function(h){h[0].removeEventListener(h[1],h[2]);});c._h=[];};
 c.end=function(title,msg){c.stop();sfxWin();confetti(c.f);showOv2(c.ov,yayMochi()+'<h3>'+title+'</h3><p>'+msg+'</p>',[['Play again',start],['👕 Dress up',function(){go('kids/monkey');},'alt'],['🎮 Math games',function(){go('kids');},'alt']]);};
+c.fail=function(title,msg){c.stop();sfxBad();showOv2(c.ov,'<div class="cm-ovemoji">🤕</div><h3>'+title+'</h3><p>'+msg+'</p>',[['Try again ▶',start,'next'],['👕 Dress up',function(){go('kids/monkey');},'alt']]);};
 onCleanup(function(){c.stop();});
 function start(){c.stop();c.T=timers();c.lay.innerHTML='';c.panelEl.innerHTML='';c.f.classList.remove('cm-skirun');FUN_G[id](c);}
 c.setProb(F.icon+' '+F.name);box.querySelector('[data-r="stats"]').innerHTML=chip('🎉 Just for fun');
@@ -2264,7 +2275,7 @@ return '<section class="cm-mybar"><div class="cm-mbscene" data-go="kids/monkey" 
 '<div class="cm-row"><a class="cm-bigbtn" href="#cm/kids/monkey" data-go="kids/monkey">👕 Dress up &amp; explore</a>'+(S.newsc?'<span class="cm-newb">✨ NEW trip unlocked!</span>':'')+'</div></div></section>';
 }
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-function vKids(){
+function vKids(){if(PENDING_ADV)setTimeout(announceAdv,600);
 var g=+S.grade;
 view.innerHTML=myBanner()+
 '<h2 class="cm-h2">1. Pick your grade</h2><div class="cm-grades">'+[1,2,3,4,5,6].map(function(n){return '<button data-grade="'+n+'" class="'+(n===g?'is-on':'')+'" aria-label="Grade '+n+'"><b>'+n+'</b><small>'+ord(n)+'</small></button>';}).join('')+'</div><p class="cm-gdesc">'+GRADE_DESC[g]+'</p>'+
@@ -2277,7 +2288,7 @@ view.querySelectorAll('[data-grade]').forEach(function(b){b.onclick=function(){S
 var CUR_GAME='';
 function gameOrder(){return KGAMES.map(function(k){return k.id;}).concat(THINK_BY_GRADE[S.grade]||[],MATHX.map(function(m){return m.id;}));}
 function gameInfo(id){var k=KGAMES.filter(function(x){return x.id===id;})[0];if(k)return k;var m=mxById(id);if(m)return {icon:ADV[m.th].icon,name:ADV[m.th].game};return THINK[id]||KGAMES[0];}
-function nextBtn(){var o=gameOrder(),n=o[(o.indexOf(CUR_GAME)+1)%o.length],g=gameInfo(n);return ['Next: '+g.icon+' '+g.name+' ▶',function(){go('kids/'+n);},'next'];}
+function nextBtn(){if(PENDING_ADV)setTimeout(announceAdv,1400);var o=gameOrder(),n=o[(o.indexOf(CUR_GAME)+1)%o.length],g=gameInfo(n);return ['Next: '+g.icon+' '+g.name+' ▶',function(){go('kids/'+n);},'next'];}
 function kCards(g,mini){return KGAMES.map(function(k){return '<a href="#cm/kids/'+k.id+'" data-go="kids/'+k.id+'" class="cm-kcard'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d+'</p>')+'<span class="cm-play">Play ▶</span></a>';}).join('')+
 THINK_BY_GRADE[g].map(function(id){var k=THINK[id];return '<a href="#cm/kids/'+id+'" data-go="kids/'+id+'" class="cm-kcard think'+(mini?' mini':'')+'" style="--c:'+k.c+'"><div class="cm-kicon">'+k.icon+'</div><h3>'+k.name+'</h3>'+(mini?'':'<p>'+k.d[g]+'</p>')+'<span class="cm-play">Start ▶</span></a>';}).join('')+mxCards(mini);}
 function vKidGame(id){
