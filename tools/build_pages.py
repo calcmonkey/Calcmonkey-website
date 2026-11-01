@@ -131,6 +131,7 @@ def page(pg):
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 {ldjson(pg)}
 {SEO_CSS}
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "3e894d27e1da44148ed0e715fde9fe50"}}'></script><!-- End Cloudflare Web Analytics -->
 </head>
 <body>
 '''
