@@ -1101,3 +1101,6 @@ linear-gradient(180deg,#c4f0ff 0%,#eaffde 55%,#fff5cc 100%)}
 .cm-lvtheme small{display:block;color:var(--l-muted)}
 .cm-lvup .cm-bigbtn.next{background:var(--acc)!important;box-shadow:0 4px 0 var(--acc-d)!important;animation:none;font-family:'Space Grotesk',system-ui,sans-serif!important;border-color:var(--acc-d)!important}
 #cm-app.cm-t-lab{--acc:var(--lacc,#6d4aff);--acc-d:var(--lacc-d,#4f2fd6)}.cm-annc.cm-lvup{--acc:var(--lacc,#6d4aff);--acc-d:var(--lacc-d,#4f2fd6)}
+
+/* landing-page focus label (e.g. multiplication facts only) */
+.cm-focus{display:inline-block;background:#fff4c2;border:2px solid #2b2350;border-radius:999px;padding:3px 12px;font-weight:900;font-size:14px;white-space:nowrap}

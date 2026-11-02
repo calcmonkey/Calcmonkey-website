@@ -6,7 +6,10 @@ The app markup lives in tools/app-markup.html.
 Each landing page below gets its own title, description, start section and
 search-friendly intro text. Run:  python3 tools/build_pages.py
 """
-import json, os, datetime
+import json, os, sys, datetime
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.dont_write_bytecode = True
+import landing_pages as LP
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = 'https://www.calcmonkey.com'
 import hashlib
@@ -82,6 +85,18 @@ html,body{margin:0;padding:0}body{background:#f4f8ff;padding:16px 12px 24px}@med
 .seo nav a{color:#6d4aff;text-decoration:none}.seo nav a:hover{text-decoration:underline}
 .seo small{display:block;margin-top:12px;opacity:.7;font-weight:700}
 @media(max-width:560px){.seo{padding:20px 16px;border-radius:20px}}
+.seo .browse{margin-top:22px}.seo .browse h2{font-size:19px;margin:14px 0 8px}
+.seo .chips{display:flex;flex-wrap:wrap;gap:8px}.seo .chips a{background:#eef7e9;border:2px solid #2b2350;border-radius:999px;padding:5px 13px;font-weight:800;color:#2b2350;text-decoration:none;font-size:15px}.seo .chips a:hover{background:#ffe27a}
+.lp .crumbs{font-size:14px;margin:0 0 6px;opacity:.85}.lp .crumbs a{color:#6d4aff;font-weight:800;text-decoration:none}
+.lp>h2,.lp .cols h2{font-size:23px;margin:24px 0 10px}
+.lp ul.games li{display:flex;flex-direction:column;gap:4px}.lp ul.games h3{font-family:'Baloo 2','Nunito',sans-serif;font-size:19px;margin:0}.lp ul.games h3 a{color:#2b2350;text-decoration:none}
+.lp .play{align-self:flex-start;margin-top:6px;background:#2b2350;color:#fff;border-radius:999px;padding:4px 14px;font-weight:900;font-size:14px;text-decoration:none}
+.lp .more{margin:12px 0 0;font-size:15px}
+.lp .cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 26px}@media(max-width:760px){.lp .cols{grid-template-columns:1fr}}
+.lp ul.dots{display:block;list-style:disc;padding-left:22px}.lp ul.dots li{background:none;border:0;border-radius:0;padding:0;margin:0 0 6px;font-size:16px;font-weight:600}
+.lp .ex ol{margin:0;padding:14px 16px 14px 38px;background:#fffbe8;border:2px solid #2b2350;border-radius:18px;font-weight:700}.lp .ex li{margin:0 0 4px;background:none;border:0;border-radius:0;padding:0 0 0 4px;font-size:16px}
+.lp .note{font-size:15px;margin:0 0 8px}
+.lp .faq h3{font-size:18px;margin:14px 0 4px}.lp .faq p{font-size:16px;margin:0}
 </style>"""
 
 def ldjson(pg):
@@ -94,7 +109,25 @@ def ldjson(pg):
         graph = [org, {"@type":["WebPage","LearningResource"],"name":pg['title'],"url":url,"description":pg['desc'],"isPartOf":{"@id":SITE+"/#site"},
                  "publisher":{"@id":SITE+"/#org"},"educationalLevel":L['level'],"learningResourceType":L['kind'],"isAccessibleForFree":True,
                  "about":[{"@type":"Thing","name":a} for a in L['about']],"inLanguage":"en"}]
+        if pg.get('crumb'):
+            graph.append({"@type":"BreadcrumbList","itemListElement":[
+                {"@type":"ListItem","position":1,"name":"CalcMonkey","item":SITE+"/"},
+                {"@type":"ListItem","position":2,"name":"Kids math games","item":SITE+"/kids-math-games/"},
+                {"@type":"ListItem","position":3,"name":pg['crumb'],"item":url}]})
     return '<script type="application/ld+json">' + json.dumps({"@context":"https://schema.org","@graph":graph}, ensure_ascii=False) + '</script>'
+
+def app_markup(pg):
+    sec = pg['start'].split('/')[0]
+    attrs = f'data-start="{pg["start"]}"'
+    for k in ('grade', 'op', 'grades'):
+        if pg.get(k): attrs += f' data-{k}="{esc(str(pg[k]))}"'
+    return MARKUP.replace('data-start="home"', attrs).replace('class="cm-t-home"', 'class="cm-t-' + ('kids' if sec=='kids' else 'lab' if sec in ('lab','tools','arcade') else 'home') + '"')
+
+def browse():
+    """links to every grade and skill page (internal linking for search engines and people)"""
+    g = ''.join(f'<a href="{h}">{t}</a>' for t,h in LP.GRADE_PAGES)
+    k = ''.join(f'<a href="{h}">{t}</a>' for t,h in LP.SKILL_PAGES)
+    return f'<div class="browse"><h2>Free math games by grade</h2><div class="chips">{g}</div><h2>Free math games by skill</h2><div class="chips">{k}</div></div>'
 
 def esc(s): return s.replace('&','&amp;').replace('"','&quot;').replace('<','&lt;')
 
@@ -103,9 +136,13 @@ def page(pg):
     items = ''.join('<li><h2>' + (f'<a href="{l}">{esc(t)}</a>' if l else esc(t)) + f'</h2><p>{esc(d)}</p></li>' for t,d,l in pg['bullets'])
     nav = ''.join(f'<a href="{h}">{t}</a>' for t,h in NAV if h != pg['path'])
     if pg['path'] != '/': nav = '<a href="/">CalcMonkey home</a>' + nav
-    seo = f'<section class="seo"><h1>{esc(pg["h"])}</h1><p>{esc(pg["intro"])}</p><ul>{items}</ul><nav aria-label="More from CalcMonkey">{nav}</nav><small>© {datetime.date.today().year} Calc Monkey LLC · Free math games &amp; step-by-step math help</small></section>'
-    app = MARKUP.replace('data-start="home"', f'data-start="{pg["start"]}"').replace('class="cm-t-home"', 'class="cm-t-' + ('kids' if pg['start']=='kids' else 'lab' if pg['start'] in ('lab','tools','arcade') else 'home') + '"')
-    head = f'''<!doctype html>
+    seo = f'<section class="seo"><h1>{esc(pg["h"])}</h1><p>{esc(pg["intro"])}</p><ul>{items}</ul>{browse() if pg['path'] in ('/','/kids-math-games/') else ''}<nav aria-label="More from CalcMonkey">{nav}</nav><small>© {datetime.date.today().year} Calc Monkey LLC · Free math games &amp; step-by-step math help</small></section>'
+    app = app_markup(pg)
+    return head_html(pg) + app + '\n' + seo + '\n<script src="/assets/calcmonkey.js?v=' + JSV + '"></script>\n</body>\n</html>\n'
+
+def head_html(pg):
+    url = SITE + pg['path']
+    return f'''<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -135,14 +172,41 @@ def page(pg):
 </head>
 <body>
 '''
-    return head + app + '\n' + seo + '\n<script src="/assets/calcmonkey.js?v=' + JSV + '"></script>\n</body>\n</html>\n'
+
+def landing(pg):
+    games = ''.join(f'<li><h3><a href="#cm/{LP.G[i][2]}">{LP.G[i][0]} {esc(LP.G[i][1])}</a></h3><p>{esc(d)}</p><a class="play" href="#cm/{LP.G[i][2]}">Play ▶</a></li>' for i,d in pg['games'])
+    more = f'<p class="more">🎪 {esc(pg["more"])}</p>' if pg.get('more') else ''
+    learn = ''.join(f'<li>{esc(x)}</li>' for x in pg['learn'])
+    ex = ''.join(f'<li>{esc(x)}</li>' for x in pg['ex'])
+    tips = ''.join(f'<li>{esc(x)}</li>' for x in pg['tips'])
+    std = ''.join(f'<li><b>{esc(c)}</b> {esc(t)}</li>' for c,t in pg['std'])
+    faq = ''.join(f'<h3>{esc(q)}</h3><p>{esc(a)}</p>' for q,a in pg['faq'])
+    crumbs = f'<p class="crumbs"><a href="/">CalcMonkey</a> › <a href="/kids-math-games/">Kids math games</a> › {esc(pg["crumb"])}</p>'
+    nav = ''.join(f'<a href="{h}">{t}</a>' for t,h in NAV)
+    seo = (f'<section class="seo lp">{crumbs}<h1>{esc(pg["h"])}</h1><p>{esc(pg["intro"])}</p>'
+           f'<h2>Games on this page</h2><ul class="games">{games}</ul>{more}'
+           f'<div class="cols"><div><h2>What kids practice</h2><ul class="dots">{learn}</ul></div>'
+           f'<div class="ex"><h2>{esc(pg["ex_title"])}</h2><ol>{ex}</ol></div></div>'
+           f'<h2>Tips for parents and teachers</h2><ul class="dots">{tips}</ul>'
+           f'<h2>Matching school standards</h2><p class="note">These games line up with these Common Core State Standards for Mathematics:</p><ul class="dots">{std}</ul>'
+           f'<h2>Questions parents ask</h2><div class="faq">{faq}</div>'
+           f'{browse()}<nav aria-label="More from CalcMonkey"><a href="/">CalcMonkey home</a>{nav}</nav>'
+           f'<small>© {datetime.date.today().year} Calc Monkey LLC · Free math games &amp; step-by-step math help</small></section>')
+    return head_html(pg) + app_markup(pg) + '\n' + seo + '\n<script src="/assets/calcmonkey.js?v=' + JSV + '"></script>\n</body>\n</html>\n'
+
+for lp in LP.L:
+    lp.setdefault('ld', dict(level=('Grade ' + str(lp['grade'])) if lp.get('grade') else 'Grades 1–6', kind='Game', about=lp['ld_about']))
 
 for pg in PAGES:
     d = os.path.join(ROOT, pg['path'].strip('/'))
     os.makedirs(d, exist_ok=True)
     open(os.path.join(d, 'index.html'), 'w').write(page(pg))
+for pg in LP.L:
+    d = os.path.join(ROOT, pg['path'].strip('/'))
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, 'index.html'), 'w').write(landing(pg))
 today = datetime.date.today().isoformat()
-urls = [p['path'] for p in PAGES] + ['/contact/']
+urls = [p['path'] for p in PAGES] + [p['path'] for p in LP.L] + ['/contact/', '/privacy/']
 open(os.path.join(ROOT,'sitemap.xml'),'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'  <url><loc>{SITE}{u}</loc><lastmod>{today}</lastmod></url>\n' for u in urls) + '</urlset>\n')
 open(os.path.join(ROOT,'robots.txt'),'w').write(f'User-agent: *\nAllow: /\nDisallow: /tools/\n\nSitemap: {SITE}/sitemap.xml\n')
-print('built', len(PAGES), 'pages')
+print('built', len(PAGES), 'pages +', len(LP.L), 'grade/skill pages')

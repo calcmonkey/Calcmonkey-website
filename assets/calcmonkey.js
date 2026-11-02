@@ -325,7 +325,7 @@ function same(a,b){return !isNaN(a)&&Math.abs(a-b)<1e-6;}
 var GRADE_DESC={1:'Grade 1: adding & subtracting within 20, tens and ones, the number line',2:'Grade 2: adding & subtracting to 100, place value to 1,000, word problems',3:'Grade 3: times tables, 3-digit adding & subtracting, fractions, word problems',4:'Grade 4: multi-digit multiplying, long division, equivalent fractions',5:'Grade 5: decimals, 2-digit multiplying, adding fractions, order of operations',6:'Grade 6: negative numbers, long division, exponents, ratios & percents'};
 var QUICK_DESC={1:'+ and − facts within 10',2:'+ and − facts within 20',3:'× and ÷ facts up to 10',4:'× and ÷ facts up to 12',5:'× and ÷ facts up to 12',6:'× and ÷ facts and perfect squares'};
 function factProblem(g,force){
-g=+g;var ops={1:['+','-'],2:['+','-'],3:['x','/'],4:['x','/'],5:['x','/'],6:['x','/','x','sq']}[g]||['+'],op=force||pick(ops),x,y,a,qs;
+g=+g;var ops={1:['+','-'],2:['+','-'],3:['x','/'],4:['x','/'],5:['x','/'],6:['x','/','x','sq']}[g]||['+'],op=force||focusOp(ops)||pick(ops),x,y,a,qs;
 if(op==='+'){var L=g===1?10:20;do{x=rnd(0,L);y=rnd(0,L-x);}while(x+y<2);a=x+y;qs=x+' + '+y;}
 else if(op==='-'){var L2=g===1?10:20;x=rnd(2,L2);y=rnd(0,x);a=x-y;qs=x+' − '+y;}
 else if(op==='x'){var M=g===3?10:12;x=rnd(g===3?1:2,M);y=rnd(2,M);a=x*y;qs=x+' × '+y;}
@@ -489,7 +489,7 @@ listen(window,'keydown',function(e){if(!st.run)return;if(e.key==='ArrowLeft'||e.
 listen(window,'keyup',function(e){if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')keys.l=0;if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')keys.r=0;});
 listen(window,'resize',size);
 hud();
-showOv(ov,'<div class="cm-ovemoji">🍌</div><h3>Banana Grab</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>Catch the banana with the right answer — or just tap it if you know it! <b>Grab '+GOAL+' right bananas to fill the basket and win.</b> Grab a wrong one and you lose a heart.</p>','Start! ▶',start);
+showOv(ov,'<div class="cm-ovemoji">🍌</div><h3>Banana Grab</h3><p>Quick facts: <b>'+quickDesc()+'</b>.<br>Catch the banana with the right answer — or just tap it if you know it! <b>Grab '+GOAL+' right bananas to fill the basket and win.</b> Grab a wrong one and you lose a heart.</p>','Start! ▶',start);
 }
 
 /* --- Balloon Pop --- */
@@ -522,7 +522,7 @@ function start(){sky.classList.remove('cm-paused');st={run:true,time:60,score:0,
 function end(){st.run=false;T.clear();clearB();probEl.textContent='Time!';var nb=setBest('balloon'+S.grade,st.score),hard=struggled(st);if(st.score>0){confetti(sky);sfxWin();}
 showOv2(ov,(hard?'<div class="cm-ovemoji">🤔</div>':yayMochi())+'<h3>Time’s up!</h3><p>You popped <b>'+st.score+'</b> balloon'+(st.score===1?'':'s')+'.'+(nb&&st.score>0?'<br>🏆 New best for grade '+S.grade+'!':'')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],nextBtn(),['Play again',start,'alt']]:[nextBtn(),['Play again',start,'alt']]);}
 hud();
-showOv(ov,'<div class="cm-ovemoji">🎈</div><h3>Balloon Pop</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>You have 60 seconds. Pop as many right-answer balloons as you can!</p>','Start! ▶',start);
+showOv(ov,'<div class="cm-ovemoji">🎈</div><h3>Balloon Pop</h3><p>Quick facts: <b>'+quickDesc()+'</b>.<br>You have 60 seconds. Pop as many right-answer balloons as you can!</p>','Start! ▶',start);
 }
 
 /* --- Jungle Race --- */
@@ -547,7 +547,7 @@ function start(){st={run:true,me:0,bot:0,right:0,wrong:0,streak:0};place();hud()
 function win(){st.run=false;T.clear();addBananas(5);sfxWin();confetti(track);showOv2(ov,yayMochi()+'<h3>You won!</h3><p>You beat the parrot! <b>+5 bananas</b> 🍌</p>',[nextBtn(),['Race again',start,'alt']]);}
 function lose(){st.run=false;T.clear();addBananas(1);var hard=st.wrong>=3;showOv2(ov,'<div class="cm-ovemoji">🦜</div><h3>So close!</h3><p>The parrot won this time. You got <b>'+st.right+'</b> right. Here’s <b>+1 banana</b> for trying!'+(hard&&st.miss?'<br>Want a quick lesson first?':'')+'</p>',hard&&st.miss?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Race again ▶');}],nextBtn(),['Race again',start,'alt']]:[nextBtn(),['Race again',start,'alt']]);}
 place();hud();ans.innerHTML='';
-showOv(ov,'<div class="cm-ovemoji">🏁</div><h3>Jungle Race</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>Answer '+need+' facts before the parrot reaches the finish line!</p>','Ready, set, GO!',start);
+showOv(ov,'<div class="cm-ovemoji">🏁</div><h3>Jungle Race</h3><p>Quick facts: <b>'+quickDesc()+'</b>.<br>Answer '+need+' facts before the parrot reaches the finish line!</p>','Ready, set, GO!',start);
 }
 
 /* --- Coconut Match --- */
@@ -604,7 +604,7 @@ st.run=false;T.clear();addBananas(3);sfxWin();confetti(area);var nb=setBest('fee
 showOv2(ov,yayMochi()+'<h3>Everyone’s full!</h3><p>You fed '+GOAL+' monkeys in <b>'+st.t+' seconds</b>. <b>+3 bonus bananas</b> 🍌'+(nb?'<br>🏆 Fastest time for grade '+S.grade+'!':'<br>Best: '+S.best['feed'+S.grade]+'s')+(hard?'<br>Want a quick lesson on <b>'+st.miss.q+'</b>?':'')+'</p>',hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}],nextBtn(),['Play again',start,'alt']]:[nextBtn(),['Play again',start,'alt']]);
 }
 hud();
-showOv(ov,'<div class="cm-ovemoji">🐵</div><h3>Feed the Monkeys</h3><p>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.<br>Each hungry monkey is holding a problem. Give it the banana with the right answer! Feed '+GOAL+' monkeys as fast as you can.</p>','Start! ▶',start);
+showOv(ov,'<div class="cm-ovemoji">🐵</div><h3>Feed the Monkeys</h3><p>Quick facts: <b>'+quickDesc()+'</b>.<br>Each hungry monkey is holding a problem. Give it the banana with the right answer! Feed '+GOAL+' monkeys as fast as you can.</p>','Start! ▶',start);
 }
 var KG_FN={banana:gBanana,balloon:gBalloon,race:gRace,feed:gFeed};
 
@@ -2040,7 +2040,7 @@ showOv2(ov,yayMochi()+'<h3>'+A.winT+'</h3><p>'+A.winP+' You earned <b>'+st.ban+'
 (hard?[['🐒 Show me how!',function(){factCoach(ov,st.miss,start,'Play again ▶');}]]:[]).concat([nextBtn(),['Play again',start,'alt']]));
 }
 hud();
-showOv(ov,'<div class="cm-ovemoji">'+A.icon+'</div><h3>'+A.game+'</h3><p>'+A.intro+'<br>Quick facts: <b>'+QUICK_DESC[S.grade]+'</b>.</p>','Start! ▶',start);
+showOv(ov,'<div class="cm-ovemoji">'+A.icon+'</div><h3>'+A.game+'</h3><p>'+A.intro+'<br>Quick facts: <b>'+quickDesc()+'</b>.</p>','Start! ▶',start);
 }
 function vAdv(id){
 var sc=SCENES.filter(function(s){return s.id===id;})[0];if(!sc||!ADV[id])return go('kids/monkey');
@@ -2370,8 +2370,12 @@ if(id.indexOf('fun-')===0)return vFun(id.slice(4));
 if(id.indexOf('adv-')===0)return go('kids/fun-'+id.slice(4));
 CUR_GAME=id;GAME_BAN0=S.bananas;
 var think=THINK[id],mx=mxById(id);if(!KG_FN[id]&&!think&&!mx)return go('kids');
-var grades=think?think.grades:[1,2,3,4,5,6],cur=grades.indexOf(+S.grade)>-1?+S.grade:grades[0];
-view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Back to the Kids Jungle</a><label style="font-weight:800">Grade <select class="cm-gsel">'+grades.map(function(n){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label></div><div class="cm-game" id="cm-g"></div>';
+var grades=think?think.grades:[1,2,3,4,5,6];
+if(onLanding()&&PAGE.grades.length){var pg=grades.filter(function(n){return PAGE.grades.indexOf(n)>-1;});if(pg.length)grades=pg;}
+var cur=grades.indexOf(+S.grade)>-1?+S.grade:grades[0];
+if(onLanding()&&PAGE.grades.length&&cur!==+S.grade){S.grade=cur;store.set('grade',cur);}
+var fo=focusOp(),focus=fo?'<span class="cm-focus">Practicing '+FOCUS_LBL[fo]+'</span>':'';
+view.innerHTML='<div class="cm-crumbs"><a href="#cm/kids" data-go="kids">← Back to the Kids Jungle</a>'+focus+'<label style="font-weight:800">Grade <select class="cm-gsel">'+grades.map(function(n){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label></div><div class="cm-game" id="cm-g"></div>';
 view.querySelector('.cm-gsel').onchange=function(){S.grade=+this.value;store.set('grade',S.grade);render();};
 if(think)gThink(view.querySelector('#cm-g'),id);else if(mx)gAdv(view.querySelector('#cm-g'),mx.th);else KG_FN[id](view.querySelector('#cm-g'));
 }
@@ -2506,6 +2510,14 @@ LG_FN[id](view.querySelector('#cm-g'));
 
 /* ================= ROUTER ================= */
 var firstRender=true;
+/* landing pages (e.g. /kids-math-games/4th-grade/) can preset a grade, and focus the opening game on one operation */
+var PAGE={start:root.getAttribute('data-start')||'home',op:root.getAttribute('data-op')||'',grade:+root.getAttribute('data-grade')||0,
+grades:(root.getAttribute('data-grades')||'').split(',').filter(Boolean).map(Number)};
+var FOCUS_LBL={'+':'➕ addition facts','-':'➖ subtraction facts','x':'✖️ multiplication facts','/':'➗ division facts'};
+if(PAGE.grade&&PAGE.grade>=1&&PAGE.grade<=6){S.grade=PAGE.grade;store.set('grade',S.grade);}
+function quickDesc(){var f=focusOp();return f?FOCUS_LBL[f].replace(/^\S+ /,'')+' only':QUICK_DESC[S.grade];}
+function onLanding(){return route()===PAGE.start;}
+function focusOp(ops){if(!PAGE.op||!onLanding())return null;if(!ops)ops={1:['+','-'],2:['+','-']}[+S.grade]||['x','/'];return ops.indexOf(PAGE.op)>-1?PAGE.op:null;}
 var memRoute=null;
 function route(){var h='';try{h=location.hash||'';}catch(e){}if(h.indexOf('#cm/')===0&&!memRoute)return decodeURIComponent(h.slice(4));if(memRoute)return memRoute;return root.getAttribute('data-start')||'home';}
 function go(r){if(route()===r){render();return;}var ok=false;if(!memRoute){try{history.pushState(null,'','#cm/'+r);ok=(location.hash==='#cm/'+r||decodeURIComponent(location.hash)==='#cm/'+r);}catch(e){}if(!ok){try{location.hash='cm/'+r;if(decodeURIComponent(location.hash)==='#cm/'+r)return;}catch(e){}}}if(!ok)memRoute=r;render();}
