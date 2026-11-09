@@ -206,7 +206,7 @@ for pg in LP.L:
     os.makedirs(d, exist_ok=True)
     open(os.path.join(d, 'index.html'), 'w').write(landing(pg))
 today = datetime.date.today().isoformat()
-urls = [p['path'] for p in PAGES] + [p['path'] for p in LP.L] + ['/contact/', '/privacy/', '/highway-hitch/support/', '/highway-hitch/privacy/']
+urls = [p['path'] for p in PAGES] + [p['path'] for p in LP.L] + ['/contact/', '/privacy/', '/highway-hitch/', '/highway-hitch/support/', '/highway-hitch/privacy/']
 open(os.path.join(ROOT,'sitemap.xml'),'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'  <url><loc>{SITE}{u}</loc><lastmod>{today}</lastmod></url>\n' for u in urls) + '</urlset>\n')
 open(os.path.join(ROOT,'robots.txt'),'w').write(f'User-agent: *\nAllow: /\nDisallow: /tools/\n\nSitemap: {SITE}/sitemap.xml\n')
 print('built', len(PAGES), 'pages +', len(LP.L), 'grade/skill pages')
