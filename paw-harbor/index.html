@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paw Harbor: Rescue — A Cozy Pet Rescue Puzzle Game for iPhone</title>
+<meta name="description" content="Paw Harbor: Rescue is a cozy puzzle game for kids and families. Tap boats in the right order to clear a jammed harbor, rescue pets stranded by a storm, then care for Snowball the bunny. 500 levels, no ads, no in-app purchases, plays offline.">
+<link rel="canonical" href="https://www.calcmonkey.com/paw-harbor/">
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="icon" href="/assets/calcmonkey-app-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="theme-color" content="#2f6f9f">
+<meta property="og:title" content="Paw Harbor: Rescue — clear the harbor, rescue the pets">
+<meta property="og:description" content="A cozy boat puzzle game for kids and families: 500 levels, a bunny named Snowball to care for, and no ads or in-app purchases.">
+<meta property="og:image" content="https://www.calcmonkey.com/assets/social-share.jpg">
+<meta property="og:url" content="https://www.calcmonkey.com/paw-harbor/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"MobileApplication","name":"Paw Harbor: Rescue","operatingSystem":"iOS","applicationCategory":"GameApplication","description":"A cozy puzzle game for kids and families: tap boats in the right order to clear a jammed harbor and rescue pets stranded by a storm, then care for and decorate your rescued pet's room. 500 levels, no ads, no in-app purchases.","author":{"@type":"Organization","name":"Calc Monkey LLC","url":"https://www.calcmonkey.com/"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "3e894d27e1da44148ed0e715fde9fe50"}'></script><!-- End Cloudflare Web Analytics -->
+<style>
+:root{--sea:#2f6f9f;--sea-d:#1d4f78;--sky:#dff1fb;--foam:#f4fbff;--cream:#fff8ee;--sand:#ffe9cc;--coral:#ff7a6b;--sun:#ffc94a;--pink:#ffb3c7;--mint:#8fd8c2;--ink:#1d2b3a;--muted:#5a6a7a;--line:#d9e7f1}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.round{font-family:'Fredoka','Inter',sans-serif;font-weight:600;letter-spacing:-.005em}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral)}
+h2.round{font-size:clamp(32px,4.4vw,48px);line-height:1.1;margin-top:8px}
+.lead{font-size:18px;color:var(--muted);max-width:600px;margin-top:14px}
+
+/* top bar */
+.bar{display:flex;justify-content:space-between;align-items:center;padding-top:18px;padding-bottom:18px;gap:10px}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;color:var(--sea-d);background:rgba(255,255,255,.7);border:1px solid var(--line);padding:7px 14px;border-radius:999px}
+.bar a:hover{background:#fff}
+
+/* hero */
+.hero{background:linear-gradient(180deg,#cfeaf9 0%,var(--sky) 55%,var(--foam) 100%);position:relative;overflow:hidden}
+.hero .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center;padding-top:26px;padding-bottom:40px}
+.title{font-family:'Fredoka',sans-serif;font-weight:700;font-size:clamp(54px,8vw,92px);line-height:.95;color:var(--sea-d)}
+.title span{display:block;font-size:.5em;color:var(--coral);margin-top:6px;letter-spacing:.02em}
+.hero h1{font-family:'Fredoka',sans-serif;font-weight:500;font-size:clamp(22px,2.6vw,28px);line-height:1.3;margin-top:22px;max-width:540px;color:var(--ink)}
+.hero .lead{margin-top:12px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:16px;padding:14px 22px;border-radius:16px;transition:transform .15s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn.main{background:var(--sea-d);color:#fff}
+.btn.soft{background:#fff;color:var(--sea-d);border:1px solid var(--line)}
+.store small{display:block;font-size:11px;font-weight:600;letter-spacing:.05em;opacity:.85;line-height:1.1}
+.store span{line-height:1.15;text-align:left}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:14px;font-weight:500;color:var(--ink)}
+.scene{width:100%;max-width:520px;justify-self:center;filter:drop-shadow(0 20px 40px rgba(29,79,120,.18))}
+.waves{display:block;width:100%;height:60px;margin-top:-1px}
+
+/* steps */
+.steps{padding:70px 0 80px;background:var(--foam)}
+.steps .head{text-align:center}.steps .lead{margin-left:auto;margin-right:auto}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
+.s{background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;position:relative}
+.s .n{position:absolute;top:-16px;left:24px;width:34px;height:34px;border-radius:50%;background:var(--coral);color:#fff;font-family:'Fredoka',sans-serif;font-weight:700;display:flex;align-items:center;justify-content:center}
+.s .ic{font-size:40px;line-height:1;margin-top:6px}
+.s h3{font-family:'Fredoka',sans-serif;font-weight:600;font-size:23px;margin-top:12px}
+.s p{color:var(--muted);margin-top:6px}
+
+/* care */
+.care{padding:90px 0;background:var(--cream)}
+.feat{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+.bunnycard{background:linear-gradient(180deg,#fff 0%,#fff1f5 100%);border:1px solid #f6d9e2;border-radius:32px;padding:30px;text-align:center}
+.bunnycard b{display:block;font-family:'Fredoka',sans-serif;font-size:28px;font-weight:600;margin-top:10px}
+.bunnycard small{color:var(--muted);font-size:15px}
+.hearts{display:flex;justify-content:center;gap:8px;margin-top:16px;font-size:26px}
+.cgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:26px}
+.c{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 20px}
+.c .ic{font-size:26px}
+.c h3{font-family:'Fredoka',sans-serif;font-weight:600;font-size:20px;margin-top:4px}
+.c p{color:var(--muted);font-size:15px;margin-top:2px}
+
+/* rooms */
+.rooms{padding:90px 0;background:linear-gradient(180deg,var(--sand) 0%,#fff3e2 100%)}
+.rooms .head{text-align:center}.rooms .lead{margin-left:auto;margin-right:auto}
+.path{list-style:none;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:46px;position:relative}
+.path:before{content:"";position:absolute;left:10%;right:10%;top:40px;border-top:3px dashed #f0b97a}
+.m{text-align:center;position:relative}
+.m .dot{width:80px;height:80px;margin:0 auto;border-radius:50%;background:#fff;border:3px solid var(--sun);display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:0 6px 0 #f3d38d}
+.m span{display:block;font-size:12px;letter-spacing:.14em;font-weight:700;color:#c46a1c;margin-top:12px}
+.m b{display:block;font-family:'Fredoka',sans-serif;font-weight:600;font-size:19px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:50px}
+.t{background:#fff;border-radius:20px;padding:20px;border:1px solid #f1dcc0}
+.t .ic{font-size:26px}
+.t h3{font-family:'Fredoka',sans-serif;font-weight:600;font-size:20px;margin-top:4px}
+.t p{color:var(--muted);font-size:15px}
+
+/* parents */
+.parents{padding:90px 0;background:var(--sea-d);color:#fff}
+.parents .eyebrow{color:var(--sun)}
+.parents .lead{color:#cfe2f1}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+.p{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:20px;padding:20px}
+.p .ic{font-size:26px}
+.p h3{font-family:'Fredoka',sans-serif;font-weight:600;font-size:20px;margin-top:4px}
+.p p{color:#cfe2f1;font-size:15px}
+.parents .more{margin-top:28px;color:#cfe2f1}
+.parents .more a{color:#fff;font-weight:700}
+
+/* final */
+.final{text-align:center;padding:90px 0 70px;background:var(--foam)}
+.final .title{font-size:clamp(46px,7vw,76px)}
+.final .cta{justify-content:center}
+
+footer{border-top:1px solid var(--line);padding:26px 0;font-size:14px;color:var(--muted);background:var(--foam)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:space-between;align-items:center}
+footer nav{display:flex;flex-wrap:wrap;gap:8px 18px}
+footer a{color:var(--sea-d);text-decoration:none;font-weight:600}footer a:hover{text-decoration:underline}
+
+@media (max-width:900px){
+ .hero .grid{grid-template-columns:1fr;text-align:center}
+ .hero h1,.hero .lead{margin-left:auto;margin-right:auto}
+ .cta,.chips{justify-content:center}
+ .sgrid{grid-template-columns:1fr;gap:28px;max-width:520px;margin-left:auto;margin-right:auto}
+ .feat{grid-template-columns:1fr;gap:36px}
+ .copy{text-align:center}.copy .lead{margin-left:auto;margin-right:auto}
+ .cgrid{text-align:left}
+ .path{grid-template-columns:repeat(3,1fr);row-gap:28px}.path:before{display:none}
+ .tiles,.pgrid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:520px){
+ .cgrid,.tiles,.pgrid{grid-template-columns:1fr}
+ .path{grid-template-columns:repeat(2,1fr)}
+ .steps,.care,.rooms,.parents,.final{padding:60px 0}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap bar"><a href="/apps/">← Calc Monkey mobile apps</a><a href="/paw-harbor/support/">Support</a></div>
+  <div class="wrap grid">
+    <div>
+      <div class="title" role="heading" aria-level="2">Paw Harbor<span>Rescue</span></div>
+      <h1>A storm jammed the harbor, and little pets are stranded. Can you clear the way?</h1>
+      <p class="lead">A cozy puzzle game for kids and families. Tap the boats in the right order to untangle the harbor, rescue the pets, and give them a warm, happy home.</p>
+      <div class="cta">
+        <span class="btn main store" aria-label="Coming soon on the App Store"><span style="font-size:22px">📲</span><span><small>COMING SOON ON THE</small>App Store</span></span>
+        <a class="btn soft" href="#how">How to play ↓</a>
+      </div>
+      <div class="chips"><span class="chip">📱 iPhone</span><span class="chip">🧩 500 levels</span><span class="chip">🚫 No ads</span><span class="chip">🛒 No in-app purchases</span><span class="chip">✈️ Plays offline</span></div>
+    </div>
+    <svg class="scene" viewBox="0 0 520 420" role="img" aria-label="Illustration: a white bunny sitting on a dock beside colorful boats in a harbor">
+      <defs><clipPath id="card"><rect width="520" height="420" rx="36"/></clipPath><linearGradient id="skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe3f7"/><stop offset="1" stop-color="#eaf7fd"/></linearGradient></defs>
+      <g clip-path="url(#card)">
+      <rect width="520" height="420" fill="url(#skyg)"/>
+      <circle cx="430" cy="70" r="38" fill="#ffd968"/>
+      <g fill="#fff"><ellipse cx="110" cy="70" rx="46" ry="18"/><ellipse cx="145" cy="58" rx="30" ry="18"/><ellipse cx="330" cy="110" rx="36" ry="13"/><ellipse cx="356" cy="101" rx="22" ry="13"/></g>
+      <path d="M0 220 Q65 205 130 220 T260 220 T390 220 T520 220 V420 H0Z" fill="#7cc3e6"/>
+      <path d="M0 250 Q65 236 130 250 T260 250 T390 250 T520 250 V420 H0Z" fill="#5aafd9"/>
+      <!-- boats -->
+      <g transform="translate(40 196)"><path d="M0 22 H96 L84 46 H12Z" fill="#ff7a6b"/><rect x="26" y="0" width="40" height="24" rx="6" fill="#fff"/><rect x="34" y="7" width="10" height="9" rx="2" fill="#8fd0ef"/><rect x="50" y="7" width="10" height="9" rx="2" fill="#8fd0ef"/></g>
+      <g transform="translate(160 222) rotate(-6)"><path d="M0 22 H110 L96 48 H14Z" fill="#ffc94a"/><rect x="30" y="-2" width="48" height="26" rx="6" fill="#fff"/><rect x="40" y="5" width="12" height="10" rx="2" fill="#8fd0ef"/><rect x="58" y="5" width="12" height="10" rx="2" fill="#8fd0ef"/><text x="56" y="-10" font-size="22" text-anchor="middle">🐱</text></g>
+      <g transform="translate(300 206) rotate(8)"><path d="M0 22 H90 L78 44 H12Z" fill="#8fd8c2"/><path d="M44 22 V-30 L80 18Z" fill="#fff"/><path d="M44 -30 V22" stroke="#1d4f78" stroke-width="3"/></g>
+      <g transform="translate(100 270) rotate(4)"><path d="M0 22 H100 L88 46 H12Z" fill="#b59cf0"/><rect x="30" y="0" width="42" height="24" rx="6" fill="#fff"/><rect x="40" y="7" width="22" height="9" rx="2" fill="#8fd0ef"/><text x="51" y="-8" font-size="22" text-anchor="middle">🐶</text></g>
+      <g transform="translate(250 296) rotate(-4)"><path d="M0 22 H92 L80 44 H12Z" fill="#ff9fbd"/><rect x="24" y="0" width="40" height="24" rx="6" fill="#fff"/><rect x="32" y="7" width="24" height="9" rx="2" fill="#8fd0ef"/></g>
+      <!-- tap hint -->
+      <g transform="translate(222 198)"><circle r="20" fill="none" stroke="#fff" stroke-width="4" opacity=".9"/><circle r="32" fill="none" stroke="#fff" stroke-width="3" opacity=".5"/></g>
+      <!-- dock -->
+      <rect x="370" y="270" width="150" height="22" rx="4" fill="#c98b55"/>
+      <g fill="#a86d3c"><rect x="384" y="290" width="14" height="80"/><rect x="440" y="290" width="14" height="80"/><rect x="496" y="290" width="14" height="80"/></g>
+      <!-- bunny (Snowball) -->
+      <g transform="translate(440 210)">
+        <ellipse cx="-14" cy="-40" rx="11" ry="34" fill="#fff" stroke="#e6ecf2" stroke-width="2" transform="rotate(-10 -14 -40)"/>
+        <ellipse cx="-14" cy="-40" rx="5" ry="24" fill="#ffc2d1" transform="rotate(-10 -14 -40)"/>
+        <ellipse cx="16" cy="-40" rx="11" ry="34" fill="#fff" stroke="#e6ecf2" stroke-width="2" transform="rotate(12 16 -40)"/>
+        <ellipse cx="16" cy="-40" rx="5" ry="24" fill="#ffc2d1" transform="rotate(12 16 -40)"/>
+        <ellipse cx="0" cy="44" rx="40" ry="20" fill="#fff" stroke="#e6ecf2" stroke-width="2"/>
+        <circle cx="0" cy="14" r="34" fill="#fff" stroke="#e6ecf2" stroke-width="2"/>
+        <circle cx="-12" cy="10" r="4.5" fill="#1d2b3a"/><circle cx="12" cy="10" r="4.5" fill="#1d2b3a"/>
+        <circle cx="-10.5" cy="8.5" r="1.4" fill="#fff"/><circle cx="13.5" cy="8.5" r="1.4" fill="#fff"/>
+        <path d="M-4 21 L4 21 L0 26Z" fill="#ff8fa8"/>
+        <path d="M0 26 Q-5 31 -9 29 M0 26 Q5 31 9 29" stroke="#1d2b3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="-21" cy="22" rx="6" ry="4" fill="#ffd0dc"/><ellipse cx="21" cy="22" rx="6" ry="4" fill="#ffd0dc"/>
+        <text x="40" y="-30" font-size="22">💗</text>
+      </g>
+      </g>
+      <rect x="1.5" y="1.5" width="517" height="417" rx="35" fill="none" stroke="#fff" stroke-width="3"/>
+    </svg>
+  </div>
+  <svg class="waves" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 Q180 0 360 30 T720 30 T1080 30 T1440 30 V60 H0Z" fill="#f4fbff"/></svg>
+</header>
+
+<section class="steps" id="how">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">How to play</p><h2 class="round">Tap, untangle, rescue.</h2>
+    <p class="lead">Every level is a harbor full of boats pointing every which way. Find the right order and watch them sail free.</p></div>
+    <div class="sgrid">
+      <div class="s"><div class="n">1</div><div class="ic">👆</div><h3>Tap a boat</h3><p>Each boat sails off in the direction it’s facing, if the way is clear.</p></div>
+      <div class="s"><div class="n">2</div><div class="ic">⛵</div><h3>Clear the jam</h3><p>Think a step ahead. Pick the right boat first and the whole harbor opens up.</p></div>
+      <div class="s"><div class="n">3</div><div class="ic">🐾</div><h3>Rescue the pets</h3><p>Every cleared level helps the stranded pets and earns coins for their care.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="care">
+  <div class="wrap feat">
+    <div class="bunnycard">
+      <svg viewBox="-60 -90 120 160" width="170" height="226" style="margin:0 auto" aria-hidden="true">
+        <ellipse cx="-16" cy="-44" rx="12" ry="38" fill="#fff" stroke="#e6ecf2" stroke-width="2" transform="rotate(-10 -16 -44)"/>
+        <ellipse cx="-16" cy="-44" rx="5.5" ry="27" fill="#ffc2d1" transform="rotate(-10 -16 -44)"/>
+        <ellipse cx="18" cy="-44" rx="12" ry="38" fill="#fff" stroke="#e6ecf2" stroke-width="2" transform="rotate(12 18 -44)"/>
+        <ellipse cx="18" cy="-44" rx="5.5" ry="27" fill="#ffc2d1" transform="rotate(12 18 -44)"/>
+        <ellipse cx="0" cy="48" rx="44" ry="22" fill="#fff" stroke="#e6ecf2" stroke-width="2"/>
+        <circle cx="0" cy="14" r="38" fill="#fff" stroke="#e6ecf2" stroke-width="2"/>
+        <circle cx="-13" cy="10" r="5" fill="#1d2b3a"/><circle cx="13" cy="10" r="5" fill="#1d2b3a"/>
+        <circle cx="-11.5" cy="8.3" r="1.6" fill="#fff"/><circle cx="14.5" cy="8.3" r="1.6" fill="#fff"/>
+        <path d="M-4.5 22 L4.5 22 L0 27.5Z" fill="#ff8fa8"/>
+        <path d="M0 27.5 Q-5.5 33 -10 31 M0 27.5 Q5.5 33 10 31" stroke="#1d2b3a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="-24" cy="23" rx="7" ry="4.5" fill="#ffd0dc"/><ellipse cx="24" cy="23" rx="7" ry="4.5" fill="#ffd0dc"/>
+      </svg>
+      <b>Meet Snowball</b>
+      <small>Your first rescued pet: a fluffy white bunny</small>
+      <div class="hearts" aria-label="Five daily care hearts">💗💗💗💗💗</div>
+      <small>Five care hearts to earn every day</small>
+    </div>
+    <div class="copy">
+      <p class="eyebrow">Pet care</p>
+      <h2 class="round">Coins from every level go to your pet.</h2>
+      <p class="lead">Spend the coins you earn looking after Snowball. Take care of your pet every day to earn all five daily care hearts, and unlock more pets and items as you play.</p>
+      <div class="cgrid">
+        <div class="c"><div class="ic">🛁</div><h3>Bath time</h3><p>Shampoo, rinse and brush until Snowball is fluffy.</p></div>
+        <div class="c"><div class="ic">🥕</div><h3>Treats</h3><p>A tasty snack for a job well done.</p></div>
+        <div class="c"><div class="ic">💤</div><h3>Naps</h3><p>Tuck your pet in for a cozy rest.</p></div>
+        <div class="c"><div class="ic">🎀</div><h3>Outfits &amp; hats</h3><p>Dress up your pet in something cute.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="rooms">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">Decorate</p><h2 class="round">Make a room they’ll love.</h2>
+    <p class="lead">Pick furniture, wallpaper and floors, then add beds, blankets and cuddly toys. New room themes unlock as you play through 500 levels.</p></div>
+    <ol class="path">
+      <li class="m"><div class="dot">🏠</div><span>LEVEL 1</span><b>First room</b></li>
+      <li class="m"><div class="dot">🌟</div><span>LEVEL 50</span><b>New theme</b></li>
+      <li class="m"><div class="dot">🌈</div><span>LEVEL 100</span><b>New theme</b></li>
+      <li class="m"><div class="dot">🌙</div><span>LEVEL 200</span><b>New theme</b></li>
+      <li class="m"><div class="dot">👑</div><span>LEVEL 300</span><b>New theme</b></li>
+    </ol>
+    <div class="tiles">
+      <div class="t"><div class="ic">🛏️</div><h3>Beds &amp; blankets</h3><p>Soft places to snuggle after a long day.</p></div>
+      <div class="t"><div class="ic">🧸</div><h3>Cuddly toys</h3><p>Friends for your pet to cuddle and play with.</p></div>
+      <div class="t"><div class="ic">🪴</div><h3>Furniture, walls &amp; floors</h3><p>Mix and match to make the room your own.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="parents" id="parents">
+  <div class="wrap">
+    <p class="eyebrow">For parents</p>
+    <h2 class="round">Made to be calm, safe and simple.</h2>
+    <p class="lead">Paw Harbor: Rescue is made for kids and families. There’s nothing to buy and nothing to sign up for.</p>
+    <div class="pgrid">
+      <div class="p"><div class="ic">🚫</div><h3>No ads</h3><p>No ads interrupt play.</p></div>
+      <div class="p"><div class="ic">🛒</div><h3>No in-app purchases</h3><p>Coins are earned by playing, never bought.</p></div>
+      <div class="p"><div class="ic">🔒</div><h3>No accounts or tracking</h3><p>No sign-in, no analytics, and no data leaves the phone.</p></div>
+      <div class="p"><div class="ic">✈️</div><h3>Plays offline</h3><p>No internet connection needed. Great for car rides and flights.</p></div>
+      <div class="p"><div class="ic">📱</div><h3>Saved on the device</h3><p>Coins, levels, pets and rooms are saved only on your iPhone.</p></div>
+      <div class="p"><div class="ic">🧩</div><h3>Gentle challenge</h3><p>500 thoughtful puzzles that reward planning ahead.</p></div>
+    </div>
+    <p class="more">Read the full <a href="/paw-harbor/privacy/">privacy policy</a> or visit <a href="/paw-harbor/support/">support</a>.</p>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <div class="title" role="heading" aria-level="2">Paw Harbor<span>Rescue</span></div>
+    <p class="lead" style="margin:16px auto 0">The pets are waiting. Coming soon to iPhone.</p>
+    <div class="cta">
+      <span class="btn main store" aria-label="Coming soon on the App Store"><span style="font-size:22px">📲</span><span><small>COMING SOON ON THE</small>App Store</span></span>
+      <a class="btn soft" href="mailto:info@calcmonkey.com?subject=Tell%20me%20when%20Paw%20Harbor%20launches">✉️ Tell me when it launches</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Calc Monkey LLC · Games &amp; mobile apps</span>
+    <nav><a href="/paw-harbor/support/">Support</a><a href="/paw-harbor/privacy/">Privacy</a><a href="/apps/">Mobile apps</a><a href="/contact/">Contact</a></nav>
+  </div>
+</footer>
+</body>
+</html>
